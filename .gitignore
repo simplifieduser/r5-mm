@@ -1,0 +1,14 @@
+# Build target
+r5mm
+dist
+
+# Python dir
+.venv
+.pytest_cache
+__pycache__
+test/__pycache__
+test/.pytest_cache
+
+# IDE config dir
+.vscode
+.idea
