@@ -15,34 +15,41 @@ endif
 #                     #
 
 # Target name
-TARGET = r5mm
+TARGET := r5mm
 
 # Directory paths
-LIB = $(SYSTEMC_HOME)
-SRC = ./src
-DIST = ./dist
+LIB := $(SYSTEMC_HOME)
+SRC := ./src
+DIST := ./dist
 
+# Source file paths
+C_SRC := main.c test.c
+CPP_SRC := modules.cpp
 
 #               #
 # Env variables #
 #               #
 
-# Source file settings
+# Source file convertion
 
-C_SRC = main.c
-CPP_SRC = modules.cpp
+C_OBJ := $(foreach wrd,$(C_SRC),$(DIST)/$(wrd))
+CPP_OBJ := $(foreach wrd,$(CPP_SRC),$(DIST)/$(wrd))
 
-C_OBJ = $(C_SRC:.c=.o)
-CPP_OBJ = $(CPP_SRC:.cpp=.o)
+C_SRC := $(foreach wrd,$(C_SRC),$(SRC)/$(wrd))
+CPP_SRC := $(foreach wrd,$(CPP_SRC),$(SRC)/$(wrd))
+
+C_OBJ := $(C_OBJ:.c=.o)
+CPP_OBJ := $(CPP_OBJ:.cpp=.o)
+
 
 # Compiler settings
 
-CX = clang
-CXFLAGS = -std=c17
+CC := clang
+CFLAGS := -std=c17
 
-CXX = clang++
-CXXFLAGS_OBJ = -std=c++14 -I$(LIB)/include
-CXXFLAGS_LINK = -std=c++14 -I$(LIB)/include -L$(LIB)/lib -lsystemc
+CXX := clang++
+CXXFLAGS := -std=c++14 -I$(LIB)/include
+LDFLAGS := -I$(LIB)/include -L$(LIB)/lib -lsystemc
 
 
 #         #
@@ -55,15 +62,15 @@ CXXFLAGS_LINK = -std=c++14 -I$(LIB)/include -L$(LIB)/lib -lsystemc
 all: debug
 
 # Debug target
-debug: CXFLAGS += -g -v
-debug: CXXFLAGS_OBJ += -g -v
-debug: CXXFLAGS_LINK += -g -v
+debug: CCFLAGS += -g
+debug: CXXFLAGS += -g
+debug: LDFLAGS += -g
 debug: $(DIST)/$(TARGET)
 
 # Release target
-release: CXFLAGS += -O2
-release: CXXFLAGS_OBJ += -O2
-release: CXXFLAGS_LINK += -O2
+release: CCFLAGS += -O2
+release: CXXFLAGS += -O2
+release: LDFLAGS += -O2
 release: $(DIST)/$(TARGET)
 
 # Test target
@@ -86,14 +93,14 @@ $(DIST):
 
 # Compile c files
 $(DIST)/%.o: $(SRC)/%.c
-	$(CX) $(CXFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Compile cpp files
 $(DIST)/%.o: $(SRC)/%.cpp
-	$(CXX) $(CXXFLAGS_OBJ) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Link files together
-$(DIST)/$(TARGET): $(DIST) $(DIST)/$(C_OBJ) $(DIST)/$(CPP_OBJ)
-	$(CXX) $(CXXFLAGS_LINK) $(DIST)/$(C_OBJ) $(DIST)/$(CPP_OBJ) -o $(DIST)/$(TARGET)
+$(DIST)/$(TARGET): $(DIST) $(C_OBJ) $(CPP_OBJ)
+	$(CXX) $(LDFLAGS) $(C_OBJ) $(CPP_OBJ) -o $(DIST)/$(TARGET)
 	cp $(DIST)/$(TARGET) ./$(TARGET)
 	
