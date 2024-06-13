@@ -23,7 +23,7 @@ SRC := ./src
 DIST := ./dist
 
 # Source file paths
-C_SRC := main.c test.c
+C_SRC := main.c
 CPP_SRC := modules.cpp
 
 #               #
