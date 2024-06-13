@@ -10,6 +10,7 @@ ifndef SYSTEMC_HOME
 override SYSTEMC_HOME = ../systemc
 endif
 
+
 #                     #
 # Build configuration #
 #                     #
@@ -26,6 +27,7 @@ DIST := ./dist
 C_SRC := main.c
 CPP_SRC := modules.cpp
 
+
 #               #
 # Env variables #
 #               #
@@ -40,7 +42,6 @@ CPP_SRC := $(foreach wrd,$(CPP_SRC),$(SRC)/$(wrd))
 
 C_OBJ := $(C_OBJ:.c=.o)
 CPP_OBJ := $(CPP_OBJ:.cpp=.o)
-
 
 # Compiler settings
 
