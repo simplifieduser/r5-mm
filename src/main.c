@@ -1,11 +1,12 @@
+#include <stdio.h>
 #include <stdlib.h>
+#include "file_parser.h"
 
 int main(int argc, char const *argv[])
 {
-  if (argc > 1 && atoi(argv[1]) == 0)
-  {
-    return 1;
-  }
-  
-  return 0;
+
+  unsigned count = parseFile("test.csv");
+
+  return count;
+
 }
