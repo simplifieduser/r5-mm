@@ -4,7 +4,7 @@
 #include <systemc>
 using namespace sc_core;
 
-SC_MODULE(GET_ADDRESS)
+SC_MODULE(TLB)
 {
     sc_in<bool> clk;
 
@@ -29,7 +29,7 @@ SC_MODULE(GET_ADDRESS)
     uint32_t current_tag_in_tlb;
     int latency;
 
-    SC_CTOR(GET_ADDRESS)
+    SC_CTOR(TLB)
     {
         SC_THREAD(count_latency);
         sensitive << clk.pos();
@@ -39,16 +39,18 @@ SC_MODULE(GET_ADDRESS)
     {
         while (true)
         {
+            // not actually necessary, but will let the clock run for latency cycles and then set the values for the new request
+
             set_values();
 
             int cycle_count = 0;
             while (cycle_count < latency)
             {
                 cycle_count++;
-                cycles->write(cycles->read() + 1);
                 wait();
             }
 
+            cycles->write(cycle_count);
             finished->write(true);
             wait();
         }
@@ -56,10 +58,15 @@ SC_MODULE(GET_ADDRESS)
 
     void set_values()
     {
+        // show that address has not been translated yet, because new translation process has started
         finished->write(false);
-        tag = virtual_address->read() >> (int)log2(blocksize);
-        current_tag_in_tlb = tlb->read()[(tag % tlb_size->read())];
 
+        // calculate tag of virtual address by shifting to the right by page index bits
+        // TODO: figure out how to calculate tag (what exactly does blocksize mean)
+        tag = virtual_address->read() >> (int)log2(blocksize);
+        current_tag_in_tlb = tlb->read().at((tag % tlb_size->read()));
+
+        // check if our tag is currently cached in the tlb
         if (tag == current_tag_in_tlb)
         {
             latency = tlbs_latency->read();
@@ -75,4 +82,16 @@ SC_MODULE(GET_ADDRESS)
     }
 };
 
+SC_MODULE(MAIN_MEMORY)
+{
+    sc_in<bool> clk;
+    sc_in<bool> we;
+    sc_in<uint32_t> data;
+    sc_in<uint32_t> address;
+    sc_in<unsigned> memory_latency;
+    // missing: memory map bzw. access to main memory
+
+    sc_out<bool> finished;
+    sc_out<uint32_t> data;
+};
 #endif
