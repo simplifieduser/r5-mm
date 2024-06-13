@@ -5,16 +5,13 @@
 #include <errno.h>
 #include "messages.h"
 
-void print(const char* msg){
-    printf("%s\n", msg);
-}
 int main(int argc, char*argv[]) {
-    int cycles;
-    unsigned int tlbSize;
-    unsigned int tlbLatency;
-    unsigned int blocksize;
-    unsigned int v2bBlockOffset;
-    unsigned int memoryLatency;
+    int cycles = 10;
+    unsigned int tlbSize = 4;
+    unsigned int tlbLatency = 1;
+    unsigned int blocksize = 4;
+    unsigned int v2bBlockOffset = 5;
+    unsigned int memoryLatency = 120;
     const char* tracefile = NULL;
     const char* inputfile;
 
@@ -27,60 +24,125 @@ int main(int argc, char*argv[]) {
             {"tlb-size",optional_argument,0,'s'},
             {"tlb-latency", optional_argument,0,'t'},
             {"memory-latency", optional_argument,0,'m'},
-            {"tf=",required_argument,0,'f'},
+            {"tf=",optional_argument,0,'f'},
             {"help", no_argument,0,'h'},
             {0,0,0,0}
     };
+    opterr = 0;
+    //Durchsucht die übergebenen Optionen ob sie -h oder --help beinhalten
+    for (int i = 1; i < argc; i++) {
+        if (strncmp(argv[i], "-h",2) == 0 || strncmp(argv[i], "--help",6) == 0) {
+            fprintf(stderr,"%s\n",HELP_MSG);
+            exit(EXIT_SUCCESS);
+        }
+    }
 
     while ((opt = getopt_long(argc, argv, "c::b::o::s::t::m::f:h", long_options, &optional_index))!= -1){
+        if (opt == '?') {
+            // Unrecognized option or missing option argument
+            if (optopt) {
+                fprintf(stderr, UNKNOWN_OPTION "'-%c'.\n", optopt);
+            } else {
+                fprintf(stderr, UNKNOWN_OPTION "'%s'.\n", argv[optind - 1]);
+            }
+            //TODO print responing error
+            exit(EXIT_FAILURE);
+        }
         switch (opt){
             case 'c':
-                if(optarg) {
+                if (optarg) {
                     char *endOfPointer;
                     errno = 0;
                     long tmp = strtol(optarg,&endOfPointer,10);
                     if(errno != 0|| *endOfPointer != '\0'|| tmp > INT32_MAX || tmp<0){
-                        print(passing_error_cycles);
+                        fprintf(stderr,"%s\n",illegal_argument_cycles);
                         exit(EXIT_FAILURE);
+                    } else {
+                        cycles = (int) tmp;
                     }
-                    cycles = (int) tmp;
-                    printf("this was passed for cycle: %i\n",cycles);
                 }
                 break;
-                //TODO apparently when there is a blank between -c 12 file, then 12 is not recognized
             case 'b':{
-                if(optarg) {
+                if (optarg) {
                     char *endOfPointer;
                     errno = 0;
                     long tmp = strtol(optarg,&endOfPointer,10);
-                    if(errno != 0|| *endOfPointer != '\0'|| tmp > UINT32_MAX || tmp<=0){
-                        print(passing_error_blocksize);
+                    if(errno != 0|| *endOfPointer != '\0'|| tmp > UINT32_MAX || tmp<0){
+                        fprintf(stderr,"%s\n",illegal_argument_blocksize);
                         exit(EXIT_FAILURE);
+                    } else {
+                        blocksize = (unsigned) tmp;
                     }
-                    blocksize = (unsigned) tmp;
-                    printf("this was passed for cycle: %i\n",blocksize);
                 }
+                break;
             }
             case 'o':{
-
+                if (optarg) {
+                    char *endOfPointer;
+                    errno = 0;
+                    long tmp = strtol(optarg,&endOfPointer,10);
+                    if(errno != 0|| *endOfPointer != '\0'|| tmp > UINT32_MAX || tmp<0){
+                        fprintf(stderr,"%s\n",illegal_argument_blocksize);
+                        exit(EXIT_FAILURE);
+                    } else {
+                        v2bBlockOffset = (unsigned) tmp;
+                    }
+                }
+                break;
             }
             case 's':{
-
+                if (optarg) {
+                    char *endOfPointer;
+                    errno = 0;
+                    long tmp = strtol(optarg,&endOfPointer,10);
+                    if(errno != 0|| *endOfPointer != '\0'|| tmp > UINT32_MAX || tmp<0){
+                        fprintf(stderr,"%s\n",illegal_argument_blocksize);
+                        exit(EXIT_FAILURE);
+                    } else {
+                        tlbSize = (unsigned) tmp;
+                    }
+                }
+                break;
             }
             case 't':{
-
+                if (optarg) {
+                    char *endOfPointer;
+                    errno = 0;
+                    long tmp = strtol(optarg,&endOfPointer,10);
+                    if(errno != 0|| *endOfPointer != '\0'|| tmp > UINT32_MAX || tmp<0){
+                        fprintf(stderr,"%s\n",illegal_argument_blocksize);
+                        exit(EXIT_FAILURE);
+                    } else {
+                        tlbLatency = (unsigned) tmp;
+                    }
+                }
+                break;
             }
             case 'm':{
-
+                if (optarg) {
+                    char *endOfPointer;
+                    errno = 0;
+                    long tmp = strtol(optarg,&endOfPointer,10);
+                    if(errno != 0|| *endOfPointer != '\0'|| tmp > UINT32_MAX || tmp<0){
+                        fprintf(stderr,"%s\n",illegal_argument_blocksize);
+                        exit(EXIT_FAILURE);
+                    } else {
+                        memoryLatency = (unsigned) tmp;
+                    }
+                }
+                break;
             }
             case 'f':{
-
+                if (optarg) {
+                    tracefile = optarg;
+                }
+                break;
             }
             case 'h':
-                print(help_msg);
+                fprintf(stderr,"%s\n",HELP_MSG);
                 exit(EXIT_SUCCESS);
             default:
-                print(usage_msg);
+                fprintf(stderr,"%s\n",usage_msg);
                 exit(EXIT_FAILURE);
         }
     }
@@ -88,16 +150,25 @@ int main(int argc, char*argv[]) {
 
     if(optind <argc) {
         inputfile = argv[optind];
+        printf("This is the file %s\n",inputfile);
         //I don't guarantee that it is a file
     } else {
-        print(no_file_input);
+        fprintf(stderr,"%s\n",no_file_input);
         exit(EXIT_FAILURE);
     }
     if(optind <argc - 1) {
-        print(usage_msg_too_many_arguments);
+        fprintf(stderr,"%s\n",usage_msg_too_many_arguments);
         exit(EXIT_FAILURE);
     }
 
-    print(successful);
+    fprintf(stderr,"cycles: %i, tlbSize: %u, tlbLatency: %u, blocksize: %u, v2b: %u, memoryLatency: %u, tracefileLocation: %s, Inputfilename: %s",cycles,tlbSize,tlbLatency,blocksize,v2bBlockOffset,memoryLatency,tracefile,inputfile);
+
+    fprintf(stderr,"%s\n",successful);
     return 0;
 }
+
+//TODO errors are currently wrong given so wirte errors for every one and set them correctly then lets go....
+/* TODO
+ *./r5mm --blocksize="3" --blocksize=5 -help name; führt dazu, dass help ausgerufen wird, da -h option verohanden ist und sein Argument elp wäre, ok so eigentlich ja.
+ *Theoretisch ist iom optarg :h unnötig, da nach -h, --help gesucht wird davor
+ * */
