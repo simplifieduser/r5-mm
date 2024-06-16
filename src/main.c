@@ -5,8 +5,8 @@
 int main(int argc, char const *argv[])
 {
 
-  unsigned count = parseFile("test.csv");
+  parseFile("test.csv");
 
-  return count;
+  return 0;
 
 }
