@@ -52,10 +52,10 @@ int parseFile(const char* path) {
 
 int getRWArg(FILE *file) {
 
-  char modeChar = fgetc(file);
+  int modeChar = fgetc(file);
   if (feof(file)) return -1;
 
-  char sepChar = fgetc(file);
+  int sepChar = fgetc(file);
   if (feof(file) || sepChar != ',') return -2;
 
   if (modeChar == 'r' || modeChar == 'R') {
@@ -83,11 +83,11 @@ int getLineCount(const char* path) {
 
   // Count lines
   int counter = 0;
-  char last = '\n';
+  int last = '\n';
 
   while (1) {
 
-    char c = fgetc(file);
+    int c = fgetc(file);
     if (feof(file)) break;
     if (c == '\n') counter++;
     last = c;
