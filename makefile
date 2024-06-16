@@ -24,7 +24,7 @@ SRC := ./src
 DIST := ./dist
 
 # Source file paths
-C_SRC := main.c
+C_SRC := main.c file_parser.c
 CPP_SRC := modules.cpp
 
 
