@@ -1,7 +1,7 @@
 #ifndef FILE_PARSER_H
 #define FILE_PARSER_H
 
-#include <stdlib.h>
+#include <stdint.h>
 
 struct Request
 {
