@@ -2,6 +2,7 @@
 #define MODULES_HPP
 
 #include <systemc>
+#include <map>
 using namespace sc_core;
 
 SC_MODULE(TLB)
@@ -78,7 +79,7 @@ SC_MODULE(TLB)
             hit->write(false);
         }
 
-        physical_address->write(((tag + v2b_block_offset->read()) << (int)log2(blocksize)) + virtual_address->read() % (int)log2(blocksize));
+        physical_address->write(((tag + v2b_block_offset->read()) << (int)log2(blocksize)) + (virtual_address->read() % (int)log2(blocksize)));
     }
 };
 
@@ -90,8 +91,68 @@ SC_MODULE(MAIN_MEMORY)
     sc_in<uint32_t> address;
     sc_in<unsigned> memory_latency;
     // missing: memory map bzw. access to main memory
+    sc_in<std::map<uint32_t, uint32_t>> memory_map;
 
     sc_out<bool> finished;
-    sc_out<uint32_t> data;
+    sc_out<uint32_t> out_data;
+    sc_out<std::map<uint32_t, uint32_t>> out_memory_map;
+
+    SC_CTOR(MAIN_MEMORY)
+    {
+        SC_THREAD(start_process);
+        sensitive << clk.pos();
+    }
+
+    void start_process()
+    {
+        while (true)
+        {
+            update_memory();
+            int cycle_counter = 0;
+            finished->write(false);
+
+            while (cycle_counter < memory_latency->read())
+            {
+                cycle_counter++;
+                wait();
+            }
+            finished->write(true);
+            wait();
+        }
+    }
+
+    void update_memory()
+    {
+        if (we->read() == true)
+        {
+            char data_bytes[4];
+            data_bytes[3] = data->read() & 0xFF;
+            data_bytes[2] = (data->read() >> 8) & 0xFF;
+            data_bytes[1] = (data->read() >> 16) & 0xFF;
+            data_bytes[0] = (data->read() >> 24) & 0xFF;
+
+            std::map<uint32_t, uint32_t> memory = memory_map->read();
+
+            // most significant bit stored at address
+            memory[address->read()] = data_bytes[0];
+            memory[address->read() + 1] = data_bytes[1];
+            memory[address->read() + 2] = data_bytes[2];
+            memory[address->read() + 3] = data_bytes[3];
+
+            out_memory_map->write(memory);
+        }
+        else
+        {
+            char data_bytes[4];
+            std::map<uint32_t, uint32_t> memory = memory_map->read();
+
+            data_bytes[0] = memory[address->read()];
+            data_bytes[1] = memory[address->read() + 1];
+            data_bytes[2] = memory[address->read() + 2];
+            data_bytes[3] = memory[address->read() + 3];
+
+            out_data->write((data_bytes[0] << 24) + (data_bytes[1] << 16) + (data_bytes[2] << 8) + data_bytes[3]);
+        }
+    }
 };
 #endif
