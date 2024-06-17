@@ -28,8 +28,8 @@ int main(int argc, char*argv[]) {
             {"help", no_argument,0,'h'},
             {0,0,0,0}
     };
-    opterr = 0;
-    //Durchsucht die übergebenen Optionen ob sie -h oder --help beinhalten
+    opterr = 0; //silences errors from optlog, error catching done manually
+    //searches if one of the option is -h
     for (int i = 1; i < argc; i++) {
         if (strncmp(argv[i], "-h",2) == 0 || strncmp(argv[i], "--help",6) == 0) {
             fprintf(stderr,"%s\n",HELP_MSG);
@@ -37,15 +37,14 @@ int main(int argc, char*argv[]) {
         }
     }
 
-    while ((opt = getopt_long(argc, argv, "c::b::o::s::t::m::f:h", long_options, &optional_index))!= -1){
+    while ((opt = getopt_long(argc, argv, "c::b::o::s::t::m::f:h", long_options, NULL))!= -1){
         if (opt == '?') {
             // Unrecognized option or missing option argument
             if (optopt) {
-                fprintf(stderr, UNKNOWN_OPTION "'-%c'.\n", optopt);
+                fprintf(stderr, UNKNOWN_OPTION "'-%c'.\n", optopt); //unrecognized short options
             } else {
-                fprintf(stderr, UNKNOWN_OPTION "'%s'.\n", argv[optind - 1]);
+                fprintf(stderr, UNKNOWN_OPTION "'%s'.\n", argv[optind - 1]); //unrecognized short options
             }
-            //TODO print responing error
             exit(EXIT_FAILURE);
         }
         switch (opt){
@@ -55,7 +54,7 @@ int main(int argc, char*argv[]) {
                     errno = 0;
                     long tmp = strtol(optarg,&endOfPointer,10);
                     if(errno != 0|| *endOfPointer != '\0'|| tmp > INT32_MAX || tmp<0){
-                        fprintf(stderr,"%s\n",illegal_argument_cycles);
+                        fprintf(stderr,"%s\n",ILLEGAL_ARGUMENT_CYCLES);
                         exit(EXIT_FAILURE);
                     } else {
                         cycles = (int) tmp;
@@ -67,8 +66,8 @@ int main(int argc, char*argv[]) {
                     char *endOfPointer;
                     errno = 0;
                     long tmp = strtol(optarg,&endOfPointer,10);
-                    if(errno != 0|| *endOfPointer != '\0'|| tmp > UINT32_MAX || tmp<0){
-                        fprintf(stderr,"%s\n",illegal_argument_blocksize);
+                    if(errno != 0|| *endOfPointer != '\0'|| tmp > UINT32_MAX || tmp<=0){
+                        fprintf(stderr,"%s\n",ILLEGAL_ARGUMENT_BLOCKSIZE);
                         exit(EXIT_FAILURE);
                     } else {
                         blocksize = (unsigned) tmp;
@@ -82,7 +81,7 @@ int main(int argc, char*argv[]) {
                     errno = 0;
                     long tmp = strtol(optarg,&endOfPointer,10);
                     if(errno != 0|| *endOfPointer != '\0'|| tmp > UINT32_MAX || tmp<0){
-                        fprintf(stderr,"%s\n",illegal_argument_blocksize);
+                        fprintf(stderr,"%s\n",ILLEGAL_ARGUMENT_V2B_BLOCK_OFFSET);
                         exit(EXIT_FAILURE);
                     } else {
                         v2bBlockOffset = (unsigned) tmp;
@@ -96,7 +95,7 @@ int main(int argc, char*argv[]) {
                     errno = 0;
                     long tmp = strtol(optarg,&endOfPointer,10);
                     if(errno != 0|| *endOfPointer != '\0'|| tmp > UINT32_MAX || tmp<0){
-                        fprintf(stderr,"%s\n",illegal_argument_blocksize);
+                        fprintf(stderr,"%s\n",ILLEGAL_ARGUMENT_TLB_SIZE);
                         exit(EXIT_FAILURE);
                     } else {
                         tlbSize = (unsigned) tmp;
@@ -110,7 +109,7 @@ int main(int argc, char*argv[]) {
                     errno = 0;
                     long tmp = strtol(optarg,&endOfPointer,10);
                     if(errno != 0|| *endOfPointer != '\0'|| tmp > UINT32_MAX || tmp<0){
-                        fprintf(stderr,"%s\n",illegal_argument_blocksize);
+                        fprintf(stderr,"%s\n",ILLEGAL_ARGUMENT_TLB_LATENCY);
                         exit(EXIT_FAILURE);
                     } else {
                         tlbLatency = (unsigned) tmp;
@@ -124,7 +123,7 @@ int main(int argc, char*argv[]) {
                     errno = 0;
                     long tmp = strtol(optarg,&endOfPointer,10);
                     if(errno != 0|| *endOfPointer != '\0'|| tmp > UINT32_MAX || tmp<0){
-                        fprintf(stderr,"%s\n",illegal_argument_blocksize);
+                        fprintf(stderr,"%s\n",ILLEGAL_ARGUMENT_MEMORY_LATENCY);
                         exit(EXIT_FAILURE);
                     } else {
                         memoryLatency = (unsigned) tmp;
@@ -138,11 +137,8 @@ int main(int argc, char*argv[]) {
                 }
                 break;
             }
-            case 'h':
-                fprintf(stderr,"%s\n",HELP_MSG);
-                exit(EXIT_SUCCESS);
             default:
-                fprintf(stderr,"%s\n",usage_msg);
+                fprintf(stderr,"%s\n",USAGE_MSG);
                 exit(EXIT_FAILURE);
         }
     }
@@ -153,11 +149,11 @@ int main(int argc, char*argv[]) {
         printf("This is the file %s\n",inputfile);
         //I don't guarantee that it is a file
     } else {
-        fprintf(stderr,"%s\n",no_file_input);
+        fprintf(stderr,"%s\n",NO_FILE_INPUT);
         exit(EXIT_FAILURE);
     }
     if(optind <argc - 1) {
-        fprintf(stderr,"%s\n",usage_msg_too_many_arguments);
+        fprintf(stderr,"%s\n",USAGE_TOO_MANY_ARGUMENTS);
         exit(EXIT_FAILURE);
     }
 
@@ -168,7 +164,14 @@ int main(int argc, char*argv[]) {
 }
 
 //TODO errors are currently wrong given so wirte errors for every one and set them correctly then lets go....
-/* TODO
+/* TODO fragen ob blocksize = 0 erlaubt war!!!!!!
  *./r5mm --blocksize="3" --blocksize=5 -help name; führt dazu, dass help ausgerufen wird, da -h option verohanden ist und sein Argument elp wäre, ok so eigentlich ja.
  *Theoretisch ist iom optarg :h unnötig, da nach -h, --help gesucht wird davor
  * */
+
+
+//QUESTIONS:
+// WHAT SHOULD HAPPEN WHEN I DO -c WITHOUT INPUT ERROR OR JUST USE DEFAULT
+// if tf= is not set then nothing should be created, but aufabenstellung isn#t precise what if i do --tf= and then don't give a name error?
+//--tf=<name> gibt name raus, owbwohl das = ja zum namen gehört, eigentlich muss == weil bei cycle muss auc ein = hin, can b fixed with simple ==
+//wir müssen alle requierd also wenn man die verwendet dann muss ein argumetn folgen, da sonst leer zweischen denen nicht geht
