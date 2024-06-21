@@ -4,6 +4,7 @@
 
 int getLineCount(const char* path);
 int getRWArg(FILE *file);
+int getAddressArg(FILE *file, uint32_t* res);
 
 int parseFile(const char* path) {
 
