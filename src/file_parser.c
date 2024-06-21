@@ -34,8 +34,40 @@ int parseFile(const char* path) {
     int mode = getRWArg(file);
     if (mode == 0) {
 
+        // Read address
+
+        uint32_t* address = malloc(sizeof(uint32_t));
+        if (address == NULL) {
+            // ERROR
+            printf("GENERAL: ERROR - memory allocation error\n");
+            return -1;
+        }
+
+        int status = getAddressArg(file, address);
+        if (status < 0) {
+            return -1;
+        }
+
+        printf("ADDRESS: %d\n", *address);
+
     }
     else if (mode == 1) {
+
+        // Read address
+
+        uint32_t* address = malloc(sizeof(uint32_t));
+        if (address == NULL) {
+            // ERROR
+            printf("GENERAL: ERROR - memory allocation error\n");
+            return -1;
+        }
+
+        int status = getAddressArg(file, address);
+        if (status < 0) {
+            return -1;
+        }
+
+        printf("ADDRESS: %d\n", *address);
 
     }
     else {
