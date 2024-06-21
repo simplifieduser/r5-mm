@@ -118,3 +118,57 @@ int getLineCount(const char* path) {
   return counter;
 
 }
+
+int getRWArg(FILE *file) {
+
+  // Get mode argument char
+
+  int modeChar = fgetc(file);
+
+  if (feof(file)) {
+    // PARSING ERROR: PREMATURE END OF FILE
+    printf("ARG_RW: ERROR - premature end of file\n");
+    return -1;
+  }
+  else if (modeChar == '\n') {
+    // PARSING ERROR: PREMATURE NEW LINE
+    printf("ARG_RW: ERROR - premature end of line\n");
+    return -1;
+  }
+
+  // Get cell separator char
+
+  int sepChar = fgetc(file);
+
+  if (feof(file)) {
+    // PARSING ERROR: PREMATURE END OF FILE
+    printf("ARG_RW: ERROR - premature end of file\n");
+    return -1;
+  }
+  else if (sepChar == '\n') {
+    // PARSING ERROR: PREMATURE NEW LINE
+    printf("ARG_RW: ERROR - premature end of line\n");
+    return -1;
+  }
+
+  if (sepChar != ',') {
+    // PARSING ERROR: ARGUMENT TOO LONG
+    printf("ARG_RW: ERROR - argument too long\n");
+    return -1;
+  }
+
+  // Return mode, READ=0 WRITE=1
+
+  if (modeChar == 'r' || modeChar == 'R') {
+    return 0;
+  }
+  else if (modeChar == 'w' || modeChar == 'W') {
+    return 1;
+  }
+  else {
+    // PARSING ERROR: NO VALID MODE
+    printf("ARG_RW: ERROR - %c is not a valid mode\n", (char)modeChar);
+    return -1;
+  }
+
+}
