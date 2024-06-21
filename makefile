@@ -27,12 +27,18 @@ DIST := ./dist
 C_SRC := main.c
 CPP_SRC := modules.cpp
 
+# Test source file paths
+TEST_C_SRC :=
+TEST_CPP_SRC := test.cpp
 
 #               #
 # Env variables #
 #               #
 
-# Source file convertion
+# Source file conversion
+
+TEST_C_SRC := $(foreach wrd,$(TEST_C_SRC),$(SRC)/$(wrd))
+TEST_CPP_SRC := $(foreach wrd,$(TEST_CPP_SRC),$(SRC)/$(wrd))
 
 C_OBJ := $(foreach wrd,$(C_SRC),$(DIST)/$(wrd))
 CPP_OBJ := $(foreach wrd,$(CPP_SRC),$(DIST)/$(wrd))
@@ -74,13 +80,19 @@ release: CXXFLAGS += -O2
 release: LDFLAGS += -O2
 release: $(DIST)/$(TARGET)
 
-# Test target
-test: debug
-	$(shell pytest)
+# Test targets
+test: test_c test_cpp
+
+test_c: CCFLAGS += -g
+test_c: $(DIST)/test_c
+
+test_cpp: CXXFLAGS += -g
+test_cpp: LDFLAGS += -g
+test_cpp: $(DIST)/test_cpp
 
 # Clean up
 clean:
-	rm -f ./$(TARGET)
+	rm -f ./$(TARGET) ./test_c ./test_cpp
 	rm -rf $(DIST)
 
 
@@ -104,4 +116,24 @@ $(DIST)/%.o: $(SRC)/%.cpp
 $(DIST)/$(TARGET): $(DIST) $(C_OBJ) $(CPP_OBJ)
 	$(CXX) $(LDFLAGS) $(C_OBJ) $(CPP_OBJ) -o $(DIST)/$(TARGET)
 	cp $(DIST)/$(TARGET) ./$(TARGET)
-	
+
+
+#              #
+# Test targets #
+#	           #
+
+# Compile c test files
+$(DIST)/test_c: $(TEST_C_SRC)
+ifdef TEST_C_SRC
+	mkdir -p $(DIST)
+	$(CC) $(CFLAGS) $< -o $@
+	cp $(DIST)/test_c ./test_c
+endif
+
+# Compile cpp test files
+$(DIST)/test_cpp: $(TEST_CPP_SRC)
+ifdef TEST_CPP_SRC
+	mkdir -p $(DIST)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
+	cp $(DIST)/test_cpp ./test_cpp
+endif
