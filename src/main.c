@@ -18,13 +18,13 @@ int main(int argc, char*argv[]) {
     int opt;
     int optional_index = 0;
     static struct option long_options[] = {
-            {"cycles",optional_argument,0,'c'},
-            {"blocksize",optional_argument,0,'b'},
-            {"v2b-block-offset",optional_argument,0,'o'},
-            {"tlb-size",optional_argument,0,'s'},
-            {"tlb-latency", optional_argument,0,'t'},
-            {"memory-latency", optional_argument,0,'m'},
-            {"tf=",optional_argument,0,'f'},
+            {"cycles",required_argument,0,'c'},
+            {"blocksize",required_argument,0,'b'},
+            {"v2b-block-offset",required_argument,0,'o'},
+            {"tlb-size",required_argument,0,'s'},
+            {"tlb-latency", required_argument,0,'t'},
+            {"memory-latency", required_argument,0,'m'},
+            {"tf",required_argument,0,'f'},
             {"help", no_argument,0,'h'},
             {0,0,0,0}
     };
@@ -37,15 +37,21 @@ int main(int argc, char*argv[]) {
         }
     }
 
-    while ((opt = getopt_long(argc, argv, "c::b::o::s::t::m::f:h", long_options, NULL))!= -1){
+    while ((opt = getopt_long(argc, argv, ":c:b:o:s:t:m:f:h", long_options, NULL))!= -1){ //the first : ensures that : is returned when a required argument is passed without an argument
         if (opt == '?') {
-            // Unrecognized option or missing option argument
+            // Unrecognized option or missing required argument has to be altered to show not only missing but also when no argument TODO
             if (optopt) {
                 fprintf(stderr, UNKNOWN_OPTION "'-%c'.\n", optopt); //unrecognized short options
             } else {
-                fprintf(stderr, UNKNOWN_OPTION "'%s'.\n", argv[optind - 1]); //unrecognized short options
+                fprintf(stderr, UNKNOWN_OPTION "'%s'.\n", argv[optind - 1]); //unrecognized long options
             }
             exit(EXIT_FAILURE);
+        }else if (opt == ':') {
+            // Missing required argument
+            fprintf(stderr, "Error: Option '-%s' requires an argument.\n", argv[optind - 1]);
+            exit(EXIT_FAILURE);
+
+            //TODO create switch Statement to find which one it is give out good response with short and long, cause only short is natively being detected
         }
         switch (opt){
             case 'c':
@@ -134,6 +140,7 @@ int main(int argc, char*argv[]) {
             case 'f':{
                 if (optarg) {
                     tracefile = optarg;
+
                 }
                 break;
             }
