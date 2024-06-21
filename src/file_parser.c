@@ -11,7 +11,6 @@ int parseFile(const char* path) {
   // Get line count
   int lineCount = getLineCount(path);
   if (lineCount < 0) {
-    printf("LINE ERROR\n");
     return -1;
   }
 
@@ -23,8 +22,8 @@ int parseFile(const char* path) {
   FILE *file = fopen(path, "r");
 
   if (file == NULL) {
-    // ERROR
-    fclose(file);
+    // IO ERROR
+    printf("IO: ERROR - can't open file '%s'\n", path);
     return -1;
   }
 
@@ -77,8 +76,8 @@ int getLineCount(const char* path) {
   FILE *file = fopen(path, "r");
 
   if (file == NULL) {
-    // ERROR
-    fclose(file);
+    // IO ERROR
+    printf("IO: ERROR - can't open file '%s'\n", path);
     return -1;
   }
 
@@ -97,6 +96,8 @@ int getLineCount(const char* path) {
 
   // Fail if last char is not new line
   if (last != '\n') {
+    // PARSING ERROR: NO NEW LINE AT END OF FILE
+    printf("IO: ERROR - no new line at end of file\n");
     fclose(file);
     return -1;
   }
