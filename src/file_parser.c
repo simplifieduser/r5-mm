@@ -71,7 +71,6 @@ int parseFile(const char* path) {
 
     }
     else {
-      printf("ARG ERROR (%d)\n", mode);
       fclose(file);
       return -1;
     }
@@ -79,26 +78,6 @@ int parseFile(const char* path) {
   }
 
   return 0;
-
-}
-
-int getRWArg(FILE *file) {
-
-  int modeChar = fgetc(file);
-  if (feof(file)) return -1;
-
-  int sepChar = fgetc(file);
-  if (feof(file) || sepChar != ',') return -2;
-
-  if (modeChar == 'r' || modeChar == 'R') {
-    return 0;
-  }
-  else if (modeChar == 'w' || modeChar == 'W') {
-    return 1;
-  }
-  else {
-    return -3;
-  }
 
 }
 
