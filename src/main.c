@@ -128,13 +128,10 @@ int main(int argc, char*argv[]) {
                 }
             }
             case ':':{
-                if(optopt) {
-                fprintf(stderr, NO_REQUIRED_ARGUMENT"'-%c'\n"HINT"\n", optopt);
-                exit(EXIT_FAILURE);
-                } else {
+
                     fprintf(stderr, NO_REQUIRED_ARGUMENT"'%s'\n"HINT"\n", argv[optind - 1]);
                     exit(EXIT_FAILURE);
-                }
+
             }
             default:
                 fprintf(stderr, UNKNOWN_OPTION "'%s'.\n", argv[optind - 1]);
