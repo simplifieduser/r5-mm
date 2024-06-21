@@ -3,12 +3,12 @@
 
 #include <stdint.h>
 
-struct Request
+typedef struct Request
 {
   uint32_t addr;
   uint32_t data;
   int we;
-};
+} Request;
 
 int parseFile(const char* path);
 
