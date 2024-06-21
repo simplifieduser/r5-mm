@@ -172,3 +172,84 @@ int getRWArg(FILE *file) {
   }
 
 }
+
+int getAddressArg(FILE *file, uint32_t* res) {
+
+  // Init address_string array
+
+  char* address_string = malloc(sizeof(char) * 11);
+
+  if (address_string == NULL) {
+    // ERROR
+    printf("GENERAL: ERROR - memory allocation error\n");
+    return -1;
+  }
+
+  // Read in until ',' '\n' or 11 chars
+
+  for (int i = 0; i < 11; i++)
+  {
+    
+    int current = fgetc(file);
+
+    if (feof(file)) {
+      // PARSING ERROR: PREMATURE END OF FILE
+      printf("ARG_ADD: ERROR - premature end of file\n");
+      return -1;
+    }
+
+    if (current == '\n') {
+      // PARSING ERROR: PREMATURE END OF LINE
+      printf("ARG_ADD: ERROR - premature end of line\n");
+      return -1;
+    }
+
+    if (i == 10 && current != ',') {
+      // PARSING ERROR: ADDRESS TO LONG
+      printf("ARG_ADD: ERROR - address_string too long\n");
+      return -1;
+    }
+
+    if (current == ',') {
+
+      // if empty
+      if (i == 0) {
+        // PARSING ERROR: EMPTY ADDRESS
+        printf("ARG_ADD: ERROR - empty argument\n");
+        return -1;
+      }
+
+      // Append null byte
+      address_string[i] = 0;
+      break;
+
+    }
+
+    // Append current char
+    address_string[i] = (char) current;
+
+  }
+
+  // Convert string to int
+
+  uint32_t address_int = 0;
+  char* end;
+
+  if (address_string[0] == '0' && address_string[1] == 'x') {
+      address_int = strtol(address_string, &end, 16);
+  }
+  else {
+      address_int = strtol(address_string, &end, 10);
+  }
+
+  if (*end != 0) {
+      // PARSING ERROR: INVALID ADDRESS
+      printf("ARG_ADD: ERROR - '%s' is not an valid address\n", address_string);
+      return -1;
+  }
+
+  // Return address
+  *res = address_int;
+  return 0;
+
+}
