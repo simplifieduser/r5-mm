@@ -126,7 +126,7 @@ $(DIST)/$(TARGET): $(DIST) $(C_OBJ) $(CPP_OBJ)
 $(DIST)/test_c: $(TEST_C_SRC)
 ifdef TEST_C_SRC
 	mkdir -p $(DIST)
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $(TEST_C_SRC) -o $@
 	cp $(DIST)/test_c ./test_c
 endif
 
@@ -134,6 +134,6 @@ endif
 $(DIST)/test_cpp: $(TEST_CPP_SRC)
 ifdef TEST_CPP_SRC
 	mkdir -p $(DIST)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(TEST_CPP_SRC) -o $@
 	cp $(DIST)/test_cpp ./test_cpp
 endif

@@ -2,6 +2,11 @@
 r5mm
 dist
 
+# Testing files & targets
+test.csv
+test_cpp
+test_c
+
 # Python dir
 .venv
 .pytest_cache
