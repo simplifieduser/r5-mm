@@ -12,6 +12,8 @@ struct Result
 
 Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsigned blocksize, unsigned v2bBlockOffset, unsigned memoryLatency, size_t numRequests, Request *requests, const char *tracefile)
 {
+    // TODO: primitive_gate_count
+
     Result result;            // to be returned
     uint32_t buffer[tlbSize]; // stores which virtual addresses are in the tlb
     sc_clock clk;
@@ -27,6 +29,13 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     request_processor.hits.bind(hits);
     request_processor.primitive_gate_count.bind(primitive_gate_count);
     request_processor.finished.bind(finished);
+
+    // create new tracefile and set the signals to be traced (clock and finished are unimportant)
+    sc_trace_file *file = sc_create_vcd_trace_file(tracefile);
+    sc_trace(file, cycles, "cycles");
+    sc_trace(file, misses, "misses");
+    sc_trace(file, hits, "hits");
+    sc_trace(file, primitive_gate_count, "gate_count");
 
     sc_start();
     while (finished.read() == false)
@@ -47,6 +56,7 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     {
         result.cycles = cycles_count.read();
     }
+    sc_close_vcd_trace_file(file);
 
     return result;
 }
