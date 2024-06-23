@@ -4,8 +4,12 @@
 
 int main(int argc, char const *argv[]) {
 
-    parseFile("test.csv");
+    int lineCount = getLineCount("test.csv");
+    if (lineCount < 0) { return -1; }
 
-    return 0;
+    Request requests[lineCount];
+    int requestCount = parseFile("test.csv", lineCount, requests);
+
+    return requestCount;
 
 }
