@@ -10,6 +10,8 @@ int main(int argc, char const *argv[]) {
     Request requests[lineCount];
     int requestCount = parseFile("test.csv", lineCount, requests);
 
+    printf("\n\nFINAL COUNT: %d\n", requestCount);
+
     return requestCount;
 
 }
