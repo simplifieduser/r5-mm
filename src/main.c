@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include "file_parser.h"
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
 
-  parseFile("test.csv");
+    parseFile("test.csv");
 
-  return 0;
+    return 0;
 
 }
