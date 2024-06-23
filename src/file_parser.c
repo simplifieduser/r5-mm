@@ -5,7 +5,7 @@
 
 int getRWArg(FILE *file);
 int getAddressArg(FILE *file, uint32_t *res);
-int getDataArg(FILE *file, uint32_t *res);
+int getDataArg(FILE *file, uint32_t *res, int writeEnable);
 
 int getLineCount(const char *path) {
 
@@ -19,24 +19,14 @@ int getLineCount(const char *path) {
     }
 
     // Count lines
-    int counter = 0;
-    int last = '\n';
+    int counter = 1;
 
     while (1) {
 
         int c = fgetc(file);
         if (feof(file)) break;
         if (c == '\n') counter++;
-        last = c;
 
-    }
-
-    // Fail if last char is not new line
-    if (last != '\n') {
-        // PARSING ERROR: NO NEW LINE AT END OF FILE
-        printf("IO: ERROR - no new line at end of file\n");
-        fclose(file);
-        return -1;
     }
 
     // Close file & return
@@ -76,6 +66,15 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
 
         // r/w arg
         int mode = getRWArg(file);
+
+        // Check if parsing complete
+        if (mode == 2) {
+            free(address);
+            free(data);
+            fclose(file);
+            return i;
+        }
+
         if (mode < 0) {
             // PARSING ERROR
             break;
@@ -89,7 +88,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
         }
 
         // data arg
-        int dataStatus = getDataArg(file, data);
+        int dataStatus = getDataArg(file, data, mode);
         if (dataStatus < 0) {
             // PARSING ERROR
             break;
@@ -103,15 +102,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
 
         requests[i] = newRequest;
 
-        // check for end of file
-        if (feof(file)) {
-            free(address);
-            free(data);
-            fclose(file);
-            return i + 1;
-
-        }
-
+        printf("MODE: %b\nADDRESS: %d\nDATA:%d\n", mode, *address, *data);
 
     }
 
@@ -129,11 +120,12 @@ int getRWArg(FILE *file) {
 
     int modeChar = fgetc(file);
 
+    // Check if file has ended, Return mode = 2
     if (feof(file)) {
-        // PARSING ERROR: PREMATURE END OF FILE
-        printf("ARG_RW: ERROR - premature end of file\n");
-        return -1;
-    } else if (modeChar == '\n') {
+        return 2;
+    }
+
+    if (modeChar == '\n') {
         // PARSING ERROR: PREMATURE NEW LINE
         printf("ARG_RW: ERROR - premature end of line\n");
         return -1;
@@ -246,13 +238,36 @@ int getAddressArg(FILE *file, uint32_t *res) {
         return -1;
     }
 
+    if (address_int > 0xFFFFFFFF) {
+        // PARSING ERROR: data too long
+        printf("ARG_ADD: ERROR - empty argument\n");
+        return -1;
+    }
+
     // Return address
     *res = address_int;
     return 0;
 
 }
 
-int getDataArg(FILE *file, uint32_t *res) {
+int getDataArg(FILE *file, uint32_t *res, int writeEnable) {
+
+    // Handle write mode disabled
+
+    if (!writeEnable) {
+        int next = fgetc(file);
+        if (feof(file)) {
+            // PARSING ERROR: PREMATURE END OF FILE
+            printf("ARG_DATA: ERROR - premature end of file\n");
+            return -1;
+        }
+        if (next != '\n') {
+            // PARSING ERROR: WHEN WRITE DISABLED DATA NEEDS TO BE EMPTY
+            printf("ARG_DATA: ERROR - data needs to be empty when reading\n");
+            return -1;
+        }
+        return 0;
+    }
 
     // Init data_string array
 
@@ -276,24 +291,24 @@ int getDataArg(FILE *file, uint32_t *res) {
             return -1;
         }
 
-        if (current == '\n') {
-            // PARSING ERROR: PREMATURE END OF LINE
-            printf("ARG_DATA: ERROR - premature end of line\n");
+        if (current == ',') {
+            // PARSING ERROR: ANOTHER ARG IN LINE
+            printf("ARGS: ERROR - too many arguments in row\n");
             return -1;
         }
 
-        if (i == 10 && current != ',') {
+        if (i == 10 && current != '\n') {
             // PARSING ERROR: DATA TO LONG
             printf("ARG_DATA: ERROR - data too long\n");
             return -1;
         }
 
-        if (current == ',') {
+        if (current == '\n') {
 
-            // if empty
+            // if empty and not allowed
             if (i == 0) {
                 // PARSING ERROR: EMPTY ADDRESS
-                printf("ARG_ADD: ERROR - empty argument\n");
+                printf("ARG_DATA: ERROR - empty argument\n");
                 return -1;
             }
 
@@ -322,6 +337,12 @@ int getDataArg(FILE *file, uint32_t *res) {
     if (*end != 0) {
         // PARSING ERROR: INVALID ADDRESS
         printf("ARG_DATA: ERROR - '%s' is not valid data\n", data_string);
+        return -1;
+    }
+
+    if (data_int > 0xFFFFFFFF) {
+        // PARSING ERROR: data too long
+        printf("ARG_DATA: ERROR - data too long\n");
         return -1;
     }
 
