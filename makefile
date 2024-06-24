@@ -58,6 +58,10 @@ CXX := clang++
 CXXFLAGS := -std=c++14 -I$(LIB)/include
 LDFLAGS := -I$(LIB)/include -L$(LIB)/lib -lsystemc
 
+ifneq ($(shell uname -s), Darwin)
+  LDFLAGS += -Wl,-rpath=$(LIB)/lib
+endif
+
 
 #         #
 # Targets #
@@ -120,7 +124,7 @@ $(DIST)/$(TARGET): $(DIST) $(C_OBJ) $(CPP_OBJ)
 
 #              #
 # Test targets #
-#	           #
+#	             #
 
 # Compile c test files
 $(DIST)/test_c: $(TEST_C_SRC)
