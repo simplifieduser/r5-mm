@@ -1,6 +1,27 @@
 #include <systemc>
+#include "modules.cpp"
 
-int sc_main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-    return -1;
+    Request r1;
+    r1.addr = 1234;
+    r1.data = 13;
+    r1.we = 1;
+
+    Request r2;
+    r2.addr = 1234;
+    r2.data = 0;
+    r2.we = 0;
+
+    Request requests[2];
+    requests[0] = r1;
+    requests[1] = r2;
+
+    Result res = run_simulation(100, 10, 2, 8, 3, 10, 2, requests, "trace");
+
+    std::cout << res.cycles << "\n"
+              << res.hits << "\n"
+              << res.misses << std::endl;
+
+    return 0;
 }

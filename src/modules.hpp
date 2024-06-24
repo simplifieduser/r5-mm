@@ -20,7 +20,7 @@ SC_MODULE(ADDRESS_GETTER)
     sc_in<bool> start;
 
     // value at index i in the buffer stores a tag that is currently cached in the tlb
-    uint32_t *buffer;
+    std::vector<uint32_t> buffer;
     // these values are set once and don't change
     unsigned tlbs_latency, memory_latency, blocksize, v2b_block_offset, tlb_size;
 
@@ -36,7 +36,7 @@ SC_MODULE(ADDRESS_GETTER)
 
     SC_CTOR(ADDRESS_GETTER);
 
-    ADDRESS_GETTER(sc_module_name name, uint32_t * buffer, unsigned tlb_size, unsigned tlbs_latency, unsigned blocksize, unsigned v2b_block_offset, unsigned memory_latency) : sc_module(name), buffer(buffer), tlb_size(tlb_size), tlbs_latency(tlbs_latency), blocksize(blocksize), v2b_block_offset(v2b_block_offset), memory_latency(memory_latency)
+    ADDRESS_GETTER(sc_module_name name, std::vector<uint32_t> buffer, unsigned tlb_size, unsigned tlbs_latency, unsigned blocksize, unsigned v2b_block_offset, unsigned memory_latency) : sc_module(name), buffer(buffer), tlb_size(tlb_size), tlbs_latency(tlbs_latency), blocksize(blocksize), v2b_block_offset(v2b_block_offset), memory_latency(memory_latency)
     {
         SC_THREAD(count_latency);
         sensitive << clk.pos();
@@ -178,27 +178,30 @@ SC_MODULE(REQUEST_PROCESSOR)
     // fixed values for this tlb
     unsigned tlb_size, tlbs_latency, blocksize, v2b_block_offset, memory_latency;
     size_t num_requests;
-    Request *requests;
+    std::vector<Request> requests;
 
     ADDRESS_GETTER address_getter;
     MAIN_MEMORY data_manager;
-    uint32_t *buffer;                 // stores which virtual addresses are currently in tlb
+    std::vector<uint32_t> buffer;     // stores which virtual addresses are currently in tlb
     std::map<uint32_t, char> mem_map; // represents the main memory
 
-    sc_signal<uint32_t> current_virt_address, current_phys_address, data;
-    sc_signal<bool> get_address_finished, manage_data_finished, we, start_request;
+    sc_signal<uint32_t> current_virt_address, current_phys_address, data, addr_cycles;
+    sc_signal<bool> get_address_finished, manage_data_finished, we, start_request, hit;
 
     sc_out<size_t> cycles, misses, hits, primitive_gate_count;
     sc_out<bool> finished;
 
     SC_CTOR(REQUEST_PROCESSOR);
-    REQUEST_PROCESSOR(sc_module_name name, unsigned tlb_size, unsigned tlbs_latency, unsigned blocksize, unsigned v2b_block_offset, unsigned memory_latency, size_t num_requests, Request *requests, uint32_t *buffer_param) : sc_module(name), tlb_size(tlb_size), tlbs_latency(tlbs_latency), blocksize(blocksize), v2b_block_offset(v2b_block_offset), memory_latency(memory_latency), num_requests(num_requests), requests(requests), buffer(buffer_param), address_getter("address_getter", buffer_param, tlb_size, tlbs_latency, blocksize, v2b_block_offset, memory_latency), data_manager("data_manager", mem_map, memory_latency)
+    REQUEST_PROCESSOR(sc_module_name name, unsigned tlb_size, unsigned tlbs_latency, unsigned blocksize, unsigned v2b_block_offset, unsigned memory_latency, size_t num_requests, std::vector<Request> requests, std::vector<uint32_t> buffer_param) : sc_module(name), tlb_size(tlb_size), tlbs_latency(tlbs_latency), blocksize(blocksize), v2b_block_offset(v2b_block_offset), memory_latency(memory_latency), num_requests(num_requests), requests(requests), buffer(buffer_param), address_getter("address_getter", buffer_param, tlb_size, tlbs_latency, blocksize, v2b_block_offset, memory_latency), data_manager("data_manager", mem_map, memory_latency)
     {
+        // TODO: bind hit and cycles for address getter
         address_getter.clk.bind(clk);
         address_getter.virtual_address.bind(current_virt_address);
         address_getter.physical_address.bind(current_phys_address);
         address_getter.finished.bind(get_address_finished);
         address_getter.start.bind(start_request);
+        address_getter.cycles(cycles);
+        address_getter.hit(hit);
 
         data_manager.clk.bind(clk);
         data_manager.address.bind(address_getter.physical_address);

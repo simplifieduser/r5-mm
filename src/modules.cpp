@@ -14,15 +14,22 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
 {
     // TODO: primitive_gate_count
 
-    Result result;            // to be returned
-    uint32_t buffer[tlbSize]; // stores which virtual addresses are in the tlb
+    std::vector<Request> reqs(numRequests);
+    for (int i = 0; i < numRequests; i++)
+    {
+        reqs.at(i) = requests[i];
+    }
+
+    Result result;                         // to be returned
+    std::vector<uint32_t> buffer(tlbSize); // stores which virtual addresses are in the tlb
     sc_clock clk;
 
     sc_signal<size_t> cycles_count, misses, hits, primitive_gate_count;
     sc_signal<bool> finished; // marks, when all the requests have been processed
 
-    REQUEST_PROCESSOR request_processor("request_processor", tlbSize, tlbsLatency, blocksize, v2bBlockOffset, memoryLatency, numRequests, requests, buffer);
+    // ONLY FOR TESTING
 
+    REQUEST_PROCESSOR request_processor("request_processor", tlbSize, tlbsLatency, blocksize, v2bBlockOffset, memoryLatency, numRequests, reqs, buffer);
     request_processor.clk.bind(clk);
     request_processor.cycles.bind(cycles_count);
     request_processor.misses.bind(misses);
