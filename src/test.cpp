@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     r2.data = 0;
     r2.we = 0;
 
-    Request requests[2];
+       Request requests[2];
     requests[0] = r1;
     requests[1] = r2;
 

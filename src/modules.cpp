@@ -17,7 +17,7 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     std::vector<Request> reqs(numRequests);
     for (int i = 0; i < numRequests; i++)
     {
-        reqs.at(i) = requests[i];
+        reqs.push_back(requests[i]);
     }
 
     Result result;                         // to be returned
@@ -26,8 +26,6 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
 
     sc_signal<size_t> cycles_count, misses, hits, primitive_gate_count;
     sc_signal<bool> finished; // marks, when all the requests have been processed
-
-    // ONLY FOR TESTING
 
     REQUEST_PROCESSOR request_processor("request_processor", tlbSize, tlbsLatency, blocksize, v2bBlockOffset, memoryLatency, numRequests, reqs, buffer);
     request_processor.clk.bind(clk);
@@ -43,17 +41,16 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     sc_trace(file, misses, "misses");
     sc_trace(file, hits, "hits");
     sc_trace(file, primitive_gate_count, "gate_count");
+    sc_trace(file, finished, "finished");
 
     sc_start();
-    while (finished.read() == false)
-    {
-        // wait, until all requests have been processed
-    }
+    wait(request_processor.finished.posedge_event());
+    std::cout << "FINISHED FR FR" << std::endl;
 
     // set result values to output from request_processor
-    result.hits = hits.read();
-    result.misses = misses.read();
-    result.primitive_gate_count = primitive_gate_count.read();
+    result.hits = request_processor.hits.read();
+    result.misses = request_processor.misses.read();
+    result.primitive_gate_count = request_processor.primitive_gate_count.read();
 
     if (cycles_count.read() > cycles)
     {
@@ -64,6 +61,7 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
         result.cycles = cycles_count.read();
     }
     sc_close_vcd_trace_file(file);
+    sc_stop();
 
     return result;
 }

@@ -39,27 +39,28 @@ SC_MODULE(ADDRESS_GETTER)
     ADDRESS_GETTER(sc_module_name name, std::vector<uint32_t> buffer, unsigned tlb_size, unsigned tlbs_latency, unsigned blocksize, unsigned v2b_block_offset, unsigned memory_latency) : sc_module(name), buffer(buffer), tlb_size(tlb_size), tlbs_latency(tlbs_latency), blocksize(blocksize), v2b_block_offset(v2b_block_offset), memory_latency(memory_latency)
     {
         SC_THREAD(count_latency);
-        sensitive << clk.pos();
+        sensitive << start.pos();
     }
 
     void count_latency()
     {
         while (true)
         {
-            // wait for start_signal
-            while (start->read() == false)
-            {
-                wait();
-            }
+            std::cout << "before setting values" << std::endl;
             // not actually necessary, but will let the clock run for latency cycles and then set the values for the new request
 
+            // show that address has not been translated yet, because new translation process has started
+            finished->write(false);
+
             set_values();
+
+            std::cout << "after setting values" << std::endl;
 
             int cycle_count = 0;
             while (cycle_count < latency)
             {
                 cycle_count++;
-                wait();
+                wait(clk.posedge_event());
             }
 
             cycles->write(cycle_count);
@@ -70,8 +71,8 @@ SC_MODULE(ADDRESS_GETTER)
 
     void set_values()
     {
-        // show that address has not been translated yet, because new translation process has started
-        finished->write(false);
+
+        std::cout << "setting values" << std::endl;
 
         // calculate tag of virtual address by shifting to the right by page index bits
         // TODO: figure out how to calculate tag (what exactly does blocksize mean)
@@ -105,36 +106,38 @@ SC_MODULE(MAIN_MEMORY)
 
     unsigned memory_latency;
     // stores address as key and data as value
-    std::map<uint32_t, char> mem_map;
+    std::map<uint32_t, unsigned char> mem_map;
 
     sc_out<bool> finished;
     sc_out<uint32_t> out_data;
 
     SC_CTOR(MAIN_MEMORY);
 
-    MAIN_MEMORY(sc_module_name name, std::map<uint32_t, char> & map, unsigned memory_latency) : sc_module(name), mem_map(map), memory_latency(memory_latency)
+    MAIN_MEMORY(sc_module_name name, unsigned memory_latency) : sc_module(name), memory_latency(memory_latency)
     {
         SC_THREAD(start_process);
-        sensitive << clk.pos();
+        sensitive << got_address.pos();
     }
 
     void start_process()
     {
+
         while (true)
         {
-            while (got_address->read() == false)
-            {
-                wait();
-            }
+            std::cout << "before update memory" << std::endl;
+
+            finished->write(false);
+
             update_memory();
 
+            std::cout << "after update memory" << std::endl;
+
             int cycle_counter = 0;
-            finished->write(false);
 
             while (cycle_counter < memory_latency)
             {
                 cycle_counter++;
-                wait();
+                wait(clk.posedge_event());
             }
             finished->write(true);
             wait();
@@ -145,7 +148,8 @@ SC_MODULE(MAIN_MEMORY)
     {
         if (we->read() == true)
         {
-            char data_bytes[4];
+            std::cout << "branch 1" << std::endl;
+            unsigned char data_bytes[4];
             data_bytes[3] = data->read() & 0xFF;
             data_bytes[2] = (data->read() >> 8) & 0xFF;
             data_bytes[1] = (data->read() >> 16) & 0xFF;
@@ -159,7 +163,9 @@ SC_MODULE(MAIN_MEMORY)
         }
         else
         {
-            char data_bytes[4];
+            std::cout << "branch 2" << std::endl;
+
+            unsigned char data_bytes[4];
 
             data_bytes[0] = mem_map[address->read()];
             data_bytes[1] = mem_map[address->read() + 1];
@@ -182,17 +188,17 @@ SC_MODULE(REQUEST_PROCESSOR)
 
     ADDRESS_GETTER address_getter;
     MAIN_MEMORY data_manager;
-    std::vector<uint32_t> buffer;     // stores which virtual addresses are currently in tlb
-    std::map<uint32_t, char> mem_map; // represents the main memory
+    std::vector<uint32_t> buffer; // stores which virtual addresses are currently in tlb
 
-    sc_signal<uint32_t> current_virt_address, current_phys_address, data, addr_cycles;
+    sc_signal<uint32_t> current_virt_address, current_phys_address, data, out_data;
+    sc_signal<size_t> addr_cycles;
     sc_signal<bool> get_address_finished, manage_data_finished, we, start_request, hit;
 
     sc_out<size_t> cycles, misses, hits, primitive_gate_count;
     sc_out<bool> finished;
 
     SC_CTOR(REQUEST_PROCESSOR);
-    REQUEST_PROCESSOR(sc_module_name name, unsigned tlb_size, unsigned tlbs_latency, unsigned blocksize, unsigned v2b_block_offset, unsigned memory_latency, size_t num_requests, std::vector<Request> requests, std::vector<uint32_t> buffer_param) : sc_module(name), tlb_size(tlb_size), tlbs_latency(tlbs_latency), blocksize(blocksize), v2b_block_offset(v2b_block_offset), memory_latency(memory_latency), num_requests(num_requests), requests(requests), buffer(buffer_param), address_getter("address_getter", buffer_param, tlb_size, tlbs_latency, blocksize, v2b_block_offset, memory_latency), data_manager("data_manager", mem_map, memory_latency)
+    REQUEST_PROCESSOR(sc_module_name name, unsigned tlb_size, unsigned tlbs_latency, unsigned blocksize, unsigned v2b_block_offset, unsigned memory_latency, size_t num_requests, std::vector<Request> requests, std::vector<uint32_t> buffer_param) : sc_module(name), tlb_size(tlb_size), tlbs_latency(tlbs_latency), blocksize(blocksize), v2b_block_offset(v2b_block_offset), memory_latency(memory_latency), num_requests(num_requests), requests(requests), buffer(buffer_param), address_getter("address_getter", buffer_param, tlb_size, tlbs_latency, blocksize, v2b_block_offset, memory_latency), data_manager("data_manager", memory_latency)
     {
         // TODO: bind hit and cycles for address getter
         address_getter.clk.bind(clk);
@@ -200,22 +206,24 @@ SC_MODULE(REQUEST_PROCESSOR)
         address_getter.physical_address.bind(current_phys_address);
         address_getter.finished.bind(get_address_finished);
         address_getter.start.bind(start_request);
-        address_getter.cycles(cycles);
+        address_getter.cycles.bind(addr_cycles);
         address_getter.hit(hit);
 
         data_manager.clk.bind(clk);
-        data_manager.address.bind(address_getter.physical_address);
+        data_manager.address.bind(current_phys_address);
         data_manager.data.bind(data);
         data_manager.we.bind(we);
-        data_manager.got_address.bind(address_getter.finished);
+        data_manager.got_address.bind(get_address_finished);
+        data_manager.out_data.bind(out_data);
+        data_manager.finished.bind(manage_data_finished);
 
-        finished->write(false);
-
-        SC_THREAD(run_program);
+        SC_METHOD(run_program);
     }
 
     void run_program()
     {
+        finished->write(false);
+
         for (int i = 0; i < num_requests; i++)
         {
             // set signals according to values in current request
@@ -225,10 +233,9 @@ SC_MODULE(REQUEST_PROCESSOR)
             start_request.write(true);
 
             // first, wait for correct physical address to be fetched
-            while (get_address_finished == false)
-            {
-                wait();
-            }
+            next_trigger(get_address_finished.posedge_event());
+
+            std::cout << "get_address_finished is true" << std::endl;
 
             // now update with returned values
             cycles->write(cycles->read() + address_getter.cycles->read());
@@ -237,15 +244,15 @@ SC_MODULE(REQUEST_PROCESSOR)
             start_request.write(false);
 
             // wait, while data is being read/written
-            while (manage_data_finished == false)
-            {
-                wait();
-            }
+            next_trigger(manage_data_finished.posedge_event());
             // update cycles again
             cycles->write(cycles->read() + memory_latency);
         }
 
         finished->write(true);
+
+        std::cout << finished->read() << std::endl;
+        std::cout << "FINISHED" << std::endl;
     }
 };
 #endif
