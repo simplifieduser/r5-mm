@@ -62,6 +62,17 @@ ifneq ($(shell uname -s), Darwin)
   LDFLAGS += -Wl,-rpath=$(LIB)/lib
 endif
 
+# Test build flags
+
+TIDYFLAGS := -checks=* -- $(CXXFLAGS)
+
+ifdef TEST_BUILD
+  CCFLAGS += -Werror
+  CXXFLAGS += -Werror
+  LDFLAGS += -fsanitize=undefined,address
+  TIDYFLAGS := -checks=* --warnings-as-errors=* -- $(CXXFLAGS)
+endif
+
 
 #         #
 # Targets #
@@ -73,8 +84,8 @@ endif
 all: debug
 
 # Debug target
-debug: CCFLAGS += -g
-debug: CXXFLAGS += -g
+debug: CCFLAGS += -g -Wall -Wextra
+debug: CXXFLAGS += -g -Wall -Wextra
 debug: LDFLAGS += -g
 debug: $(DIST)/$(TARGET)
 
@@ -87,12 +98,17 @@ release: $(DIST)/$(TARGET)
 # Test targets
 test: test_c test_cpp
 
-test_c: CCFLAGS += -g
+test_c: CCFLAGS += -g -Wall -Wextra
 test_c: $(DIST)/test_c
 
-test_cpp: CXXFLAGS += -g
+test_cpp: CXXFLAGS += -g -Wall -Wextra
 test_cpp: LDFLAGS += -g
 test_cpp: $(DIST)/test_cpp
+
+# Tidy targets
+tidy:
+	clang-tidy $(C_SRC) $(TIDYFLAGS)
+	clang-tidy $(CPP_SRC) $(TIDYFLAGS)
 
 # Clean up
 clean:
