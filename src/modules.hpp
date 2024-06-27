@@ -84,7 +84,7 @@ SC_MODULE(ADDRESS_GETTER)
         uint32_t current_tag_in_tlb = buffer[tag % tlb_size];
 
         // check if our tag is currently cached in the tlb
-        if (tag == current_tag_in_tlb && previuosly_visited.find(tag) == previuosly_visited.end())
+        if (tag == current_tag_in_tlb && previuosly_visited.find(tag) != previuosly_visited.end())
         {
             std::cout << "hit" << std::endl;
             latency = tlbs_latency;
