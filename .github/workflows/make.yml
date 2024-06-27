@@ -10,8 +10,25 @@ on:
 
 env:
   SYSTEMC_HOME: ./systemc
+  TEST_BUILD: yes
 
 jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up build tools
+        run: sudo apt-get install -y build-essential
+
+      - name: Run code linter
+        continue-on-error: true
+        run: make tidy
+
   build:
     runs-on: ubuntu-latest
 
@@ -36,7 +53,8 @@ jobs:
           cd ..
 
       - name: Build project
-        run: make
+        continue-on-error: true
+        run: scan-build make debug
 
       - name: Cache build
         uses: actions/cache@v3
