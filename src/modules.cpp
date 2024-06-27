@@ -44,7 +44,6 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     sc_trace(file, finished, "finished");
 
     sc_start();
-    wait(request_processor.finished.posedge_event());
     std::cout << "FINISHED FR FR" << std::endl;
 
     // set result values to output from request_processor
@@ -61,7 +60,6 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
         result.cycles = cycles_count.read();
     }
     sc_close_vcd_trace_file(file);
-    sc_stop();
 
     return result;
 }

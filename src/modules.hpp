@@ -3,6 +3,7 @@
 
 #include <systemc>
 #include <map>
+#include <unordered_set>
 using namespace sc_core;
 
 struct Request
@@ -21,8 +22,11 @@ SC_MODULE(ADDRESS_GETTER)
 
     // value at index i in the buffer stores a tag that is currently cached in the tlb
     std::vector<uint32_t> buffer;
+    // stores which values have been previously cached to catch cold misses
+    std::unordered_set<uint32_t> previuosly_visited;
     // these values are set once and don't change
-    unsigned tlbs_latency, memory_latency, blocksize, v2b_block_offset, tlb_size;
+    unsigned tlbs_latency,
+        memory_latency, blocksize, v2b_block_offset, tlb_size;
 
     // true as soon as a valid physical address has been written to physical_address out-signal
     sc_out<bool> finished;
@@ -80,13 +84,16 @@ SC_MODULE(ADDRESS_GETTER)
         uint32_t current_tag_in_tlb = buffer[tag % tlb_size];
 
         // check if our tag is currently cached in the tlb
-        if (tag == current_tag_in_tlb)
+        if (tag == current_tag_in_tlb && previuosly_visited.find(tag) == previuosly_visited.end())
         {
+            std::cout << "hit" << std::endl;
             latency = tlbs_latency;
             hit->write(true);
         }
         else
         {
+            previuosly_visited.insert(tag);
+            buffer[tag % tlb_size] = tag;
             latency = tlbs_latency + memory_latency;
             hit->write(false);
         }
@@ -217,7 +224,9 @@ SC_MODULE(REQUEST_PROCESSOR)
         data_manager.out_data.bind(out_data);
         data_manager.finished.bind(manage_data_finished);
 
-        SC_METHOD(run_program);
+        get_address_finished.write(false);
+
+        SC_THREAD(run_program);
     }
 
     void run_program()
@@ -228,12 +237,15 @@ SC_MODULE(REQUEST_PROCESSOR)
         {
             // set signals according to values in current request
             data.write(requests[i].data);
+            std::cout << "current data: " << requests[i].data << std::endl;
             we.write(requests[i].we);
+            std::cout << "current write enable: " << requests[i].we << std::endl;
             current_virt_address.write(requests[i].addr);
+            std::cout << "current virtual address: " << requests[i].addr << std::endl;
             start_request.write(true);
 
             // first, wait for correct physical address to be fetched
-            next_trigger(get_address_finished.posedge_event());
+            wait(get_address_finished.posedge_event());
 
             std::cout << "get_address_finished is true" << std::endl;
 
@@ -244,8 +256,9 @@ SC_MODULE(REQUEST_PROCESSOR)
             start_request.write(false);
 
             // wait, while data is being read/written
-            next_trigger(manage_data_finished.posedge_event());
+            wait(manage_data_finished.posedge_event());
             // update cycles again
+            std::cout << "manage_data_finished is true" << std::endl;
             cycles->write(cycles->read() + memory_latency);
         }
 
@@ -253,6 +266,7 @@ SC_MODULE(REQUEST_PROCESSOR)
 
         std::cout << finished->read() << std::endl;
         std::cout << "FINISHED" << std::endl;
+        sc_stop();
     }
 };
 #endif

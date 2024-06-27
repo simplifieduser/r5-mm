@@ -13,11 +13,11 @@ int main(int argc, char *argv[])
     r2.data = 0;
     r2.we = 0;
 
-       Request requests[2];
+    Request requests[1];
     requests[0] = r1;
-    requests[1] = r2;
+    // requests[1] = r2;
 
-    Result res = run_simulation(100, 10, 2, 8, 3, 10, 2, requests, "trace");
+    Result res = run_simulation(100, 10, 2, 8, 3, 10, 1, requests, "trace");
 
     std::cout << res.cycles << "\n"
               << res.hits << "\n"
