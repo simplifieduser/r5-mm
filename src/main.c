@@ -5,13 +5,20 @@
 int main(int argc, char const *argv[]) {
 
     int lineCount = getLineCount("test.csv");
-    if (lineCount < 0) { return -1; }
+    if (lineCount < 0) { return 1; }
 
     Request requests[lineCount];
     int requestCount = parseFile("test.csv", lineCount, requests);
 
-    printf("\n\nFINAL COUNT: %d\n", requestCount);
+    if (requestCount < 0) {
+        return 1;
+    }
 
-    return requestCount;
+    for (int i = 0; i < requestCount; ++i) {
+        Request req = requests[i];
+        printf("%d: %d %d %d\n", i, req.we, req.addr, req.data);
+    }
+
+    return 0;
 
 }
