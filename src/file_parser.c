@@ -12,8 +12,8 @@
 
 
 int getRWArg(FILE *file);
-int getAddressArg(FILE *file, uint32_t *res);
-int getDataArg(FILE *file, uint32_t *res, int writeEnable);
+int getAddressArg(FILE *file, uint32_t *res, int writeEnable);
+int getDataArg(FILE *file, uint32_t *res);
 
 void printError(int code, const char* arg, int line) {
 
@@ -117,28 +117,30 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
         }
 
         // address arg
-        int addressStatus = getAddressArg(file, address);
+        int addressStatus = getAddressArg(file, address, mode);
         if (addressStatus < 0) {
             // PARSING ERROR
             printError(addressStatus, "address", i + 1);
             break;
         }
 
-        // data arg
-        int dataStatus = getDataArg(file, data, mode);
-        if (dataStatus < 0) {
-            // PARSING ERROR
-            printError(dataStatus, "write_data", i + 1);
-            break;
+        // data arg - if write enabled
+        if (mode) {
+            int dataStatus = getDataArg(file, data);
+            if (dataStatus < 0) {
+                // PARSING ERROR
+                printError(dataStatus, "write_data", i + 1);
+                break;
+            }
         }
 
-
-
         // Instance new request struct & add to array
-        Request newRequest;
+        Request newRequest = {};
         newRequest.we = mode;
         newRequest.addr = *address;
-        newRequest.data = *data;
+        if (mode) {
+            newRequest.data = *data;
+        }
 
         requests[i] = newRequest;
 
@@ -198,7 +200,7 @@ int getRWArg(FILE *file) {
 
 }
 
-int getAddressArg(FILE *file, uint32_t *res) {
+int getAddressArg(FILE *file, uint32_t *res, int writeEnable) {
 
     // Init address_string array
 
@@ -221,6 +223,23 @@ int getAddressArg(FILE *file, uint32_t *res) {
             return ERR_EOF;
         }
 
+        // On new line in read mode -> valid
+        if (current == '\n' && !writeEnable) {
+
+            // if empty
+            if (i == 0) {
+                // PARSING ERROR: INVALID ARG
+                free(address_string);
+                return ERR_IA;
+            }
+
+            // Append null byte
+            address_string[i] = 0;
+            break;
+
+        }
+
+        // On new line in write mode -> invalid
         if (current == '\n') {
             // PARSING ERROR: PREMATURE NEW LINE
             free(address_string);
@@ -264,40 +283,26 @@ int getAddressArg(FILE *file, uint32_t *res) {
         address_int = strtol(address_string, &end, 10);
     }
 
-    free(address_string);
-
     if (*end != 0) {
         // PARSING ERROR: INVALID ARG
+        free(address_string);
         return ERR_IA;
     }
 
     if (address_int > 0xFFFFFFFF) {
         // PARSING ERROR: INVALID ARG
+        free(address_string);
         return ERR_IA;
     }
 
     // Return address
     *res = address_int;
+    free(address_string);
     return 0;
 
 }
 
-int getDataArg(FILE *file, uint32_t *res, int writeEnable) {
-
-    // Handle write mode disabled
-
-    if (!writeEnable) {
-        int next = fgetc(file);
-        if (feof(file)) {
-            // PARSING ERROR: PREMATURE END OF FILE
-            return ERR_EOF;
-        }
-        if (next != '\n') {
-            // PARSING ERROR: TOO_MANY_ARGS
-            return ERR_TMA;
-        }
-        return 0;
-    }
+int getDataArg(FILE *file, uint32_t *res) {
 
     // Init data_string array
 
@@ -362,20 +367,21 @@ int getDataArg(FILE *file, uint32_t *res, int writeEnable) {
         data_int = strtol(data_string, &end, 10);
     }
 
-    free(data_string);
-
     if (*end != '\0') {
         // PARSING ERROR: INVALID ARG
+        free(data_string);
         return ERR_IA;
     }
 
     if (data_int > 0xFFFFFFFF) {
         // PARSING ERROR: INVALID ARG
+        free(data_string);
         return ERR_IA;
     }
 
     // Return address
     *res = data_int;
+    free(data_string);
     return 0;
 
 }
