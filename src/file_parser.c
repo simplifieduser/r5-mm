@@ -218,16 +218,19 @@ int getAddressArg(FILE *file, uint32_t *res) {
 
         if (feof(file)) {
             // PARSING ERROR: PREMATURE END OF FILE
+            free(address_string);
             return ERR_EOF;
         }
 
         if (current == '\n') {
             // PARSING ERROR: PREMATURE NEW LINE
+            free(address_string);
             return ERR_NL;
         }
 
         if (i == 10 && current != ',') {
             // PARSING ERROR: INVALID ARG
+            free(address_string);
             return ERR_IA;
         }
 
@@ -236,6 +239,7 @@ int getAddressArg(FILE *file, uint32_t *res) {
             // if empty
             if (i == 0) {
                 // PARSING ERROR: INVALID ARG
+                free(address_string);
                 return ERR_IA;
             }
 
@@ -260,6 +264,8 @@ int getAddressArg(FILE *file, uint32_t *res) {
     } else {
         address_int = strtol(address_string, &end, 10);
     }
+
+    free(address_string);
 
     if (*end != 0) {
         // PARSING ERROR: INVALID ARG
@@ -300,6 +306,7 @@ int getDataArg(FILE *file, uint32_t *res, int writeEnable) {
 
     if (data_string == NULL) {
         // MEMORY ALLOC ERROR
+        free(data_string);
         return ERR_ALLOC;
     }
 
@@ -311,16 +318,19 @@ int getDataArg(FILE *file, uint32_t *res, int writeEnable) {
 
         if (feof(file)) {
             // PARSING ERROR: PREMATURE END OF FILE
+            free(data_string);
             return ERR_EOF;
         }
 
         if (current == ',') {
             // PARSING ERROR: TOO MANY ARGS
+            free(data_string);
             return ERR_TMA;
         }
 
         if (i == 10 && current != '\n') {
             // PARSING ERROR: INVALID ARG
+            free(data_string);
             return ERR_IA;
         }
 
@@ -329,6 +339,7 @@ int getDataArg(FILE *file, uint32_t *res, int writeEnable) {
             // if empty and not allowed
             if (i == 0) {
                 // PARSING ERROR: INVALID ARG
+                free(data_string);
                 return ERR_IA;
             }
 
@@ -351,6 +362,8 @@ int getDataArg(FILE *file, uint32_t *res, int writeEnable) {
     } else {
         data_int = strtol(data_string, &end, 10);
     }
+
+    free(data_string);
 
     if (*end != '\0') {
         // PARSING ERROR: INVALID ARG
