@@ -5,8 +5,8 @@
 #include <errno.h>
 #include "messages.h"
 int main(int argc, char*argv[]) {
-    int cycles = 10;
-    unsigned int tlbSize = 512;
+    int cycles = 100;
+    unsigned int tlbSize = 64;
     unsigned int tlbLatency = 1;
     unsigned int blocksize = 4;
     unsigned int v2bBlockOffset = 4;

@@ -38,12 +38,12 @@
 "\n"             \
 "Beschreibung: -----TO ´°_°` BE CONTINUED\n" \
 "Optionen:                     Standardwert:                mögliche Argumente:     Beschreibung:\n"     \
-"   -c, --cycles                                            [0; 2147483647] int     Gibt an, wie viele Zyklen simuliert werden sollen\n" \
-"   -b, --blocksize                                         [1; 4294967295] uint    Gibt die Größe eines Speicherblockes in Byte an\n"                         \
-"   -o, --v2b-block-offset                                  [0; 4294967295] uint    Gibt an, um wie viele Blöcke die physische Adresse verschoben wird um die virtuelle Adresse darzustellen\n" \
-"   -s, --tlb-size                                          [0; 4294967295] uint    Gibt, wie viele Einträge der TLB gleichzeitig speichern kann\n" \
-"   -t, --tlb-latency                                       [0; 4294967295] uint    Gibt die Latenzzeit des TLB in Zyklen an\n"                    \
-"   -m, --memory-latency                                    [0; 4294967295] uint    Gibt die Latenzzeit des Hauptspeichers in Zyklen an\n"   \
-"   -f, --tf                  null                          <Dateiname>             Name der Ausgabedatei, falls ein Tracefile erstellt werden soll\n"                 \
+"   -c, --cycles               100                          [0; 2147483647] int     Gibt an, wie viele Zyklen simuliert werden sollen\n" \
+"   -b, --blocksize            4                            [1; 4294967295] uint    Gibt die Größe eines Speicherblockes in Byte an\n"                         \
+"   -o, --v2b-block-offset     4                            [0; 4294967295] uint    Gibt an, um wie viele Blöcke die physische Adresse verschoben wird um die virtuelle Adresse darzustellen\n" \
+"   -s, --tlb-size             64                           [0; 4294967295] uint    Gibt, wie viele Einträge der TLB gleichzeitig speichern kann\n" \
+"   -t, --tlb-latency          1                            [0; 4294967295] uint    Gibt die Latenzzeit des TLB in Zyklen an\n"                    \
+"   -m, --memory-latency       10                           [0; 4294967295] uint    Gibt die Latenzzeit des Hauptspeichers in Zyklen an\n"   \
+"   -f, --tf                   null                         <Dateiname>             Name der Ausgabedatei, falls ein Tracefile erstellt werden soll\n"                 \
 "   <Dateiname>               !muss immer gesetzt werden!   <Dateiname>             Name der Eingabedatei, mit den zu verarbeitenden Daten\n"\
 "   -h, --help                --------------------------------------------------    Gibt diese Nachricht aus\n"
