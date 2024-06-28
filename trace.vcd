@@ -1,5 +1,5 @@
 $date
-     Jun 27, 2024       17:21:29
+     Jun 28, 2024       14:49:40
 $end
 
 $version
@@ -15,7 +15,6 @@ $var wire   32  aaaaa  cycles [31:0]  $end
 $var wire   64  aaaab  misses [63:0]  $end
 $var wire   64  aaaac  hits [63:0]  $end
 $var wire   64  aaaad  gate_count [63:0]  $end
-$var wire    1  aaaae  finished       $end
 $upscope $end
 $enddefinitions  $end
 
@@ -24,17 +23,25 @@ All initial values are dumped below at time 0 sec = 0 timescale units.
 $end
 
 $dumpvars
-b1100100 aaaaa
+b1111101000 aaaaa
 b0 aaaab
 b0 aaaac
 b0 aaaad
-0aaaae
 $end
 
-#11000
+#26000
 b1 aaaab
 
-#23000
+#53000
 b1 aaaac
 
-#33000
+#103000
+b10 aaaab
+
+#130000
+b10 aaaac
+
+#180000
+b11 aaaab
+
+#204000

@@ -14,26 +14,18 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
 {
     // TODO: primitive_gate_count
 
-    std::vector<Request> reqs(numRequests);
-    for (int i = 0; i < numRequests; i++)
-    {
-        reqs.push_back(requests[i]);
-    }
-
     Result result;                         // to be returned
     std::vector<uint32_t> buffer(tlbSize); // stores which virtual addresses are in the tlb
     sc_clock clk;
 
     sc_signal<size_t> cycles_count, misses, hits, primitive_gate_count;
-    sc_signal<bool> finished; // marks, when all the requests have been processed
 
-    REQUEST_PROCESSOR request_processor("request_processor", tlbSize, tlbsLatency, blocksize, v2bBlockOffset, memoryLatency, numRequests, reqs, buffer);
+    REQUEST_PROCESSOR request_processor("request_processor", tlbSize, tlbsLatency, blocksize, v2bBlockOffset, memoryLatency, numRequests, requests, buffer);
     request_processor.clk.bind(clk);
     request_processor.cycles.bind(cycles_count);
     request_processor.misses.bind(misses);
     request_processor.hits.bind(hits);
     request_processor.primitive_gate_count.bind(primitive_gate_count);
-    request_processor.finished.bind(finished);
 
     // create new tracefile and set the signals to be traced (clock and finished are unimportant)
     sc_trace_file *file = sc_create_vcd_trace_file(tracefile);
@@ -41,10 +33,8 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     sc_trace(file, misses, "misses");
     sc_trace(file, hits, "hits");
     sc_trace(file, primitive_gate_count, "gate_count");
-    sc_trace(file, finished, "finished");
 
     sc_start();
-    std::cout << "FINISHED FR FR" << std::endl;
 
     // set result values to output from request_processor
     result.hits = request_processor.hits.read();
