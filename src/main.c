@@ -16,7 +16,7 @@ int main(int argc, char const *argv[]) {
 
     for (int i = 0; i < requestCount; ++i) {
         Request req = requests[i];
-        printf("%d: %d %d %d\n", i, req.we, req.addr, req.data);
+        printf("%d: %u %u %u\n", i, req.we, req.addr, req.data);
     }
 
     return 0;
