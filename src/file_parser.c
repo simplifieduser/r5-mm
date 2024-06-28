@@ -1,11 +1,47 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "file_parser.h"
+#include "messages.h"
+
+#define ERR_ALLOC (-1)
+#define ERR_OPEN (-2)
+#define ERR_EOF (-3)
+#define ERR_NL (-4)
+#define ERR_IA (-5)
+#define ERR_TMA (-6)
 
 
 int getRWArg(FILE *file);
 int getAddressArg(FILE *file, uint32_t *res);
 int getDataArg(FILE *file, uint32_t *res, int writeEnable);
+
+void printError(int code, const char* arg, int line) {
+
+    switch (code) {
+        case ERR_ALLOC:
+            printf(ERR_GENERAL_MEMORY_ALLOCATION_ERROR);
+            break;
+        case ERR_OPEN:
+            printf(ERR_GENERAL_CANT_OPEN_FILE(arg));
+            break;
+        case ERR_EOF:
+            printf(ERR_FILE_PREMATURE_END_OF_FILE(arg, line));
+            break;
+        case ERR_NL:
+            printf(ERR_FILE_PREMATURE_NEW_LINE(arg, line));
+            break;
+        case ERR_IA:
+            printf(ERR_FILE_INVALID_ARG(arg, line));
+            break;
+        case ERR_TMA:
+            printf(ERR_FILE_TOO_MANY_ARGS(line));
+            break;
+        default:
+            printf("CODE: %d\n", code);
+            printf(ERR_GENERAL_UNKNOWN);
+            break;
+    }
+}
 
 int getLineCount(const char *path) {
 
@@ -14,7 +50,7 @@ int getLineCount(const char *path) {
 
     if (file == NULL) {
         // IO ERROR
-        printf("IO: ERROR - can't open file '%s'\n", path);
+        printError(ERR_OPEN, path, 0);
         return -1;
     }
 
@@ -41,14 +77,14 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
     uint32_t* address = malloc(sizeof(uint32_t));
     if (address == NULL) {
         // ERROR
-        printf("GENERAL: ERROR - memory allocation error\n");
+        printError(ERR_ALLOC, "", 0);
         return -1;
     }
 
     uint32_t* data = malloc(sizeof(uint32_t));
     if (data == NULL) {
         // ERROR
-        printf("GENERAL: ERROR - memory allocation error\n");
+        printError(ERR_ALLOC, "", 0);
         return -1;
     }
 
@@ -57,7 +93,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
 
     if (file == NULL) {
         // IO ERROR
-        printf("IO: ERROR - can't open file '%s'\n", path);
+        printError(ERR_OPEN, "", 0);
         return -1;
     }
 
@@ -77,6 +113,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
 
         if (mode < 0) {
             // PARSING ERROR
+            printError(mode, "write_enable", i + 1);
             break;
         }
 
@@ -84,6 +121,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
         int addressStatus = getAddressArg(file, address);
         if (addressStatus < 0) {
             // PARSING ERROR
+            printError(addressStatus, "address", i + 1);
             break;
         }
 
@@ -91,8 +129,11 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
         int dataStatus = getDataArg(file, data, mode);
         if (dataStatus < 0) {
             // PARSING ERROR
+            printError(dataStatus, "write_data", i + 1);
             break;
         }
+
+
 
         // Instance new request struct & add to array
         Request newRequest;
@@ -101,8 +142,6 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
         newRequest.data = *data;
 
         requests[i] = newRequest;
-
-        printf("MODE: %b\nADDRESS: %d\nDATA:%d\n", mode, *address, *data);
 
     }
 
@@ -127,8 +166,7 @@ int getRWArg(FILE *file) {
 
     if (modeChar == '\n') {
         // PARSING ERROR: PREMATURE NEW LINE
-        printf("ARG_RW: ERROR - premature end of line\n");
-        return -1;
+        return ERR_NL;
     }
 
     // Get cell separator char
@@ -137,18 +175,15 @@ int getRWArg(FILE *file) {
 
     if (feof(file)) {
         // PARSING ERROR: PREMATURE END OF FILE
-        printf("ARG_RW: ERROR - premature end of file\n");
-        return -1;
+        return ERR_EOF;
     } else if (sepChar == '\n') {
         // PARSING ERROR: PREMATURE NEW LINE
-        printf("ARG_RW: ERROR - premature end of line\n");
-        return -1;
+        return ERR_NL;
     }
 
     if (sepChar != ',') {
-        // PARSING ERROR: ARGUMENT TOO LONG
-        printf("ARG_RW: ERROR - argument too long\n");
-        return -1;
+        // PARSING ERROR: INVALID ARG
+        return ERR_IA;
     }
 
     // Return mode, READ=0 WRITE=1
@@ -158,9 +193,8 @@ int getRWArg(FILE *file) {
     } else if (modeChar == 'w' || modeChar == 'W') {
         return 1;
     } else {
-        // PARSING ERROR: NO VALID MODE
-        printf("ARG_RW: ERROR - %c is not a valid mode\n", (char) modeChar);
-        return -1;
+        // PARSING ERROR: INVALID ARG
+        return ERR_IA;
     }
 
 }
@@ -172,9 +206,8 @@ int getAddressArg(FILE *file, uint32_t *res) {
     char *address_string = malloc(sizeof(char) * 11);
 
     if (address_string == NULL) {
-        // ERROR
-        printf("GENERAL: ERROR - memory allocation error\n");
-        return -1;
+        // MEMORY ALLOC ERROR
+        return ERR_ALLOC;
     }
 
     // Read in until ',' '\n' or 11 chars
@@ -185,29 +218,25 @@ int getAddressArg(FILE *file, uint32_t *res) {
 
         if (feof(file)) {
             // PARSING ERROR: PREMATURE END OF FILE
-            printf("ARG_ADD: ERROR - premature end of file\n");
-            return -1;
+            return ERR_EOF;
         }
 
         if (current == '\n') {
-            // PARSING ERROR: PREMATURE END OF LINE
-            printf("ARG_ADD: ERROR - premature end of line\n");
-            return -1;
+            // PARSING ERROR: PREMATURE NEW LINE
+            return ERR_NL;
         }
 
         if (i == 10 && current != ',') {
-            // PARSING ERROR: ADDRESS TO LONG
-            printf("ARG_ADD: ERROR - address too long\n");
-            return -1;
+            // PARSING ERROR: INVALID ARG
+            return ERR_IA;
         }
 
         if (current == ',') {
 
             // if empty
             if (i == 0) {
-                // PARSING ERROR: EMPTY ADDRESS
-                printf("ARG_ADD: ERROR - empty argument\n");
-                return -1;
+                // PARSING ERROR: INVALID ARG
+                return ERR_IA;
             }
 
             // Append null byte
@@ -233,15 +262,13 @@ int getAddressArg(FILE *file, uint32_t *res) {
     }
 
     if (*end != 0) {
-        // PARSING ERROR: INVALID ADDRESS
-        printf("ARG_ADD: ERROR - '%s' is not an valid address\n", address_string);
-        return -1;
+        // PARSING ERROR: INVALID ARG
+        return ERR_IA;
     }
 
     if (address_int > 0xFFFFFFFF) {
-        // PARSING ERROR: data too long
-        printf("ARG_ADD: ERROR - empty argument\n");
-        return -1;
+        // PARSING ERROR: INVALID ARG
+        return ERR_IA;
     }
 
     // Return address
@@ -258,13 +285,11 @@ int getDataArg(FILE *file, uint32_t *res, int writeEnable) {
         int next = fgetc(file);
         if (feof(file)) {
             // PARSING ERROR: PREMATURE END OF FILE
-            printf("ARG_DATA: ERROR - premature end of file\n");
-            return -1;
+            return ERR_EOF;
         }
         if (next != '\n') {
-            // PARSING ERROR: WHEN WRITE DISABLED DATA NEEDS TO BE EMPTY
-            printf("ARG_DATA: ERROR - data needs to be empty when reading\n");
-            return -1;
+            // PARSING ERROR: TOO_MANY_ARGS
+            return ERR_TMA;
         }
         return 0;
     }
@@ -274,9 +299,8 @@ int getDataArg(FILE *file, uint32_t *res, int writeEnable) {
     char *data_string = malloc(sizeof(char) * 11);
 
     if (data_string == NULL) {
-        // ERROR
-        printf("GENERAL: ERROR - memory allocation error\n");
-        return -1;
+        // MEMORY ALLOC ERROR
+        return ERR_ALLOC;
     }
 
     // Read in until ',' '\n' or 11 chars
@@ -287,33 +311,29 @@ int getDataArg(FILE *file, uint32_t *res, int writeEnable) {
 
         if (feof(file)) {
             // PARSING ERROR: PREMATURE END OF FILE
-            printf("ARG_DATA: ERROR - premature end of file\n");
-            return -1;
+            return ERR_EOF;
         }
 
         if (current == ',') {
-            // PARSING ERROR: ANOTHER ARG IN LINE
-            printf("ARGS: ERROR - too many arguments in row\n");
-            return -1;
+            // PARSING ERROR: TOO MANY ARGS
+            return ERR_TMA;
         }
 
         if (i == 10 && current != '\n') {
-            // PARSING ERROR: DATA TO LONG
-            printf("ARG_DATA: ERROR - data too long\n");
-            return -1;
+            // PARSING ERROR: INVALID ARG
+            return ERR_IA;
         }
 
         if (current == '\n') {
 
             // if empty and not allowed
             if (i == 0) {
-                // PARSING ERROR: EMPTY ADDRESS
-                printf("ARG_DATA: ERROR - empty argument\n");
-                return -1;
+                // PARSING ERROR: INVALID ARG
+                return ERR_IA;
             }
 
             // Append null byte
-            data_string[i] = 0;
+            data_string[i] ='\0';
             break;
 
         }
@@ -322,8 +342,6 @@ int getDataArg(FILE *file, uint32_t *res, int writeEnable) {
         data_string[i] = (char) current;
 
     }
-
-    // Convert string to int
 
     uint32_t data_int = 0;
     char *end;
@@ -334,16 +352,14 @@ int getDataArg(FILE *file, uint32_t *res, int writeEnable) {
         data_int = strtol(data_string, &end, 10);
     }
 
-    if (*end != 0) {
-        // PARSING ERROR: INVALID ADDRESS
-        printf("ARG_DATA: ERROR - '%s' is not valid data\n", data_string);
-        return -1;
+    if (*end != '\0') {
+        // PARSING ERROR: INVALID ARG
+        return ERR_IA;
     }
 
     if (data_int > 0xFFFFFFFF) {
-        // PARSING ERROR: data too long
-        printf("ARG_DATA: ERROR - data too long\n");
-        return -1;
+        // PARSING ERROR: INVALID ARG
+        return ERR_IA;
     }
 
     // Return address
