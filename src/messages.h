@@ -33,7 +33,6 @@
 
 
 
-#define successful  "Program succeeded successfully"
 #define HELP_MSG \
 "Verwendung: r5mm\n"  \
 "\n"             \
