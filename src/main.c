@@ -29,6 +29,7 @@ int main(int argc, char*argv[]) {
             {0,0,0,0}
     };
     opterr = 0; // Stellt die Fehlermeldungen von getopt_long still, um eigene Fehlermeldungen auszugeben
+
     // Durchsucht die übergebenen Optionen ob Hilfe gedruckt werden soll
     for (int i = 1; i < argc; i++) {
         if (strncmp(argv[i], "-h",2) == 0 || strncmp(argv[i], "--help",6) == 0) {
@@ -36,6 +37,7 @@ int main(int argc, char*argv[]) {
             exit(EXIT_SUCCESS);
         }
     }
+
     //Einlesen der Optionen/Argumente
     while ((opt = getopt_long(argc, argv, ":c:b:o:s:t:m:f:h", long_options, NULL))!= -1){
         switch (opt){
@@ -119,7 +121,7 @@ int main(int argc, char*argv[]) {
                 fprintf(stderr,HELP_MSG"\n");
                 exit(EXIT_SUCCESS);
             }
-            //ab hier fehlerhafte
+            //Fehlerbehandlung
             case '?':{
                 if(optopt) {
                     fprintf(stderr, UNKNOWN_OPTION "'-%c'\n"HINT"\n", optopt);
@@ -133,7 +135,6 @@ int main(int argc, char*argv[]) {
 
                     fprintf(stderr, NO_REQUIRED_ARGUMENT"'%s'\n"HINT"\n", argv[optind - 1]);
                     exit(EXIT_FAILURE);
-
             }
             default:
                 fprintf(stderr, UNKNOWN_OPTION "'%s'.\n", argv[optind - 1]);
@@ -154,7 +155,7 @@ int main(int argc, char*argv[]) {
     }
 
 
-    //for testing
+    //Zum Testen der Eingaben
     printf("cycles=%d\n", cycles);
     printf("blocksize=%u\n", blocksize);
     printf("v2bBlockOffset=%u\n", v2bBlockOffset);
