@@ -19,26 +19,25 @@ void printError(int code, const char* arg, int line) {
 
     switch (code) {
         case ERR_ALLOC:
-            printf(ERR_GENERAL_MEMORY_ALLOCATION_ERROR);
+            fprintf(stderr, ERR_GENERAL_MEMORY_ALLOCATION_ERROR);
             break;
         case ERR_OPEN:
-            printf(ERR_GENERAL_CANT_OPEN_FILE(arg));
+            fprintf(stderr, ERR_GENERAL_CANT_OPEN_FILE(arg));
             break;
         case ERR_EOF:
-            printf(ERR_FILE_PREMATURE_END_OF_FILE(arg, line));
+            fprintf(stderr, ERR_FILE_PREMATURE_END_OF_FILE(arg, line));
             break;
         case ERR_NL:
-            printf(ERR_FILE_PREMATURE_NEW_LINE(arg, line));
+            fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE(arg, line));
             break;
         case ERR_IA:
-            printf(ERR_FILE_INVALID_ARG(arg, line));
+            fprintf(stderr, ERR_FILE_INVALID_ARG(arg, line));
             break;
         case ERR_TMA:
-            printf(ERR_FILE_TOO_MANY_ARGS(line));
+            fprintf(stderr, ERR_FILE_TOO_MANY_ARGS(line));
             break;
         default:
-            printf("CODE: %d\n", code);
-            printf(ERR_GENERAL_UNKNOWN);
+            fprintf(stderr, ERR_GENERAL_UNKNOWN);
             break;
     }
 }
@@ -83,7 +82,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
 
     uint32_t* data = malloc(sizeof(uint32_t));
     if (data == NULL) {
-        // ERROR
+        // MEMORY ALLOC ERROR
         printError(ERR_ALLOC, "", 0);
         return -1;
     }
