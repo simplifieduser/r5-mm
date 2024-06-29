@@ -65,7 +65,7 @@ jobs:
         run: make debug
 
       - name: Cache build
-        uses: actions/cache/save@v3
+        uses: actions/cache@v3
         with:
           path: ./dist
           key: build
@@ -88,7 +88,7 @@ jobs:
         run: pip install pytest
 
       - name: Copy cached build
-        uses: actions/cache/restore@v3
+        uses: actions/cache@v3
         with:
           path: ./dist
           key: build
