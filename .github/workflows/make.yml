@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  actions: write
+
 env:
   SYSTEMC_HOME: ./systemc
   LD_LIBRARY_PATH: ./systemc/lib
@@ -64,8 +68,12 @@ jobs:
       - name: Build project
         run: make debug
 
+      - name: Clear cache
+        continue-on-error: true
+        run: gh cache delete build
+
       - name: Cache build
-        uses: actions/cache@v3
+        uses: actions/cache/save@v3
         with:
           path: ./dist
           key: build
@@ -88,7 +96,7 @@ jobs:
         run: pip install pytest
 
       - name: Copy cached build
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
           path: ./dist
           key: build
