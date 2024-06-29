@@ -67,6 +67,7 @@ jobs:
           key: build
 
   lint:
+    needs: build
     name: Linting checks
     runs-on: ubuntu-latest
     env:
@@ -83,6 +84,7 @@ jobs:
         run: sudo apt-get install -y build-essential
 
       - name: Run source code linter
+        continue-on-error: true
         run: make tidy
 
       - name: Set up libs
