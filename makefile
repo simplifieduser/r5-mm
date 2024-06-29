@@ -64,13 +64,13 @@ endif
 
 # Test build flags
 
-TIDYFLAGS := -checks=* -- $(CXXFLAGS)
+TIDYFLAGS := -checks=*
+CHECKFLAGS := -fsyntax-only -Wall -Wextra -Wpedantic
 
 ifdef TEST_BUILD
-  CCFLAGS += -Werror
-  CXXFLAGS += -Werror
   LDFLAGS += -fsanitize=undefined,address
-  TIDYFLAGS := -checks=* --warnings-as-errors=* -- $(CXXFLAGS)
+  TIDYFLAGS += --warnings-as-errors=*
+	CHECKFLAGS += -Werror
 endif
 
 
@@ -107,8 +107,10 @@ test_cpp: $(DIST)/test_cpp
 
 # Tidy targets
 tidy:
-	clang-tidy $(C_SRC) $(TIDYFLAGS)
-	clang-tidy $(CPP_SRC) $(TIDYFLAGS)
+	- clang $(CHECKFLAGS) $(C_SRC) $(CFLAGS)
+	- clang++ $(CHECKFLAGS) $(CPP_SRC) $(CXXFLAGS)
+	- clang-tidy $(C_SRC) $(TIDYFLAGS) -- $(CFLAGS)
+	- clang-tidy $(CPP_SRC) $(TIDYFLAGS) -- $(CXXFLAGS)
 
 # Clean up
 clean:
