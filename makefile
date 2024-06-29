@@ -78,7 +78,7 @@ endif
 # Targets #
 #         #
 
-.PHONY: all debug release clean
+.PHONY: all debug release tidy clean
 
 # Default target
 all: debug
@@ -106,11 +106,14 @@ test_cpp: LDFLAGS += -g
 test_cpp: $(DIST)/test_cpp
 
 # Tidy targets
-tidy:
-	- clang $(CHECKFLAGS) $(C_SRC) $(CFLAGS)
-	- clang++ $(CHECKFLAGS) $(CPP_SRC) $(CXXFLAGS)
-	- clang-tidy $(C_SRC) $(TIDYFLAGS) -- $(CFLAGS)
-	- clang-tidy $(CPP_SRC) $(TIDYFLAGS) -- $(CXXFLAGS)
+tidy:: 
+	clang $(CHECKFLAGS) $(C_SRC) $(CFLAGS)
+tidy:: 
+	clang++ $(CHECKFLAGS) $(CPP_SRC) $(CXXFLAGS)
+tidy::
+	clang-tidy $(C_SRC) $(TIDYFLAGS) -- $(CFLAGS)
+tidy::
+	clang-tidy $(CPP_SRC) $(TIDYFLAGS) -- $(CXXFLAGS)
 
 # Clean up
 clean:
