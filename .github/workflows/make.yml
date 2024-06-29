@@ -9,10 +9,10 @@ on:
       - main
 
 permissions:
-  contents: read
   actions: write
 
 env:
+  GH_TOKEN: ${{ github.token }}
   SYSTEMC_HOME: ./systemc
   LD_LIBRARY_PATH: ./systemc/lib
 
@@ -68,7 +68,7 @@ jobs:
       - name: Build project
         run: make debug
 
-      - name: Clear cache
+      - name: Clear build cache
         continue-on-error: true
         run: gh cache delete build
 
