@@ -41,10 +41,10 @@ jobs:
 
       - name: Set up libs
         id: cache-libs
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
           path: ./systemc
-          restore-keys: libs
+          key: libs
 
       - if: ${{ steps.cache-libs.outputs.cache-hit != 'true' }}
         name: Build libs
@@ -56,7 +56,7 @@ jobs:
 
       - if: ${{ steps.cache-libs.outputs.cache-hit != 'true' }}
         name: Cache libs
-        uses: actions/cache@v3
+        uses: actions/cache/save@v3
         with:
           path: ./systemc
           key: libs
@@ -65,7 +65,7 @@ jobs:
         run: make debug
 
       - name: Cache build
-        uses: actions/cache@v3
+        uses: actions/cache/save@v3
         with:
           path: ./dist
           key: build
@@ -88,7 +88,7 @@ jobs:
         run: pip install pytest
 
       - name: Copy cached build
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
           path: ./dist
           key: build
