@@ -9,6 +9,7 @@ on:
       - main
 
 permissions:
+  contents: read
   actions: write
 
 env:
