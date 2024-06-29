@@ -45,6 +45,12 @@ jobs:
           repository: 'simplifieduser/systemc'
           path: 'systemc'
 
+      - name: Build libs
+        run: |
+          cd systemc
+          make
+          cd ..
+
       - name: Build project
         run: make debug
 
