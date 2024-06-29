@@ -27,11 +27,6 @@ jobs:
 
     steps:
 
-      - name: Checkout lib repository
-        uses: actions/checkout@v4
-        with:
-          repository: simplifieduser/systemc
-
       - name: Set up build tools
         run: sudo apt-get install -y build-essential
 
@@ -39,18 +34,22 @@ jobs:
         id: cache-libs
         uses: actions/cache/restore@v3
         with:
-          path: .
+          path: ./systemc
           key: libs
 
       - if: ${{ steps.cache-libs.outputs.cache-hit != 'true' }}
         name: Build libs
-        run: make
+        run: |
+          git clone https://github.com/simplifieduser/systemc.git
+          cd systemc
+          make
+          cd ..
 
       - if: ${{ steps.cache-libs.outputs.cache-hit != 'true' }}
         name: Cache libs
         uses: actions/cache/save@v3
         with:
-          path: .
+          path: ./systemc
           key: libs
 
   lint:
