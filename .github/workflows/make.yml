@@ -45,18 +45,6 @@ jobs:
           repository: 'simplifieduser/systemc'
           path: 'systemc'
 
-      - name: Build libs
-        run: |
-          cd systemc
-          make
-          cd .. 
-
-      - name: upload lib
-        uses: actions/upload-artifact@v4
-        with:
-          name: systemc-build
-          path: systemc
-
       - name: Build project
         run: make debug
 
