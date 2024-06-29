@@ -56,7 +56,7 @@ CFLAGS := -std=c17
 
 CXX := clang++
 CXXFLAGS := -std=c++14 -I$(LIB)/include
-LDFLAGS := -I$(LIB)/include -L$(LIB)/lib -lsystemc
+LDFLAGS := -L$(LIB)/lib -I$(LIB)/include -lsystemc
 
 ifneq ($(shell uname -s), Darwin)
   LDFLAGS += -Wl,-rpath=$(LIB)/lib
