@@ -39,6 +39,7 @@ jobs:
         id: cache-libs
         uses: actions/cache/restore@v3
         with:
+          path: .
           key: libs
 
       - if: ${{ steps.cache-libs.outputs.cache-hit != 'true' }}
@@ -49,6 +50,7 @@ jobs:
         name: Cache libs
         uses: actions/cache/save@v3
         with:
+          path: .
           key: libs
 
   lint:
