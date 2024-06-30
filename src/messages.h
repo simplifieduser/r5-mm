@@ -1,6 +1,7 @@
 #ifndef IO_MESSAGES_H
 #define IO_MESSAGES_H
 
+
 #define INT_MAX "2147483647"
 #define UINT_MAX "4294967295"
 
@@ -60,5 +61,6 @@
 #define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler in Request-Datei: Zeile %d - Erwartet wurde %s, jedoch neue Request gefunden\n", line, arg
 #define ERR_FILE_INVALID_ARG(arg, line) "Fehler in Request-Datei: Zeile %d - Angegebener Wert, ist nich valide für %s\n", line, arg
 #define ERR_FILE_TOO_MANY_ARGS(line) "Fehler in Request-Datei: Zeile %d - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n", line
+
 
 #endif //IO_MESSAGES_H
