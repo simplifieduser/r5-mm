@@ -1,7 +1,6 @@
 #ifndef IO_MESSAGES_H
 #define IO_MESSAGES_H
 
-
 #define INT_MAX "2147483647"
 #define UINT_MAX "4294967295"
 
@@ -35,7 +34,7 @@
 #define ILLEGAL_ARGUMENT_MEMORY_LATENCY ILLEGAL_ARGUMENT_PASSING  "'memory-latency(-m/--memory-latency)' muss ein Integer im Interval [0; " UINT_MAX "] sein"
 
 // hint message
-#define successful  "Program succeeded successfully"
+#define successful  "Program succeeded successfully" // TODO: PLEASE RENAME UPPER CASE
 #define HINT "Hinweis: Verwenden Sie '-h/--help', um weiter Informationen bezüglich möglicher Argumente und ihrer Benutzung zu erhalten"
 #define HELP_MSG \
 "Verwendung: r5mm\n"  \
@@ -61,6 +60,5 @@
 #define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler in Request-Datei: Zeile %d - Erwartet wurde %s, jedoch neue Request gefunden\n", line, arg
 #define ERR_FILE_INVALID_ARG(arg, line) "Fehler in Request-Datei: Zeile %d - Angegebener Wert, ist nich valide für %s\n", line, arg
 #define ERR_FILE_TOO_MANY_ARGS(line) "Fehler in Request-Datei: Zeile %d - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n", line
-
 
 #endif //IO_MESSAGES_H
