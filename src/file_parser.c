@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include "file_parser.h"
 #include "messages.h"
 
@@ -7,6 +8,7 @@ enum RET_CODE {
     OK, OK_READ, OK_WRITE, OK_EOF, ERR_ALLOC, ERR_FOPEN, ERR_EOF, ERR_NEWLINE, ERR_INVARG, ERR_TOOMANY
 } typedef RET_CODE;
 
+const int MAX_ARG_LENGTH = 11;
 
 int getRWArg(FILE *file);
 int getAddressArg(FILE *file, uint32_t *res, RET_CODE mode);
@@ -16,25 +18,25 @@ void printError(RET_CODE code, const char* arg, int line) {
 
     switch (code) {
         case ERR_ALLOC:
-            fprintf(stderr, ERR_GENERAL_MEMORY_ALLOCATION_ERROR);
+            (void) fprintf(stderr, ERR_GENERAL_MEMORY_ALLOCATION_ERROR);
             break;
         case ERR_FOPEN:
-            fprintf(stderr, ERR_GENERAL_CANT_OPEN_FILE(arg));
+            (void) fprintf(stderr, ERR_GENERAL_CANT_OPEN_FILE(arg));
             break;
         case ERR_EOF:
-            fprintf(stderr, ERR_FILE_PREMATURE_END_OF_FILE(arg, line));
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_END_OF_FILE(arg, line));
             break;
         case ERR_NEWLINE:
-            fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE(arg, line));
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE(arg, line));
             break;
         case ERR_INVARG:
-            fprintf(stderr, ERR_FILE_INVALID_ARG(arg, line));
+            (void) fprintf(stderr, ERR_FILE_INVALID_ARG(arg, line));
             break;
         case ERR_TOOMANY:
-            fprintf(stderr, ERR_FILE_TOO_MANY_ARGS(line));
+            (void) fprintf(stderr, ERR_FILE_TOO_MANY_ARGS(line));
             break;
         default:
-            fprintf(stderr, ERR_GENERAL_UNKNOWN);
+            (void) fprintf(stderr, ERR_GENERAL_UNKNOWN);
             break;
     }
 }
@@ -42,7 +44,7 @@ void printError(RET_CODE code, const char* arg, int line) {
 int getLineCount(const char *path) {
 
     // Open file
-    FILE *file = fopen(path, "r");
+    FILE *file = fopen(path, "re");
 
     if (file == NULL) {
         // IO ERROR
@@ -55,14 +57,17 @@ int getLineCount(const char *path) {
 
     while (1) {
 
-        int c = fgetc(file);
-        if (feof(file)) break;
-        if (c == '\n') counter++;
+        int current = fgetc(file);
+        if (feof(file)) { break; }
+        if (current == '\n') { counter++; }
 
     }
 
     // Close file & return
-    fclose(file);
+    if (fclose(file) != 0) {
+        // IO ERROR
+        return -1;
+    }
     return counter;
 
 }
@@ -80,15 +85,18 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
     uint32_t* data = malloc(sizeof(uint32_t));
     if (data == NULL) {
         // MEMORY ERR_ALLOC ERROR
+        free(address);
         printError(ERR_ALLOC, "", 0);
         return -1;
     }
 
     // Open file
-    FILE *file = fopen(path, "r");
+    FILE *file = fopen(path, "re");
 
     if (file == NULL) {
         // IO ERROR
+        free(address);
+        free(data);
         printError(ERR_FOPEN, "", 0);
         return -1;
     }
@@ -103,7 +111,12 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
         if (mode == OK_EOF) {
             free(address);
             free(data);
-            fclose(file);
+
+            if (fclose(file) != 0) {
+                // IO ERROR
+                return -1;
+            }
+
             return i;
         }
 
@@ -132,9 +145,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
         }
 
         // Instance new request struct & add to array
-        Request newRequest = {};
-        newRequest.we = mode;
-        newRequest.addr = *address;
+        Request newRequest = { .we=mode, .data=*address, .addr=0 };
         if (mode == OK_WRITE) {
             newRequest.data = *data;
         }
@@ -146,7 +157,10 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
     // Something failed
     free(address);
     free(data);
-    fclose(file);
+    if (fclose(file) != 0) {
+        // IO ERROR
+        return -1;
+    }
     return -1;
 
 }
@@ -174,7 +188,9 @@ int getRWArg(FILE *file) {
     if (feof(file)) {
         // PARSING ERROR: PREMATURE END OF FILE
         return ERR_EOF;
-    } else if (sepChar == '\n') {
+    }
+
+    if (sepChar == '\n') {
         // PARSING ERROR: PREMATURE NEW LINE
         return ERR_NEWLINE;
     }
@@ -188,12 +204,15 @@ int getRWArg(FILE *file) {
 
     if (modeChar == 'r' || modeChar == 'R') {
         return OK_READ;
-    } else if (modeChar == 'w' || modeChar == 'W') {
-        return OK_WRITE;
-    } else {
-        // PARSING ERROR: INVALID ARG
-        return ERR_INVARG;
     }
+
+    if (modeChar == 'w' || modeChar == 'W') {
+        return OK_WRITE;
+    }
+
+    // PARSING ERROR: INVALID ARG
+    return ERR_INVARG;
+
 
 }
 
@@ -201,7 +220,7 @@ int getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
 
     // Init address_string array
 
-    char *address_string = malloc(sizeof(char) * 11);
+    char *address_string = malloc(sizeof(char) * MAX_ARG_LENGTH);
 
     if (address_string == NULL) {
         // MEMORY ERR_ALLOC ERROR
@@ -210,7 +229,7 @@ int getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
 
     // Read in until ',' '\n' or 11 chars
 
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < MAX_ARG_LENGTH; i++) {
 
         int current = fgetc(file);
 
@@ -243,7 +262,7 @@ int getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
             return ERR_NEWLINE;
         }
 
-        if (i == 10 && current != ',') {
+        if (i == MAX_ARG_LENGTH - 1 && current != ',') {
             // PARSING ERROR: INVALID ARG
             free(address_string);
             return ERR_INVARG;
@@ -286,7 +305,7 @@ int getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
         return ERR_INVARG;
     }
 
-    if (address_int > 0xFFFFFFFF) {
+    if (address_int > 0xFFFFFFFF) { // TODO: IS NECESSARY
         // PARSING ERROR: INVALID ARG
         free(address_string);
         return ERR_INVARG;
@@ -303,7 +322,7 @@ int getDataArg(FILE *file, uint32_t *res) {
 
     // Init data_string array
 
-    char *data_string = malloc(sizeof(char) * 11);
+    char *data_string = malloc(sizeof(char) * MAX_ARG_LENGTH);
 
     if (data_string == NULL) {
         // MEMORY ERR_ALLOC ERROR
@@ -313,7 +332,7 @@ int getDataArg(FILE *file, uint32_t *res) {
 
     // Read in until ',' '\n' or 11 chars
 
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < MAX_ARG_LENGTH; i++) {
 
         int current = fgetc(file);
 
@@ -329,7 +348,7 @@ int getDataArg(FILE *file, uint32_t *res) {
             return ERR_TOOMANY;
         }
 
-        if (i == 10 && current != '\n') {
+        if (i == MAX_ARG_LENGTH - 1 && current != '\n') {
             // PARSING ERROR: INVALID ARG
             free(data_string);
             return ERR_INVARG;
