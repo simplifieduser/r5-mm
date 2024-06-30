@@ -4,17 +4,20 @@
 #include "file_parser.h"
 #include "messages.h"
 
+// Used for determining success of supplement functions for arguments
 enum RET_CODE {
-    OK, OK_READ, OK_WRITE, OK_EOF, ERR_ALLOC, ERR_FOPEN, ERR_EOF, ERR_NEWLINE, ERR_INVARG, ERR_TOOMANY
+    OK_READ, OK_WRITE, OK_EOF,                                                    // Codes solely used by getREArg
+    OK, ERR_ALLOC, ERR_FOPEN, ERR_EOF, ERR_NEWLINE, ERR_INVARG, ERR_TOOMANY       // Codes used by all other args
 } typedef RET_CODE;
 
-const int MAX_ARG_LENGTH = 11;
+const int MAX_ARG_LENGTH = 11;                    // 32-bit number can only consist of 11 chars
+const unsigned int MAX_ARG_VALUE = 0xFFFFFFFF;    // Masked used to determining if passed number exceeds maximum
 
-int getRWArg(FILE *file);
+RET_CODE getRWArg(FILE *file);
 
-int getAddressArg(FILE *file, uint32_t *res, RET_CODE mode);
+RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode);
 
-int getDataArg(FILE *file, uint32_t *res);
+RET_CODE getDataArg(FILE *file, uint32_t *res);
 
 void printError(RET_CODE code, const char *arg, int line) {
 
@@ -167,13 +170,13 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
 
 }
 
-int getRWArg(FILE *file) {
+RET_CODE getRWArg(FILE *file) {
 
     // Get mode argument char
 
     int modeChar = fgetc(file);
 
-    // Check if file has ended, Return mode = 2
+    // Check if file has ended
     if (feof(file)) {
         return OK_EOF;
     }
@@ -202,7 +205,7 @@ int getRWArg(FILE *file) {
         return ERR_INVARG;
     }
 
-    // Return mode, READ=0 WRITE=1
+    // Return mode
 
     if (modeChar == 'r' || modeChar == 'R') {
         return OK_READ;
@@ -217,14 +220,14 @@ int getRWArg(FILE *file) {
 
 }
 
-int getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
+RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
 
     // Init address_string array
 
     char *address_string = malloc(sizeof(char) * MAX_ARG_LENGTH);
 
     if (address_string == NULL) {
-        // MEMORY ERR_ALLOC ERROR
+        // MEMORY ALLOC ERROR
         return ERR_ALLOC;
     }
 
@@ -306,7 +309,7 @@ int getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
         return ERR_INVARG;
     }
 
-    if (address_int > 0xFFFFFFFF) { // TODO: IS NECESSARY
+    if (address_int > MAX_ARG_VALUE) { // TODO: IS NECESSARY??
         // PARSING ERROR: INVALID ARG
         free(address_string);
         return ERR_INVARG;
@@ -319,7 +322,7 @@ int getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
 
 }
 
-int getDataArg(FILE *file, uint32_t *res) {
+RET_CODE getDataArg(FILE *file, uint32_t *res) {
 
     // Init data_string array
 
@@ -357,7 +360,7 @@ int getDataArg(FILE *file, uint32_t *res) {
 
         if (current == '\n') {
 
-            // if empty and not allowed
+            // if empty
             if (i == 0) {
                 // PARSING ERROR: INVALID ARG
                 free(data_string);
@@ -390,7 +393,7 @@ int getDataArg(FILE *file, uint32_t *res) {
         return ERR_INVARG;
     }
 
-    if (data_int > 0xFFFFFFFF) {
+    if (data_int > MAX_ARG_VALUE) { // TODO: IS NECESSARY??
         // PARSING ERROR: INVALID ARG
         free(data_string);
         return ERR_INVARG;
