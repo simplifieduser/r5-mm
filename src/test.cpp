@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     requests[3] = r4;
     requests[4] = r5;
 
-    Result res = run_simulation(1000, 17, 2, 8, 3, 23, 5, requests, "trace");
+    Result res = run_simulation(1000, 17, 2, 8, 3, 23, 5, requests, NULL);
 
     std::cout << res.cycles << "\n"
               << res.hits << "\n"

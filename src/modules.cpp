@@ -18,7 +18,8 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     std::vector<uint32_t> buffer(tlbSize); // stores which virtual addresses are in the tlb
     sc_clock clk;
 
-    sc_signal<size_t> cycles_count, misses, hits, primitive_gate_count;
+    sc_signal<size_t> misses, hits, primitive_gate_count;
+    sc_signal<int> cycles_count;
 
     REQUEST_PROCESSOR request_processor("request_processor", tlbSize, tlbsLatency, blocksize, v2bBlockOffset, memoryLatency, numRequests, requests, buffer);
     request_processor.clk.bind(clk);
@@ -28,11 +29,15 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     request_processor.primitive_gate_count.bind(primitive_gate_count);
 
     // create new tracefile and set the signals to be traced (clock and finished are unimportant)
-    sc_trace_file *file = sc_create_vcd_trace_file(tracefile);
-    sc_trace(file, cycles, "cycles");
-    sc_trace(file, misses, "misses");
-    sc_trace(file, hits, "hits");
-    sc_trace(file, primitive_gate_count, "gate_count");
+    sc_trace_file *file = NULL;
+    if (tracefile != NULL)
+    {
+        sc_trace_file *file = sc_create_vcd_trace_file(tracefile);
+        sc_trace(file, cycles_count, "cycles");
+        sc_trace(file, misses, "misses");
+        sc_trace(file, hits, "hits");
+        sc_trace(file, primitive_gate_count, "gate_count");
+    }
 
     sc_start();
 
@@ -49,7 +54,8 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     {
         result.cycles = cycles_count.read();
     }
-    sc_close_vcd_trace_file(file);
+    if (tracefile != NULL)
+        sc_close_vcd_trace_file(file);
 
     return result;
 }

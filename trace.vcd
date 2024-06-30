@@ -1,5 +1,5 @@
 $date
-     Jun 28, 2024       14:49:40
+     Jun 30, 2024       10:05:47
 $end
 
 $version
@@ -23,25 +23,44 @@ All initial values are dumped below at time 0 sec = 0 timescale units.
 $end
 
 $dumpvars
-b1111101000 aaaaa
+b0 aaaaa
 b0 aaaab
 b0 aaaac
 b0 aaaad
 $end
 
 #26000
+b11001 aaaaa
 b1 aaaab
 
+#49000
+b110000 aaaaa
+
 #53000
+b110010 aaaaa
 b1 aaaac
 
+#76000
+b1001001 aaaaa
+
 #103000
+b1100010 aaaaa
 b10 aaaab
 
+#126000
+b1111001 aaaaa
+
 #130000
+b1111011 aaaaa
 b10 aaaac
 
+#153000
+b10010010 aaaaa
+
 #180000
+b10101011 aaaaa
 b11 aaaab
 
-#204000
+#203000
+b11000010 aaaaa
+

@@ -32,7 +32,7 @@ SC_MODULE(ADDRESS_GETTER)
     sc_out<bool> finished;
     sc_out<uint32_t> physical_address;
     // counts the cycles needed to retrieve the address
-    sc_out<size_t> cycles;
+    sc_out<int> cycles;
     // true, if address in tlb, otherwise false
     sc_out<bool> hit;
 
@@ -40,7 +40,7 @@ SC_MODULE(ADDRESS_GETTER)
 
     SC_CTOR(ADDRESS_GETTER);
 
-    ADDRESS_GETTER(sc_module_name name, std::vector<uint32_t> buffer, unsigned tlb_size, unsigned tlbs_latency, unsigned blocksize, unsigned v2b_block_offset, unsigned memory_latency) : sc_module(name), buffer(buffer), tlb_size(tlb_size), tlbs_latency(tlbs_latency), blocksize(blocksize), v2b_block_offset(v2b_block_offset), memory_latency(memory_latency)
+    ADDRESS_GETTER(sc_module_name name, std::vector<uint32_t> buffer, unsigned tlb_size, unsigned tlbs_latency, unsigned blocksize, unsigned v2b_block_offset, unsigned memory_latency) : sc_module(name), buffer(buffer), tlbs_latency(tlbs_latency), memory_latency(memory_latency), blocksize(blocksize), v2b_block_offset(v2b_block_offset), tlb_size(tlb_size)
     {
         SC_THREAD(count_latency);
         sensitive << clk.pos();
@@ -65,6 +65,7 @@ SC_MODULE(ADDRESS_GETTER)
             while (cycle_count < latency)
             {
                 cycle_count++;
+                cycles->write(cycle_count);
                 wait();
             }
             wait(SC_ZERO_TIME);
@@ -93,7 +94,7 @@ SC_MODULE(ADDRESS_GETTER)
         }
         else
         {
-            std::cout << "miss, because: \ntag is wrong: " << (current_tag_in_tlb != tag) << "cold miss: " << (previuosly_visited.count(tag) == 0) << std::endl;
+            std::cout << "miss, because: \ntag is wrong: " << (current_tag_in_tlb != tag) << "; cold miss: " << (previuosly_visited.count(tag) == 0) << std::endl;
 
             previuosly_visited.insert(tag);
             buffer[tag % tlb_size] = tag;
@@ -143,7 +144,7 @@ SC_MODULE(MAIN_MEMORY)
 
             update_memory();
 
-            int cycle_counter = 0;
+            unsigned int cycle_counter = 0;
 
             while (cycle_counter < memory_latency)
             {
@@ -201,13 +202,14 @@ SC_MODULE(REQUEST_PROCESSOR)
     std::vector<uint32_t> buffer; // stores which virtual addresses are currently in tlb
 
     sc_signal<uint32_t> current_virt_address, current_phys_address, data, out_data;
-    sc_signal<size_t> addr_cycles;
+    sc_signal<int> addr_cycles;
     sc_signal<bool> get_address_finished, manage_data_finished, we, start_request, hit, notify_memory;
 
-    sc_out<size_t> cycles, misses, hits, primitive_gate_count;
+    sc_out<size_t> misses, hits, primitive_gate_count;
+    sc_out<int> cycles;
 
     SC_CTOR(REQUEST_PROCESSOR);
-    REQUEST_PROCESSOR(sc_module_name name, unsigned tlb_size, unsigned tlbs_latency, unsigned blocksize, unsigned v2b_block_offset, unsigned memory_latency, size_t num_requests, Request *requests, std::vector<uint32_t> buffer_param) : sc_module(name), tlb_size(tlb_size), tlbs_latency(tlbs_latency), blocksize(blocksize), v2b_block_offset(v2b_block_offset), memory_latency(memory_latency), num_requests(num_requests), requests(requests), buffer(buffer_param), address_getter("address_getter", buffer_param, tlb_size, tlbs_latency, blocksize, v2b_block_offset, memory_latency), data_manager("data_manager", memory_latency)
+    REQUEST_PROCESSOR(sc_module_name name, unsigned tlb_size, unsigned tlbs_latency, unsigned blocksize, unsigned v2b_block_offset, unsigned memory_latency, size_t num_requests, Request *requests, std::vector<uint32_t> buffer_param) : sc_module(name), tlb_size(tlb_size), tlbs_latency(tlbs_latency), blocksize(blocksize), v2b_block_offset(v2b_block_offset), memory_latency(memory_latency), num_requests(num_requests), requests(requests), address_getter("address_getter", buffer_param, tlb_size, tlbs_latency, blocksize, v2b_block_offset, memory_latency), data_manager("data_manager", memory_latency), buffer(buffer_param)
     {
         // TODO: bind hit and cycles for address getter
         address_getter.clk.bind(clk);
@@ -235,7 +237,7 @@ SC_MODULE(REQUEST_PROCESSOR)
 
     void run_program()
     {
-        for (int i = 0; i < num_requests; i++)
+        for (size_t i = 0; i < num_requests; i++)
         {
             wait(SC_ZERO_TIME);
             std::cout << "\n\n"
