@@ -197,7 +197,7 @@ int getRWArg(FILE *file) {
 
     if (sepChar != ',') {
         // PARSING ERROR: INVALID ARG
-        return ERR_NEWLINE;
+        return ERR_INVARG;
     }
 
     // Return mode, READ=0 WRITE=1
@@ -212,7 +212,6 @@ int getRWArg(FILE *file) {
 
     // PARSING ERROR: INVALID ARG
     return ERR_INVARG;
-
 
 }
 
