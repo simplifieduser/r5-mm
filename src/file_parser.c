@@ -11,10 +11,12 @@ enum RET_CODE {
 const int MAX_ARG_LENGTH = 11;
 
 int getRWArg(FILE *file);
+
 int getAddressArg(FILE *file, uint32_t *res, RET_CODE mode);
+
 int getDataArg(FILE *file, uint32_t *res);
 
-void printError(RET_CODE code, const char* arg, int line) {
+void printError(RET_CODE code, const char *arg, int line) {
 
     switch (code) {
         case ERR_ALLOC:
@@ -75,14 +77,14 @@ int getLineCount(const char *path) {
 int parseFile(const char *path, int maxRequestCount, Request requests[]) {
 
     // Init value pointers
-    uint32_t* address = malloc(sizeof(uint32_t));
+    uint32_t *address = malloc(sizeof(uint32_t));
     if (address == NULL) {
         // ERROR
         printError(ERR_ALLOC, "", 0);
         return -1;
     }
 
-    uint32_t* data = malloc(sizeof(uint32_t));
+    uint32_t *data = malloc(sizeof(uint32_t));
     if (data == NULL) {
         // MEMORY ERR_ALLOC ERROR
         free(address);
@@ -145,7 +147,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
         }
 
         // Instance new request struct & add to array
-        Request newRequest = { .we=mode, .data=*address, .addr=0 };
+        Request newRequest = {.we=mode, .data=*address, .addr=0};
         if (mode == OK_WRITE) {
             newRequest.data = *data;
         }
@@ -363,7 +365,7 @@ int getDataArg(FILE *file, uint32_t *res) {
             }
 
             // Append null byte
-            data_string[i] ='\0';
+            data_string[i] = '\0';
             break;
 
         }
