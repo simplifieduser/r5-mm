@@ -3,37 +3,34 @@
 #include "file_parser.h"
 #include "messages.h"
 
-#define ERR_ALLOC (-1)
-#define ERR_OPEN (-2)
-#define ERR_EOF (-3)
-#define ERR_NL (-4)
-#define ERR_IA (-5)
-#define ERR_TMA (-6)
+enum RET_CODE {
+    OK, OK_READ, OK_WRITE, OK_EOF, ERR_ALLOC, ERR_FOPEN, ERR_EOF, ERR_NEWLINE, ERR_INVARG, ERR_TOOMANY
+} typedef RET_CODE;
 
 
 int getRWArg(FILE *file);
-int getAddressArg(FILE *file, uint32_t *res, int writeEnable);
+int getAddressArg(FILE *file, uint32_t *res, RET_CODE mode);
 int getDataArg(FILE *file, uint32_t *res);
 
-void printError(int code, const char* arg, int line) {
+void printError(RET_CODE code, const char* arg, int line) {
 
     switch (code) {
         case ERR_ALLOC:
             fprintf(stderr, ERR_GENERAL_MEMORY_ALLOCATION_ERROR);
             break;
-        case ERR_OPEN:
+        case ERR_FOPEN:
             fprintf(stderr, ERR_GENERAL_CANT_OPEN_FILE(arg));
             break;
         case ERR_EOF:
             fprintf(stderr, ERR_FILE_PREMATURE_END_OF_FILE(arg, line));
             break;
-        case ERR_NL:
+        case ERR_NEWLINE:
             fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE(arg, line));
             break;
-        case ERR_IA:
+        case ERR_INVARG:
             fprintf(stderr, ERR_FILE_INVALID_ARG(arg, line));
             break;
-        case ERR_TMA:
+        case ERR_TOOMANY:
             fprintf(stderr, ERR_FILE_TOO_MANY_ARGS(line));
             break;
         default:
@@ -49,7 +46,7 @@ int getLineCount(const char *path) {
 
     if (file == NULL) {
         // IO ERROR
-        printError(ERR_OPEN, path, 0);
+        printError(ERR_FOPEN, path, 0);
         return -1;
     }
 
@@ -82,7 +79,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
 
     uint32_t* data = malloc(sizeof(uint32_t));
     if (data == NULL) {
-        // MEMORY ALLOC ERROR
+        // MEMORY ERR_ALLOC ERROR
         printError(ERR_ALLOC, "", 0);
         return -1;
     }
@@ -92,7 +89,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
 
     if (file == NULL) {
         // IO ERROR
-        printError(ERR_OPEN, "", 0);
+        printError(ERR_FOPEN, "", 0);
         return -1;
     }
 
@@ -103,14 +100,14 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
         int mode = getRWArg(file);
 
         // Check if parsing complete
-        if (mode == 2) {
+        if (mode == OK_EOF) {
             free(address);
             free(data);
             fclose(file);
             return i;
         }
 
-        if (mode < 0) {
+        if (mode != OK_READ && mode != OK_WRITE) {
             // PARSING ERROR
             printError(mode, "write_enable", i + 1);
             break;
@@ -118,16 +115,16 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
 
         // address arg
         int addressStatus = getAddressArg(file, address, mode);
-        if (addressStatus < 0) {
+        if (addressStatus != OK) {
             // PARSING ERROR
             printError(addressStatus, "address", i + 1);
             break;
         }
 
         // data arg - if write enabled
-        if (mode) {
+        if (mode == OK_WRITE) {
             int dataStatus = getDataArg(file, data);
-            if (dataStatus < 0) {
+            if (dataStatus != OK) {
                 // PARSING ERROR
                 printError(dataStatus, "write_data", i + 1);
                 break;
@@ -138,7 +135,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
         Request newRequest = {};
         newRequest.we = mode;
         newRequest.addr = *address;
-        if (mode) {
+        if (mode == OK_WRITE) {
             newRequest.data = *data;
         }
 
@@ -162,12 +159,12 @@ int getRWArg(FILE *file) {
 
     // Check if file has ended, Return mode = 2
     if (feof(file)) {
-        return 2;
+        return OK_EOF;
     }
 
     if (modeChar == '\n') {
         // PARSING ERROR: PREMATURE NEW LINE
-        return ERR_NL;
+        return ERR_NEWLINE;
     }
 
     // Get cell separator char
@@ -179,35 +176,35 @@ int getRWArg(FILE *file) {
         return ERR_EOF;
     } else if (sepChar == '\n') {
         // PARSING ERROR: PREMATURE NEW LINE
-        return ERR_NL;
+        return ERR_NEWLINE;
     }
 
     if (sepChar != ',') {
         // PARSING ERROR: INVALID ARG
-        return ERR_IA;
+        return ERR_NEWLINE;
     }
 
     // Return mode, READ=0 WRITE=1
 
     if (modeChar == 'r' || modeChar == 'R') {
-        return 0;
+        return OK_READ;
     } else if (modeChar == 'w' || modeChar == 'W') {
-        return 1;
+        return OK_WRITE;
     } else {
         // PARSING ERROR: INVALID ARG
-        return ERR_IA;
+        return ERR_INVARG;
     }
 
 }
 
-int getAddressArg(FILE *file, uint32_t *res, int writeEnable) {
+int getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
 
     // Init address_string array
 
     char *address_string = malloc(sizeof(char) * 11);
 
     if (address_string == NULL) {
-        // MEMORY ALLOC ERROR
+        // MEMORY ERR_ALLOC ERROR
         return ERR_ALLOC;
     }
 
@@ -224,13 +221,13 @@ int getAddressArg(FILE *file, uint32_t *res, int writeEnable) {
         }
 
         // On new line in read mode -> valid
-        if (current == '\n' && !writeEnable) {
+        if (current == '\n' && mode == OK_READ) {
 
             // if empty
             if (i == 0) {
                 // PARSING ERROR: INVALID ARG
                 free(address_string);
-                return ERR_IA;
+                return ERR_INVARG;
             }
 
             // Append null byte
@@ -240,16 +237,16 @@ int getAddressArg(FILE *file, uint32_t *res, int writeEnable) {
         }
 
         // On new line in write mode -> invalid
-        if (current == '\n') {
+        if (current == '\n' && mode == OK_WRITE) {
             // PARSING ERROR: PREMATURE NEW LINE
             free(address_string);
-            return ERR_NL;
+            return ERR_NEWLINE;
         }
 
         if (i == 10 && current != ',') {
             // PARSING ERROR: INVALID ARG
             free(address_string);
-            return ERR_IA;
+            return ERR_INVARG;
         }
 
         if (current == ',') {
@@ -258,7 +255,7 @@ int getAddressArg(FILE *file, uint32_t *res, int writeEnable) {
             if (i == 0) {
                 // PARSING ERROR: INVALID ARG
                 free(address_string);
-                return ERR_IA;
+                return ERR_INVARG;
             }
 
             // Append null byte
@@ -286,19 +283,19 @@ int getAddressArg(FILE *file, uint32_t *res, int writeEnable) {
     if (*end != 0) {
         // PARSING ERROR: INVALID ARG
         free(address_string);
-        return ERR_IA;
+        return ERR_INVARG;
     }
 
     if (address_int > 0xFFFFFFFF) {
         // PARSING ERROR: INVALID ARG
         free(address_string);
-        return ERR_IA;
+        return ERR_INVARG;
     }
 
     // Return address
     *res = address_int;
     free(address_string);
-    return 0;
+    return OK;
 
 }
 
@@ -309,7 +306,7 @@ int getDataArg(FILE *file, uint32_t *res) {
     char *data_string = malloc(sizeof(char) * 11);
 
     if (data_string == NULL) {
-        // MEMORY ALLOC ERROR
+        // MEMORY ERR_ALLOC ERROR
         free(data_string);
         return ERR_ALLOC;
     }
@@ -329,13 +326,13 @@ int getDataArg(FILE *file, uint32_t *res) {
         if (current == ',') {
             // PARSING ERROR: TOO MANY ARGS
             free(data_string);
-            return ERR_TMA;
+            return ERR_TOOMANY;
         }
 
         if (i == 10 && current != '\n') {
             // PARSING ERROR: INVALID ARG
             free(data_string);
-            return ERR_IA;
+            return ERR_INVARG;
         }
 
         if (current == '\n') {
@@ -344,7 +341,7 @@ int getDataArg(FILE *file, uint32_t *res) {
             if (i == 0) {
                 // PARSING ERROR: INVALID ARG
                 free(data_string);
-                return ERR_IA;
+                return ERR_INVARG;
             }
 
             // Append null byte
@@ -370,18 +367,18 @@ int getDataArg(FILE *file, uint32_t *res) {
     if (*end != '\0') {
         // PARSING ERROR: INVALID ARG
         free(data_string);
-        return ERR_IA;
+        return ERR_INVARG;
     }
 
     if (data_int > 0xFFFFFFFF) {
         // PARSING ERROR: INVALID ARG
         free(data_string);
-        return ERR_IA;
+        return ERR_INVARG;
     }
 
     // Return address
     *res = data_int;
     free(data_string);
-    return 0;
+    return OK;
 
 }

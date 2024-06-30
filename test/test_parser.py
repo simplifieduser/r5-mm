@@ -34,12 +34,12 @@ def generate_valid(filename, reqeust_count):
             if mode is 'r' or mode is 'R':
                 addr = random_value()
                 writer.writerow([mode, addr])
-                requests.append(f"{i}: 0 {int(addr, 0)} 0")
+                requests.append(f"{i}: 1 {int(addr, 0)} 0")
             else:
                 addr = random_value()
                 data = random_value()
                 writer.writerow([mode, addr, data])
-                requests.append(f"{i}: 1 {int(addr, 0)} {int(data, 0)}")
+                requests.append(f"{i}: 2 {int(addr, 0)} {int(data, 0)}")
 
     return requests
 
@@ -71,12 +71,12 @@ def generate_invalid(filename, reqeust_count):
             if mode is 'r' or mode is 'R':
                 addr = random_value()
                 writer.writerow([mode, addr])
-                requests.append(f"{i}: 0 {int(addr, 0)} 0")
+                requests.append(f"{i}: 1 {int(addr, 0)} 0")
             else:
                 addr = random_value()
                 data = random_value()
                 writer.writerow([mode, addr, data])
-                requests.append(f"{i}: 1 {int(addr, 0)} {int(data, 0)}")
+                requests.append(f"{i}: 2 {int(addr, 0)} {int(data, 0)}")
 
         invalid_argument = random.choice(invalid_argument_options)
 
