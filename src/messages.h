@@ -1,24 +1,30 @@
 #ifndef IO_MESSAGES_H
 #define IO_MESSAGES_H
 
-#endif //IO_MESSAGES_H
-#include <string.h>
-#include "stdint.h"
-#include <stdio.h>
-//Here are messages to be returned
 #define INT_MAX "2147483647"
 #define UINT_MAX "4294967295"
 
-//hint
-#define HINT "Hinweis: Verwenden Sie '-h/--help', um weiter Informationen bezüglich möglicher Argumente und ihrer Benutzung zu erhalten"
 
-//error msg input
+//             //
+//   GENERAL   //
+//             //
+
+#define ERR_GENERAL_UNKNOWN "Es ist ein unerwarteter Fehler aufgetreten\n"
+#define ERR_GENERAL_MEMORY_ALLOCATION_ERROR "Es konnte kein Speicher alloziert werden\n"
+#define ERR_GENERAL_CANT_OPEN_FILE(file) "Fehler beim öffnen der Datei %s\n", file
+
+
+//                  //
+// ARGUMENT PARSING //
+//                  //
+
+// invalid arguments
 #define ILLEGAL_ARGUMENT_PASSING "Fehler: ungültiges Argument: "
 #define UNKNOWN_OPTION "Fehler: es wurde eine unbekannte Option übergeben, bitte entferne: "
 #define TOO_MANY_OPTION "Fehler: es wurden zu viele Optionen übergeben"
 #define NO_REQUIRED_ARGUMENT "Fehler: folgende Option benötigt ein Argument: "
 
-//ILLEGAL_ARGUMENT_PASSING
+// illegal arguments
 #define NO_FILE_INPUT ILLEGAL_ARGUMENT_PASSING "Es muss eine Eingabedatei als Positional Argument übergeben werden"
 #define ILLEGAL_ARGUMENT_CYCLES ILLEGAL_ARGUMENT_PASSING "'cycles (-c/--cycles)' muss ein Integer im Interval [0; " INT_MAX "] sein"
 #define ILLEGAL_ARGUMENT_BLOCKSIZE ILLEGAL_ARGUMENT_PASSING  "'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; " UINT_MAX "] sein"
@@ -27,9 +33,9 @@
 #define ILLEGAL_ARGUMENT_TLB_LATENCY ILLEGAL_ARGUMENT_PASSING  "'tlb-latency(-t/--tlb-latency)' muss ein Integer im Interval [0; " UINT_MAX "] sein"
 #define ILLEGAL_ARGUMENT_MEMORY_LATENCY ILLEGAL_ARGUMENT_PASSING  "'memory-latency(-m/--memory-latency)' muss ein Integer im Interval [0; " UINT_MAX "] sein"
 
-
-
+// hint message
 #define successful  "Program succeeded successfully"
+#define HINT "Hinweis: Verwenden Sie '-h/--help', um weiter Informationen bezüglich möglicher Argumente und ihrer Benutzung zu erhalten"
 #define HELP_MSG \
 "Verwendung: r5mm\n"  \
 "\n"             \
@@ -45,13 +51,14 @@
 "   <Dateiname>               !muss immer gesetzt werden!   <Dateiname>             Name der Eingabedatei, mit den zu verarbeitenden Daten\n"\
 "   -h, --help                --------------------------------------------------    Gibt diese Nachricht aus\n"
 
-// general messages
-#define ERR_GENERAL_UNKNOWN "Es ist ein unerwarteter Fehler aufgetreten\n"
-#define ERR_GENERAL_MEMORY_ALLOCATION_ERROR "Es konnte kein Speicher alloziert werden\n"
-#define ERR_GENERAL_CANT_OPEN_FILE(file) "Fehler beim öffnen der Datei %s\n", file
 
-// request file passing messages
+//                      //
+// REQUEST FILE PARSING //
+//                      //
+
 #define ERR_FILE_PREMATURE_END_OF_FILE(arg, line) "Fehler in Request-Datei: Zeile %d - Erwartet wurde %s, jedoch Ende der Datei gefunden\n", line, arg
 #define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler in Request-Datei: Zeile %d - Erwartet wurde %s, jedoch neue Request gefunden\n", line, arg
 #define ERR_FILE_INVALID_ARG(arg, line) "Fehler in Request-Datei: Zeile %d - Angegebener Wert, ist nich valide für %s\n", line, arg
 #define ERR_FILE_TOO_MANY_ARGS(line) "Fehler in Request-Datei: Zeile %d - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n", line
+
+#endif //IO_MESSAGES_H
