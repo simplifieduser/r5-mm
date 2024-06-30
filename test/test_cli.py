@@ -88,7 +88,7 @@ test_cases = [
             "error": "Fehler: ungültiges Argument: 'cycles (-c/--cycles)' muss ein Integer im Interval [0; 2147483647] sein"
         }
     },
-#down are gpt
+    #down are gpt
     {
         "expected": {
             "returncode": 0,
@@ -378,21 +378,19 @@ test_cases = [
             }
         }
     }
-#gpt generated
+    #gpt generated
 
 ]
-
 
 
 def run_program(args):
     print(' '.join(args))
     return subprocess.run(
-         args,
+        args,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
     )
-
 
 
 @pytest.mark.parametrize("test_case", test_cases)
@@ -402,11 +400,11 @@ def test_cases_runner(test_case):
     expected_values = default_values.copy()
     args = ["./r5mm"]
 
-    for key, value in expected["values"].items():# filtert und erstellt den Input
+    for key, value in expected["values"].items():  # filtert und erstellt den Input
         key_str = str(key)
-        if key_str == "INPUT": # die Inputfile ist ein Partial argument, deswegen ohne key
+        if key_str == "INPUT":  # die Inputfile ist ein Partial argument, deswegen ohne key
             args.append(str(value))
-        elif str(value) == "": # falls eine Option ohne Argument übergeben werden soll
+        elif str(value) == "":  # falls eine Option ohne Argument übergeben werden soll
             args.append(key_str)
         else:
             args.append(key_str)
@@ -429,9 +427,7 @@ def test_cases_runner(test_case):
         elif key_str == "INPUT":
             expected_values["inputfile"] = value
 
-
     result = run_program(args)
-
 
     assert result.returncode == expected["returncode"]
 
