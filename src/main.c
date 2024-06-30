@@ -5,7 +5,7 @@
 #include <errno.h>
 #include "messages.h"
 int main(int argc, char*argv[]) {
-    int cycles = 100;
+    int cycles = 10000;
     unsigned int tlbSize = 64;
     unsigned int tlbLatency = 1;
     unsigned int blocksize = 4;
@@ -121,7 +121,7 @@ int main(int argc, char*argv[]) {
                 fprintf(stderr,HELP_MSG"\n");
                 exit(EXIT_SUCCESS);
             }
-            //Fehlerbehandlung
+                //Fehlerbehandlung
             case '?':{
                 if(optopt) {
                     fprintf(stderr, UNKNOWN_OPTION "'-%c'\n"HINT"\n", optopt);
@@ -133,8 +133,8 @@ int main(int argc, char*argv[]) {
             }
             case ':':{
 
-                    fprintf(stderr, NO_REQUIRED_ARGUMENT"'%s'\n"HINT"\n", argv[optind - 1]);
-                    exit(EXIT_FAILURE);
+                fprintf(stderr, NO_REQUIRED_ARGUMENT"'%s'\n"HINT"\n", argv[optind - 1]);
+                exit(EXIT_FAILURE);
             }
             default:
                 fprintf(stderr, UNKNOWN_OPTION "'%s'.\n", argv[optind - 1]);
