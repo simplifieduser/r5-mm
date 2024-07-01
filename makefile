@@ -84,13 +84,13 @@ endif
 all: debug
 
 # Debug target
-debug: CCFLAGS += -g -Wall -Wextra
+debug: CFLAGS += -g -Wall -Wextra
 debug: CXXFLAGS += -g -Wall -Wextra
 debug: LDFLAGS += -g
 debug: $(DIST)/$(TARGET)
 
 # Release target
-release: CCFLAGS += -O2
+release: CFLAGS += -O2
 release: CXXFLAGS += -O2
 release: LDFLAGS += -O2
 release: $(DIST)/$(TARGET)
@@ -98,7 +98,7 @@ release: $(DIST)/$(TARGET)
 # Test targets
 test: test_c test_cpp
 
-test_c: CCFLAGS += -g -Wall -Wextra
+test_c: CFLAGS += -g -Wall -Wextra
 test_c: $(DIST)/test_c
 
 test_cpp: CXXFLAGS += -g -Wall -Wextra
