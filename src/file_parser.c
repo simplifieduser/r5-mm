@@ -150,7 +150,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
         }
 
         // Instance new request struct & add to array
-        Request newRequest = {.we=mode, .data=*address, .addr=0};
+        Request newRequest = {.we=mode, .addr=*address, .data=0};
         if (mode == OK_WRITE) {
             newRequest.data = *data;
         }

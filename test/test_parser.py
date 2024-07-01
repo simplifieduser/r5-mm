@@ -34,99 +34,48 @@ def generate_valid(filename, reqeust_count):
             if mode is 'r' or mode is 'R':
                 addr = random_value()
                 writer.writerow([mode, addr])
-                requests.append(f"{i}: 1 {int(addr, 0)} 0")
+                requests.append(f"{i}: 0 {int(addr, 0)} 0")
             else:
                 addr = random_value()
                 data = random_value()
                 writer.writerow([mode, addr, data])
-                requests.append(f"{i}: 2 {int(addr, 0)} {int(data, 0)}")
+                requests.append(f"{i}: 1 {int(addr, 0)} {int(data, 0)}")
 
     return requests
 
 
-def test_valid():
-
-    for _ in range(50):
-
-        requests = generate_valid("./test.csv", random.randrange(0, 100))
-        process = subprocess.run(["./r5mm", "./test.csv"], stdout=subprocess.PIPE, text=True)
-        assert process.returncode == 0
-        lines = process.stdout.split('\n')
-        for i, req in enumerate(requests):
-            assert req == lines[i]
-
-
-def generate_invalid(filename, reqeust_count):
-
-    requests = []
-    command_options = ['r', 'R', 'w', 'W']
-    invalid_argument_options = ['mode', 'add', 'data']
-
+def generate_invalid(filename, request_count):
+    command_options = ['r', 'R', 'w', 'W', random_value(False)]
     with open(filename, 'w', newline='') as file:
-
         writer = csv.writer(file, lineterminator="\n")
-
-        for i in range(reqeust_count - 1):
+        for _ in range(request_count):
             mode = random.choice(command_options)
-            if mode is 'r' or mode is 'R':
-                addr = random_value()
+            if mode in ['r', 'R']:
+                addr = random_value(random.choice([True, False]))
                 writer.writerow([mode, addr])
-                requests.append(f"{i}: 1 {int(addr, 0)} 0")
-            else:
-                addr = random_value()
-                data = random_value()
+            elif mode in ['w', 'W']:
+                addr = random_value(random.choice([True, False]))
+                data = random_value(random.choice([True, False]))
                 writer.writerow([mode, addr, data])
-                requests.append(f"{i}: 2 {int(addr, 0)} {int(data, 0)}")
-
-        invalid_argument = random.choice(invalid_argument_options)
-
-        if invalid_argument is 'mode':
-            random_mode = random_value(False)
-            for i in range(reqeust_count):
-                mode = random.choice(command_options)
-                if mode is 'r' or mode is 'R':
-                    addr = random_value()
-                    writer.writerow([random_mode, addr])
-                    requests.append("mode")
-                else:
-                    addr = random_value()
-                    data = random_value()
-                    writer.writerow([random_mode, addr, data])
-                    requests.append("mode")
-
-        elif invalid_argument is 'add':
-            random_add = random_value(False)
-            for i in range(reqeust_count):
-                mode = random.choice(command_options)
-                if mode is 'r' or mode is 'R':
-                    writer.writerow([mode, random_add])
-                    requests.append("mode")
-                else:
-                    data = random_value()
-                    writer.writerow([mode, random_add, data])
-                    requests.append("mode")
-
-        elif invalid_argument is 'data':
-            random_data = random_value(False)
-            for i in range(reqeust_count):
-                mode = random.choice(command_options)
-                if mode is 'r' or mode is 'R':
-                    addr = random_value()
-                    writer.writerow([mode, addr, random_data])
-                    requests.append("data-read")
-                else:
-                    addr = random_value()
-                    writer.writerow([mode, addr, random_data])
-                    requests.append("data")
-
-    return requests
-
-def test_invalid():
-
-    for _ in range(50):
-        requests = generate_valid("./test.csv", random.randrange(0, 100))
-        requests = generate_invalid("./test.csv", 50)
-        process = subprocess.run(["./r5mm", "./test.csv"], stdout=subprocess.PIPE, text=True)
-        assert process.returncode == 1
+            else:
+                addr = random_value(random.choice([True, False]))
+                data = random_value(random.choice([True, False]))
+                writer.writerow([mode, addr, data])
 
 
+@pytest.mark.parametrize("request_count", [random.randint(1, 100) for _ in range(50)])
+def test_valid(request_count):
+
+    requests = generate_valid("./test.csv", request_count)
+    process = subprocess.run(["./r5mm", "./test.csv"], stdout=subprocess.PIPE, text=True)
+    assert process.returncode == 0
+    lines = process.stdout.split('\n')
+    for i, req in enumerate(requests):
+        assert lines[i] == req
+
+
+@pytest.mark.parametrize("request_count", [random.randint(1, 100) for _ in range(50)])
+def test_invalid(request_count):
+    generate_invalid("./test.csv", request_count)
+    process = subprocess.run(["./r5mm", "./test.csv"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+    assert process.returncode != 0
