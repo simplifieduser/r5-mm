@@ -57,6 +57,185 @@ test_cases = [
             }
         }
     },
+    {
+        "expected": {
+            "returncode": 0,
+            "values": {
+                "-c": 75,
+                "-b": 64,
+                "-o": 9,
+                "-s": 512,
+                "-t": 12,
+                "-m": 400,
+                "-f": "tracefile7.txt",
+                "INPUT": "Inputfile7.csv"
+            }
+        }
+    },
+    {
+        "expected": {
+            "returncode": 0,
+            "values": {
+                "--cycles": 35,
+                "--blocksize": 256,
+                "--v2b-block-offset": 10,
+                "--tlb-size": 1024,
+                "--tlb-latency": 6,
+                "--memory-latency": 450,
+                "--tf": "tracefile8.txt",
+                "INPUT": "Inputfile8.csv"
+            }
+        }
+    },
+    {
+        "expected": {
+            "returncode": 0,
+            "values": {
+                "-c": 5,
+                "-b": 512,
+                "-o": 2,
+                "-s": 8,
+                "-t": 3,
+                "-m": 50,
+                "-f": "tracefile1.txt",
+                "INPUT": "Inputfile1.csv"
+            }
+        }
+    },
+    {
+        "expected": {
+            "returncode": 0,
+            "values": {
+                "--cycles": 20,
+                "--blocksize": 2048,
+                "--v2b-block-offset": 1,
+                "--tlb-size": 32,
+                "--tlb-latency": 2,
+                "--memory-latency": 150,
+                "--tf": "tracefile2.txt",
+                "INPUT": "Inputfile2.csv"
+            }
+        }
+    },
+    {
+        "expected": {
+            "returncode": 0,
+            "values": {
+                "-c": 30,
+                "-b": 4096,
+                "-o": 3,
+                "-s": 64,
+                "-t": 4,
+                "-m": 200,
+                "-f": "tracefile3.txt",
+                "INPUT": "Inputfile3.csv"
+            }
+        }
+    },
+    {
+        "expected": {
+            "returncode": 0,
+            "values": {
+                "--cycles": 15,
+                "--blocksize": 1024,
+                "--v2b-block-offset": 5,
+                "--tlb-size": 128,
+                "--tlb-latency": 5,
+                "--memory-latency": 250,
+                "--tf": "tracefile4.txt",
+                "INPUT": "Inputfile4.csv"
+            }
+        }
+    },
+    {
+        "expected": {
+            "returncode": 0,
+            "values": {
+                "-c": 50,
+                "-b": 256,
+                "-o": 1,
+                "-s": 32,
+                "-t": 10,
+                "-m": 300,
+                "-f": "tracefile5.txt",
+                "INPUT": "Inputfile5.csv"
+            }
+        }
+    },
+    {
+        "expected": {
+            "returncode": 0,
+            "values": {
+                "--cycles": 25,
+                "--blocksize": 128,
+                "--v2b-block-offset": 7,
+                "--tlb-size": 256,
+                "--tlb-latency": 8,
+                "--memory-latency": 350,
+                "--tf": "tracefile6.txt",
+                "INPUT": "Inputfile6.csv"
+            }
+        }
+    },{
+        "expected": {
+            "returncode": 0,
+            "values": {
+                "-c": 100,
+                "-b": 8192,
+                "-o": 15,
+                "-s": 128,
+                "-t": 15,
+                "-m": 500,
+                "-f": "tracefile9.txt",
+                "INPUT": "Inputfile9.csv"
+            }
+        }
+    },
+    {
+        "expected": {
+            "returncode": 0,
+            "values": {
+                "--cycles": 50,
+                "--blocksize": 512,
+                "--v2b-block-offset": 20,
+                "--tlb-size": 2048,
+                "--tlb-latency": 20,
+                "--memory-latency": 550,
+                "--tf": "tracefile10.txt",
+                "INPUT": "Inputfile10.csv"
+            }
+        }
+    },
+    {
+        "expected": {
+            "returncode": 0,
+            "values": {
+                "-c": 150,
+                "-b": 1024,
+                "-o": 5,
+                "-s": 64,
+                "-t": 3,
+                "-m": 600,
+                "-f": "tracefile11.txt",
+                "INPUT": "Inputfile11.csv"
+            }
+        }
+    },
+    {
+        "expected": {
+            "returncode": 0,
+            "values": {
+                "--cycles": 75,
+                "--blocksize": 2048,
+                "--v2b-block-offset": 0,
+                "--tlb-size": 16,
+                "--tlb-latency": 1,
+                "--memory-latency": 700,
+                "--tf": "tracefile12.txt",
+                "INPUT": "Inputfile12.csv"
+            }
+        }
+    },
     # Fehlerfälle
     {
         "expected": {
@@ -88,38 +267,6 @@ test_cases = [
             "error": "Fehler: ungültiges Argument: 'cycles (-c/--cycles)' muss ein Integer im Interval [0; 2147483647] sein"
         }
     },
-    #down are gpt
-    {
-        "expected": {
-            "returncode": 0,
-            "values": {
-                "-c": 5,
-                "-b": 512,
-                "-o": 2,
-                "-s": 8,
-                "-t": 3,
-                "-m": 50,
-                "-f": "tracefile1.txt",
-                "INPUT": "Inputfile1.csv"
-            }
-        }
-    },
-    {
-        "expected": {
-            "returncode": 0,
-            "values": {
-                "--cycles": 20,
-                "--blocksize": 2048,
-                "--v2b-block-offset": 1,
-                "--tlb-size": 32,
-                "--tlb-latency": 2,
-                "--memory-latency": 150,
-                "--tf": "tracefile2.txt",
-                "INPUT": "Inputfile2.csv"
-            }
-        }
-    },
-    # Fehlerfälle
     {
         "expected": {
             "returncode": 1,
@@ -147,45 +294,13 @@ test_cases = [
             "error": "Fehler: ungültiges Argument: 'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; 4294967295] sein"
         }
     },
-    # Erfolgreiche Fälle
-    {
-        "expected": {
-            "returncode": 0,
-            "values": {
-                "-c": 30,
-                "-b": 4096,
-                "-o": 3,
-                "-s": 64,
-                "-t": 4,
-                "-m": 200,
-                "-f": "tracefile3.txt",
-                "INPUT": "Inputfile3.csv"
-            }
-        }
-    },
-    {
-        "expected": {
-            "returncode": 0,
-            "values": {
-                "--cycles": 15,
-                "--blocksize": 1024,
-                "--v2b-block-offset": 5,
-                "--tlb-size": 128,
-                "--tlb-latency": 5,
-                "--memory-latency": 250,
-                "--tf": "tracefile4.txt",
-                "INPUT": "Inputfile4.csv"
-            }
-        }
-    },
-    # Fehlerfälle
     {
         "expected": {
             "returncode": 1,
             "values": {
-                "-c": "",
+                "-f": "",
             },
-            "error": "Fehler: folgende Option benötigt ein Argument: '-c'"
+            "error": "Fehler: folgende Option benötigt ein Argument: '-f'"
         }
     },
     {
@@ -197,38 +312,6 @@ test_cases = [
             "error": "Fehler: ungültiges Argument: 'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; 4294967295] sein"
         }
     },
-    # Erfolgreiche Fälle
-    {
-        "expected": {
-            "returncode": 0,
-            "values": {
-                "-c": 50,
-                "-b": 256,
-                "-o": 1,
-                "-s": 32,
-                "-t": 10,
-                "-m": 300,
-                "-f": "tracefile5.txt",
-                "INPUT": "Inputfile5.csv"
-            }
-        }
-    },
-    {
-        "expected": {
-            "returncode": 0,
-            "values": {
-                "--cycles": 25,
-                "--blocksize": 128,
-                "--v2b-block-offset": 7,
-                "--tlb-size": 256,
-                "--tlb-latency": 8,
-                "--memory-latency": 350,
-                "--tf": "tracefile6.txt",
-                "INPUT": "Inputfile6.csv"
-            }
-        }
-    },
-    # Fehlerfälle
     {
         "expected": {
             "returncode": 1,
@@ -247,38 +330,6 @@ test_cases = [
             "error": "Fehler: ungültiges Argument: 'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; 4294967295] sein"
         }
     },
-    # Erfolgreiche Fälle
-    {
-        "expected": {
-            "returncode": 0,
-            "values": {
-                "-c": 75,
-                "-b": 64,
-                "-o": 9,
-                "-s": 512,
-                "-t": 12,
-                "-m": 400,
-                "-f": "tracefile7.txt",
-                "INPUT": "Inputfile7.csv"
-            }
-        }
-    },
-    {
-        "expected": {
-            "returncode": 0,
-            "values": {
-                "--cycles": 35,
-                "--blocksize": 256,
-                "--v2b-block-offset": 10,
-                "--tlb-size": 1024,
-                "--tlb-latency": 6,
-                "--memory-latency": 450,
-                "--tf": "tracefile8.txt",
-                "INPUT": "Inputfile8.csv"
-            }
-        }
-    },
-    # Fehlerfälle
     {
         "expected": {
             "returncode": 1,
@@ -297,38 +348,6 @@ test_cases = [
             "error": "Fehler: ungültiges Argument: 'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; 4294967295] sein"
         }
     },
-    # Erfolgreiche Fälle
-    {
-        "expected": {
-            "returncode": 0,
-            "values": {
-                "-c": 100,
-                "-b": 8192,
-                "-o": 15,
-                "-s": 128,
-                "-t": 15,
-                "-m": 500,
-                "-f": "tracefile9.txt",
-                "INPUT": "Inputfile9.csv"
-            }
-        }
-    },
-    {
-        "expected": {
-            "returncode": 0,
-            "values": {
-                "--cycles": 50,
-                "--blocksize": 512,
-                "--v2b-block-offset": 20,
-                "--tlb-size": 2048,
-                "--tlb-latency": 20,
-                "--memory-latency": 550,
-                "--tf": "tracefile10.txt",
-                "INPUT": "Inputfile10.csv"
-            }
-        }
-    },
-    # Fehlerfälle
     {
         "expected": {
             "returncode": 1,
@@ -347,38 +366,6 @@ test_cases = [
             "error": "Fehler: ungültiges Argument: 'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; 4294967295] sein"
         }
     },
-    # Erfolgreiche Fälle
-    {
-        "expected": {
-            "returncode": 0,
-            "values": {
-                "-c": 150,
-                "-b": 1024,
-                "-o": 5,
-                "-s": 64,
-                "-t": 3,
-                "-m": 600,
-                "-f": "tracefile11.txt",
-                "INPUT": "Inputfile11.csv"
-            }
-        }
-    },
-    {
-        "expected": {
-            "returncode": 0,
-            "values": {
-                "--cycles": 75,
-                "--blocksize": 2048,
-                "--v2b-block-offset": 0,
-                "--tlb-size": 16,
-                "--tlb-latency": 1,
-                "--memory-latency": 700,
-                "--tf": "tracefile12.txt",
-                "INPUT": "Inputfile12.csv"
-            }
-        }
-    }
-    #gpt generated
 
 ]
 
