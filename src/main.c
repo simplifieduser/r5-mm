@@ -16,7 +16,6 @@ int main(int argc, char*argv[]) {
     /*
      * die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da es in der Realität keinen v2bBlockOffset gibt
      * alle anderen Werte stammen von: Patterson, D. A., Hennessy, J. L. (). Computer Organization and Design: The Hardware/Software Interface. (4th ed.). Morgan Kaufman. Seite 503.
-     *
     */
     int opt;
     static struct option long_options[] = {
