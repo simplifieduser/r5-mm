@@ -132,10 +132,10 @@ jobs:
       - name: Restore cached build
         uses: actions/cache/restore@v3
         with:
-          path: .
+          path: ./dist
           key: build
 
       - name: Run tests with pytest
         run: |
-          sudo chmod +x ./r5mm
+          sudo chmod +x ./dist/r5mm
           pytest
