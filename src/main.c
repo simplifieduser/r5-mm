@@ -116,7 +116,7 @@ int main(int argc, char*argv[]) {
             }
             case 'f':{
                 tracefile = optarg;
-                FILE *file;
+                FILE *file; // Erstelle eine Datei mit den Namen der künftigen Tracefile
                 file = fopen(tracefile,"w");
                 if(file == NULL) {
                     fprintf(stderr,ILLEGAL_ARGUMENT_TRACEFILE"\n");
