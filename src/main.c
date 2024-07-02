@@ -13,7 +13,8 @@ int main(int argc, char*argv[]) {
     unsigned int memoryLatency = 100;
     const char* tracefile = NULL;
     const char* inputfile;
-    /* die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da es in der Realität keinen v2bBlockOffset gibt
+    /*
+     * die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da es in der Realität keinen v2bBlockOffset gibt
      * alle anderen Werte stammen von: Patterson, D. A., Hennessy, J. L. (). Computer Organization and Design: The Hardware/Software Interface. (4th ed.). Morgan Kaufman. Seite 503.
     */
     int opt;
@@ -38,7 +39,7 @@ int main(int argc, char*argv[]) {
         }
     }
 
-    //Einlesen der Optionen/Argumente
+    // Einlesen der Optionen/Argumente
     while ((opt = getopt_long(argc, argv, ":c:b:o:s:t:m:f:h", long_options, NULL))!= -1){
         switch (opt){
             case 'c':{
@@ -121,7 +122,7 @@ int main(int argc, char*argv[]) {
                 fprintf(stderr,HELP_MSG"\n");
                 exit(EXIT_SUCCESS);
             }
-                //Fehlerbehandlung
+            // Fehlerbehandlung
             case '?':{
                 if(optopt) {
                     fprintf(stderr, UNKNOWN_OPTION "'-%c'\n"HINT"\n", optopt);
@@ -144,7 +145,7 @@ int main(int argc, char*argv[]) {
 
 
     if(optind <argc) {
-        inputfile = argv[optind];//Mögliche Fehlerbehandlung folgt beim Einlesen der Datei
+        inputfile = argv[optind];// Mögliche Fehlerbehandlung folgt beim Einlesen der Datei
     } else {
         fprintf(stderr,NO_FILE_INPUT"\n"HINT"\n");
         exit(EXIT_FAILURE);
@@ -155,7 +156,7 @@ int main(int argc, char*argv[]) {
     }
 
 
-    //Zum Testen der Eingaben
+    // Zum Testen der Eingaben
     printf("cycles=%d\n", cycles);
     printf("blocksize=%u\n", blocksize);
     printf("v2bBlockOffset=%u\n", v2bBlockOffset);
