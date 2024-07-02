@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     r4.we = 0;
 
     Request r5;
-    r5.addr = 345;
+    r5.addr = 5234;
     r5.data = 0;
     r5.we = 0;
 
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     requests[3] = r4;
     requests[4] = r5;
 
-    Result res = run_simulation(1000, 17, 2, 8, 3, 23, 5, requests, NULL);
+    Result res = run_simulation(10000, 64, 1, 4, 4, 100, 5, requests, "trace");
 
     std::cout << res.cycles << "\n"
               << res.hits << "\n"
