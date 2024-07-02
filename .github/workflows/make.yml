@@ -137,5 +137,5 @@ jobs:
 
       - name: Run tests with pytest
         run: |
-          sudo chmod +x ./dist/r5mm
+          sudo chmod +x ./r5mm
           pytest
