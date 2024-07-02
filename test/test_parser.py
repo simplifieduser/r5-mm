@@ -74,7 +74,7 @@ def generate_invalid_file(filename, request_count):
 def test_valid(request_count):
 
     requests = generate_valid_file("./test.csv", request_count)
-    process = subprocess.run(["./r5mm", "./test.csv"], stdout=subprocess.PIPE, text=True)
+    process = subprocess.run(["./dist/r5mm", "../test.csv"], stdout=subprocess.PIPE, text=True)
     assert process.returncode == 0
     lines = process.stdout.split('\n')
     for i, req in enumerate(requests):
@@ -84,5 +84,5 @@ def test_valid(request_count):
 @pytest.mark.parametrize("request_count", [random.randint(1, 100) for _ in range(50)])
 def test_invalid(request_count):
     generate_invalid_file("./test.csv", request_count)
-    process = subprocess.run(["./r5mm", "./test.csv"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+    process = subprocess.run(["./dist/r5mm", "./test.csv"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
     assert process.returncode == 1
