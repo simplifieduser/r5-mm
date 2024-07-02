@@ -385,7 +385,7 @@ def test_cases_runner(test_case):
     expected = test_case["expected"]
 
     expected_values = default_values.copy()
-    args = ["./r5mm"]
+    args = ["./dist/r5mm"]
 
     for key, value in expected["values"].items():  # filtert und erstellt den Input
         key_str = str(key)
