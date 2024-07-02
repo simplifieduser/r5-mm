@@ -129,6 +129,12 @@ jobs:
       - name: Install pytest
         run: pip install pytest
 
+      - name: Set up libs
+        uses: actions/cache/restore@v3
+        with:
+          path: ./systemc
+          key: libs
+
       - name: Restore cached build
         uses: actions/cache/restore@v3
         with:
