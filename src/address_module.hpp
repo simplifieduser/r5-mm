@@ -49,7 +49,6 @@ SC_MODULE(ADDRESS_GETTER)
         {
 
             wait(start.posedge_event());
-            wait();
             wait(SC_ZERO_TIME);
 
             // show that address has not been translated yet, because new translation process has started

@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     r4.we = 0;
 
     Request r5;
-    r5.addr = 5234;
+    r5.addr = 789;
     r5.data = 0;
     r5.we = 0;
 
