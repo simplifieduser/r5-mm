@@ -27,12 +27,18 @@ DIST := ./dist
 C_SRC := main.c
 CPP_SRC := modules.cpp
 
+# Test source file paths
+TEST_C_SRC :=
+TEST_CPP_SRC := test.cpp
 
 #               #
 # Env variables #
 #               #
 
-# Source file convertion
+# Source file conversion
+
+TEST_C_SRC := $(foreach wrd,$(TEST_C_SRC),$(SRC)/$(wrd))
+TEST_CPP_SRC := $(foreach wrd,$(TEST_CPP_SRC),$(SRC)/$(wrd))
 
 C_OBJ := $(foreach wrd,$(C_SRC),$(DIST)/$(wrd))
 CPP_OBJ := $(foreach wrd,$(CPP_SRC),$(DIST)/$(wrd))
@@ -50,21 +56,36 @@ CFLAGS := -std=c17
 
 CXX := clang++
 CXXFLAGS := -std=c++14 -I$(LIB)/include
-LDFLAGS := -I$(LIB)/include -L$(LIB)/lib -lsystemc
+LDFLAGS := -L$(LIB)/lib -I$(LIB)/include -lsystemc
+
+ifneq ($(shell uname -s), Darwin)
+  LDFLAGS += -Wl,-rpath=$(LIB)/lib
+endif
+
+# Test build flags
+
+TIDYFLAGS := -checks=*
+CHECKFLAGS := -fsyntax-only -Wall -Wextra -Wpedantic
+
+ifdef TEST_BUILD
+  LDFLAGS += -fsanitize=undefined,address
+  TIDYFLAGS += --warnings-as-errors=*
+	CHECKFLAGS += -Werror
+endif
 
 
 #         #
 # Targets #
 #         #
 
-.PHONY: all debug release clean
+.PHONY: all debug release tidy clean
 
 # Default target
 all: debug
 
 # Debug target
-debug: CCFLAGS += -g
-debug: CXXFLAGS += -g
+debug: CCFLAGS += -g -Wall -Wextra
+debug: CXXFLAGS += -g -Wall -Wextra
 debug: LDFLAGS += -g
 debug: $(DIST)/$(TARGET)
 
@@ -74,13 +95,29 @@ release: CXXFLAGS += -O2
 release: LDFLAGS += -O2
 release: $(DIST)/$(TARGET)
 
-# Test target
-test: debug
-	$(shell pytest)
+# Test targets
+test: test_c test_cpp
+
+test_c: CCFLAGS += -g -Wall -Wextra
+test_c: $(DIST)/test_c
+
+test_cpp: CXXFLAGS += -g -Wall -Wextra
+test_cpp: LDFLAGS += -g
+test_cpp: $(DIST)/test_cpp
+
+# Tidy targets
+tidy:: 
+	clang $(CHECKFLAGS) $(C_SRC) $(CFLAGS)
+tidy:: 
+	clang++ $(CHECKFLAGS) $(CPP_SRC) $(CXXFLAGS)
+tidy::
+	clang-tidy $(C_SRC) $(TIDYFLAGS) -- $(CFLAGS)
+tidy::
+	clang-tidy $(CPP_SRC) $(TIDYFLAGS) -- $(CXXFLAGS)
 
 # Clean up
 clean:
-	rm -f ./$(TARGET)
+	rm -f ./$(TARGET) ./test_c ./test_cpp
 	rm -rf $(DIST)
 
 
@@ -104,4 +141,24 @@ $(DIST)/%.o: $(SRC)/%.cpp
 $(DIST)/$(TARGET): $(DIST) $(C_OBJ) $(CPP_OBJ)
 	$(CXX) $(LDFLAGS) $(C_OBJ) $(CPP_OBJ) -o $(DIST)/$(TARGET)
 	cp $(DIST)/$(TARGET) ./$(TARGET)
-	
+
+
+#              #
+# Test targets #
+#	             #
+
+# Compile c test files
+$(DIST)/test_c: $(TEST_C_SRC)
+ifdef TEST_C_SRC
+	mkdir -p $(DIST)
+	$(CC) $(CFLAGS) $(TEST_C_SRC) -o $@
+	cp $(DIST)/test_c ./test_c
+endif
+
+# Compile cpp test files
+$(DIST)/test_cpp: $(TEST_CPP_SRC)
+ifdef TEST_CPP_SRC
+	mkdir -p $(DIST)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(TEST_CPP_SRC) -o $@
+	cp $(DIST)/test_cpp ./test_cpp
+endif
