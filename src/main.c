@@ -116,6 +116,13 @@ int main(int argc, char*argv[]) {
             }
             case 'f':{
                 tracefile = optarg;
+                FILE *file;
+                file = fopen(tracefile,"w");
+                if(file == NULL) {
+                    fprintf(stderr,ILLEGAL_ARGUMENT_TRACEFILE"\n");
+                    exit(EXIT_FAILURE);
+                }
+                fclose(file);
                 break;
             }
             case 'h':{

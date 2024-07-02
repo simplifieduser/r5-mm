@@ -26,6 +26,7 @@
 #define ILLEGAL_ARGUMENT_TLB_SIZE ILLEGAL_ARGUMENT_PASSING  "'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; " UINT_MAX "] sein"
 #define ILLEGAL_ARGUMENT_TLB_LATENCY ILLEGAL_ARGUMENT_PASSING  "'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; " UINT_MAX "] sein"
 #define ILLEGAL_ARGUMENT_MEMORY_LATENCY ILLEGAL_ARGUMENT_PASSING  "'memory-latency (-m/--memory-latency)' muss ein Integer im Interval [0; " UINT_MAX "] sein"
+#define ILLEGAL_ARGUMENT_TRACEFILE ILLEGAL_ARGUMENT_PASSING "'Tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden"
 
 
 
