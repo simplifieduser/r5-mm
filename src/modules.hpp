@@ -2,8 +2,6 @@
 #define MODULES_HPP
 
 #include <systemc>
-#include <map>
-#include <unordered_set>
 #include "address_module.hpp"
 #include "memory_module.hpp"
 using namespace sc_core;

@@ -3,7 +3,6 @@
 
 #include <systemc>
 #include <map>
-#include <unordered_set>
 using namespace sc_core;
 
 SC_MODULE(MAIN_MEMORY)

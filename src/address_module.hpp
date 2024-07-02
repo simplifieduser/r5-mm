@@ -2,7 +2,6 @@
 #define ADDRESS_MODULE_HPP
 
 #include <systemc>
-#include <map>
 #include <unordered_set>
 using namespace sc_core;
 
