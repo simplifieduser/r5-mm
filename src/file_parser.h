@@ -10,7 +10,6 @@ typedef struct Request
   int we;
 } Request;
 
-int getLineCount(const char *path);
 int parseFile(const char *path, Request **requests);
 
 #endif

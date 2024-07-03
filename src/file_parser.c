@@ -47,37 +47,6 @@ void printError(RET_CODE code, const char *arg, int line) {
     }
 }
 
-int getLineCount(const char *path) {
-
-    // Open file
-    FILE *file = fopen(path, "re");
-
-    if (file == NULL) {
-        // IO ERROR
-        printError(ERR_FOPEN, path, 0);
-        return -1;
-    }
-
-    // Count lines
-    int counter = 1;
-
-    while (1) {
-
-        int current = fgetc(file);
-        if (feof(file)) { break; }
-        if (current == '\n') { counter++; }
-
-    }
-
-    // Close file & return
-    if (fclose(file) != 0) {
-        // IO ERROR
-        return -1;
-    }
-    return counter;
-
-}
-
 int parseFile(const char *path, Request **requests) {
 
     // Init value pointers
