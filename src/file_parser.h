@@ -11,6 +11,6 @@ typedef struct Request
 } Request;
 
 int getLineCount(const char *path);
-int parseFile(const char *path, int maxRequestCount, Request requests[]);
+int parseFile(const char *path, Request **requests);
 
 #endif

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <malloc.h>
 #include "file_parser.h"
 #include "messages.h"
 
@@ -77,7 +78,7 @@ int getLineCount(const char *path) {
 
 }
 
-int parseFile(const char *path, int maxRequestCount, Request requests[]) {
+int parseFile(const char *path, Request **requests) {
 
     // Init value pointers
     uint32_t *address = malloc(sizeof(uint32_t));
@@ -107,7 +108,7 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
     }
 
     // Read loop
-    for (int i = 0; i < maxRequestCount; i++) {
+    for (int i = 0;; i++) {
 
         // r/w arg
         int mode = getRWArg(file);
@@ -149,13 +150,24 @@ int parseFile(const char *path, int maxRequestCount, Request requests[]) {
             }
         }
 
-        // Instance new request struct & add to array
+        // Allocate mem for new request & add to array
+
+        *requests = reallocarray(*requests, i + 1, sizeof(Request));
+
+        if (*requests == NULL) {
+            // MEMORY ERR_ALLOC ERROR
+            free(address);
+            free(data);
+            printError(ERR_ALLOC, "", 0);
+            return -1;
+        }
+
         Request newRequest = {.we=mode, .addr=*address, .data=0};
         if (mode == OK_WRITE) {
             newRequest.data = *data;
         }
 
-        requests[i] = newRequest;
+        (*requests)[i] = newRequest;
 
     }
 
