@@ -74,9 +74,11 @@ def generate_invalid_file(filename, request_count):
 def test_valid(request_count):
 
     requests = generate_valid_file("./test.csv", request_count)
-    process = subprocess.run(["./dist/r5mm", "../test.csv"], stdout=subprocess.PIPE, text=True)
+    process = subprocess.run(["./dist/r5mm", "./test.csv"], stdout=subprocess.PIPE, text=True)
     assert process.returncode == 0
-    lines = process.stdout.split('\n')
+    lines = process.stdout.split('-')[1]
+    lines = lines.split('\n')
+    lines.pop(0)
     for i, req in enumerate(requests):
         assert lines[i] == req
 
