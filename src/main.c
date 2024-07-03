@@ -177,6 +177,7 @@ int main(int argc, char*argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    //TODO: Implement the simulation
 
     // Zum Testen der Eingaben
     printf("cycles=%d\n", cycles);
