@@ -3,7 +3,10 @@
 #include <getopt.h>
 #include <stdint.h>
 #include <errno.h>
+#include <string.h>
 #include "messages.h"
+#include "file_parser.h"
+
 int main(int argc, char*argv[]) {
     int cycles = 10000;
     unsigned int tlbSize = 64;
@@ -151,16 +154,29 @@ int main(int argc, char*argv[]) {
     }
 
 
-    if(optind <argc) {
+    if(optind < argc) {
+
         inputfile = argv[optind];// Mögliche Fehlerbehandlung folgt beim Einlesen der Datei
+
     } else {
         fprintf(stderr,NO_FILE_INPUT"\n"HINT"\n");
         exit(EXIT_FAILURE);
     }
-    if(optind <argc - 1) {
+    if(optind < argc - 1) {
         fprintf(stderr,TOO_MANY_OPTION"\n"HINT"\n");
         exit(EXIT_FAILURE);
     }
+
+    // Read input file
+    int lineCount = getLineCount(inputfile);
+
+    if (lineCount < 0) {
+        fprintf(stderr, ERR_GENERAL_CANT_OPEN_FILE(inputfile));
+        exit(EXIT_FAILURE);
+    }
+
+    Request requests[lineCount] = {};
+    parseFile(inputfile, lineCount, requests);
 
 
     // Zum Testen der Eingaben
@@ -173,6 +189,11 @@ int main(int argc, char*argv[]) {
     printf("inputfile=%s\n", inputfile);
     if (tracefile) {
         printf("tracefile=%s\n", tracefile);
+    }
+    printf("-\n");
+
+    for (int i = 0; i < lineCount; ++i) {
+        printf("%d: %d %u %u\n", i, requests[i].we, requests[i].addr, requests[i].data);
     }
 
     exit(EXIT_SUCCESS);
