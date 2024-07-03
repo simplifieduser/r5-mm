@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <errno.h>
 #include <string.h>
+#include <malloc.h>
 #include "messages.h"
 #include "file_parser.h"
 
@@ -168,15 +169,13 @@ int main(int argc, char*argv[]) {
     }
 
     // Read input file
-    int lineCount = getLineCount(inputfile);
 
-    if (lineCount < 0) {
-        fprintf(stderr, ERR_GENERAL_CANT_OPEN_FILE(inputfile));
+    Request *requests = NULL;
+    int requestCount = parseFile(inputfile, &requests);
+
+    if (requestCount < 0) {
         exit(EXIT_FAILURE);
     }
-
-    Request requests[lineCount] = {};
-    parseFile(inputfile, lineCount, requests);
 
 
     // Zum Testen der Eingaben
@@ -192,7 +191,7 @@ int main(int argc, char*argv[]) {
     }
     printf("-\n");
 
-    for (int i = 0; i < lineCount; ++i) {
+    for (int i = 0; i < requestCount; ++i) {
         printf("%d: %d %u %u\n", i, requests[i].we, requests[i].addr, requests[i].data);
     }
 
