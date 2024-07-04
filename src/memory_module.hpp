@@ -76,14 +76,21 @@ SC_MODULE(MAIN_MEMORY)
         }
         else
         {
-            unsigned char data_bytes[4];
+            if (mem_map.count(address->read()))
+            {
+                unsigned char data_bytes[4];
 
-            data_bytes[0] = mem_map[address->read()];
-            data_bytes[1] = mem_map[address->read() + 1];
-            data_bytes[2] = mem_map[address->read() + 2];
-            data_bytes[3] = mem_map[address->read() + 3];
+                data_bytes[0] = mem_map[address->read()];
+                data_bytes[1] = mem_map[address->read() + 1];
+                data_bytes[2] = mem_map[address->read() + 2];
+                data_bytes[3] = mem_map[address->read() + 3];
 
-            out_data->write((data_bytes[0] << 24) + (data_bytes[1] << 16) + (data_bytes[2] << 8) + data_bytes[3]);
+                out_data->write((data_bytes[0] << 24) + (data_bytes[1] << 16) + (data_bytes[2] << 8) + data_bytes[3]);
+            }
+            else
+            {
+                out_data->write(0);
+            }
         }
     }
 };
