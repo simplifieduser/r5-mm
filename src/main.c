@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <errno.h>
 #include <string.h>
-#include <malloc.h>
 #include "messages.h"
 #include "file_parser.h"
 
