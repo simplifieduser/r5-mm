@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <malloc.h>
 #include "file_parser.h"
 #include "messages.h"
 
@@ -121,7 +120,16 @@ int parseFile(const char *path, Request **requests) {
 
         // Allocate mem for new request & add to array
 
-        *requests = reallocarray(*requests, i + 1, sizeof(Request));
+        size_t newSize = 0;
+        if (__builtin_mul_overflow((i + 1), sizeof(Request), &newSize)) {
+            // MEMORY ERR_ALLOC ERROR
+            free(address);
+            free(data);
+            printError(ERR_ALLOC, "", 0);
+            return -1;
+        }
+
+        *requests = realloc(*requests, newSize);
 
         if (*requests == NULL) {
             // MEMORY ERR_ALLOC ERROR
