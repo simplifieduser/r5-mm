@@ -22,11 +22,11 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     sc_signal<int> cycles_count;
 
     REQUEST_PROCESSOR request_processor("request_processor", tlbSize, tlbsLatency, blocksize, v2bBlockOffset, memoryLatency, numRequests, requests, buffer);
+    request_processor.primitive_gate_count.bind(primitive_gate_count);
     request_processor.clk.bind(clk);
     request_processor.cycles.bind(cycles_count);
     request_processor.misses.bind(misses);
     request_processor.hits.bind(hits);
-    request_processor.primitive_gate_count.bind(primitive_gate_count);
 
     // create new tracefile and set the signals to be traced (clock and finished are unimportant)
     sc_trace_file *file = NULL;
@@ -42,9 +42,9 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     sc_start();
 
     // set result values to output from request_processor
-    result.hits = request_processor.hits.read();
-    result.misses = request_processor.misses.read();
-    result.primitive_gate_count = request_processor.primitive_gate_count.read();
+    result.hits = hits.read();
+    result.misses = misses.read();
+    result.primitive_gate_count = primitive_gate_count.read();
 
     if (cycles_count.read() > cycles)
     {

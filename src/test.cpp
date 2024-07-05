@@ -39,7 +39,8 @@ int main(int argc, char *argv[])
 
     std::cout << res.cycles << "\n"
               << res.hits << "\n"
-              << res.misses << std::endl;
+              << res.misses << "\n"
+              << res.primitive_gate_count << std::endl;
 
     return 0;
 }

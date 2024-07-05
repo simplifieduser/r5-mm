@@ -31,7 +31,7 @@ SC_MODULE(REQUEST_PROCESSOR)
     sc_signal<int> addr_cycles;
     sc_signal<bool> get_address_finished, manage_data_finished, we, start_request, hit, notify_memory;
 
-    sc_out<size_t> misses, hits, primitive_gate_count;
+    sc_out<size_t> misses, primitive_gate_count, hits;
     sc_out<int> cycles;
 
     SC_CTOR(REQUEST_PROCESSOR);
@@ -62,6 +62,9 @@ SC_MODULE(REQUEST_PROCESSOR)
 
     void run_program()
     {
+        // set gates needed for size of the tlb (tag size + address size (32 Bits): gates per row)
+        primitive_gate_count->write((64 - (log2(blocksize)) + 1) * 4 * tlb_size);
+
         for (size_t i = 0; i < num_requests; i++)
         {
             wait(SC_ZERO_TIME);
@@ -91,6 +94,10 @@ SC_MODULE(REQUEST_PROCESSOR)
             // update cycles again
             cycles->write(cycles->read() + memory_latency);
             wait();
+
+            // update number of used gates
+            // 182 = 150 for addition of 2 32-bit numbers + 32 xor gates for two's complement
+            primitive_gate_count->write(primitive_gate_count->read() + 182);
         }
         sc_stop();
     }
