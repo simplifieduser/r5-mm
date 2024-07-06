@@ -4,14 +4,14 @@
 #include "file_parser.h"
 #include "messages.h"
 
-// Used for determining success of supplement functions for arguments
+// Wird zur Bestimmung des Erfolgs der Zusatzfunktionen für Argumente verwendet
 enum RET_CODE {
-    OK_READ, OK_WRITE, OK_EOF,                                                    // Codes solely used by getREArg
-    OK, ERR_ALLOC, ERR_FOPEN, ERR_EOF, ERR_NEWLINE, ERR_INVARG, ERR_TOOMANY       // Codes used by all other args
+    OK_READ, OK_WRITE, OK_EOF,                                                    // Codes, die ausschließlich von getREArg verwendet werden
+    OK, ERR_ALLOC, ERR_FOPEN, ERR_EOF, ERR_NEWLINE, ERR_INVARG, ERR_TOOMANY       // Codes, die von allen anderen Argumenten verwendet werden
 } typedef RET_CODE;
 
-const int MAX_ARG_LENGTH = 11;                    // 32-bit number can only consist of 11 chars
-const unsigned int MAX_ARG_VALUE = 0xFFFFFFFF;    // Masked used to determining if passed number exceeds maximum
+const int MAX_ARG_LENGTH = 11;                    // Eine 32-Bit-Zahl kann nur aus 11 Zeichen bestehen
+const unsigned int MAX_ARG_VALUE = 0xFFFFFFFF;    // Maske zur Bestimmung, ob die übergebene Zahl den Höchstwert überschreitet
 
 RET_CODE getRWArg(FILE *file);
 
@@ -48,46 +48,46 @@ void printError(RET_CODE code, const char *arg, int line) {
 
 int parseFile(const char *path, Request **requests) {
 
-    // Init value pointers
+    // Initialisiere Pointer
     uint32_t *address = malloc(sizeof(uint32_t));
     if (address == NULL) {
-        // ERROR
+        // SPEICHER-FEHLER
         printError(ERR_ALLOC, "", 0);
         return -1;
     }
 
     uint32_t *data = malloc(sizeof(uint32_t));
     if (data == NULL) {
-        // MEMORY ERR_ALLOC ERROR
+        // SPEICHER-FEHLER
         free(address);
         printError(ERR_ALLOC, "", 0);
         return -1;
     }
 
-    // Open file
+    // Datei öffnen
     FILE *file = fopen(path, "re");
 
     if (file == NULL) {
-        // IO ERROR
+        // IO-FEHLER
         free(address);
         free(data);
         printError(ERR_FOPEN, "", 0);
         return -1;
     }
 
-    // Read loop
+    // Lese-Schleife
     for (int i = 0;; i++) {
 
-        // r/w arg
+        // Lese-/Schreib-Argument
         int mode = getRWArg(file);
 
-        // Check if parsing complete
+        // Prüfen, ob das Parsen abgeschlossen ist
         if (mode == OK_EOF) {
             free(address);
             free(data);
 
             if (fclose(file) != 0) {
-                // IO ERROR
+                // IO-FEHLER
                 return -1;
             }
 
@@ -95,34 +95,34 @@ int parseFile(const char *path, Request **requests) {
         }
 
         if (mode != OK_READ && mode != OK_WRITE) {
-            // PARSING ERROR
+            // PARSE-FEHLER
             printError(mode, "write_enable", i + 1);
             break;
         }
 
-        // address arg
+        // Adress-Argument
         int addressStatus = getAddressArg(file, address, mode);
         if (addressStatus != OK) {
-            // PARSING ERROR
+            // PARSE-FEHLER
             printError(addressStatus, "address", i + 1);
             break;
         }
 
-        // data arg - if write enabled
+        // Daten-Argument - wenn Schreibzugriff aktiviert
         if (mode == OK_WRITE) {
             int dataStatus = getDataArg(file, data);
             if (dataStatus != OK) {
-                // PARSING ERROR
+                // PARSE-FEHLER
                 printError(dataStatus, "write_data", i + 1);
                 break;
             }
         }
 
-        // Allocate mem for new request & add to array
+        // Speicher für neue Request zuweisen und zum Array hinzufügen
 
         size_t newSize = 0;
         if (__builtin_mul_overflow((i + 1), sizeof(Request), &newSize)) {
-            // MEMORY ERR_ALLOC ERROR
+            // SPEICHER-FEHLER ERR_ALLOC
             free(address);
             free(data);
             printError(ERR_ALLOC, "", 0);
@@ -132,7 +132,7 @@ int parseFile(const char *path, Request **requests) {
         *requests = realloc(*requests, newSize);
 
         if (*requests == NULL) {
-            // MEMORY ERR_ALLOC ERROR
+            // SPEICHER-FEHLER
             free(address);
             free(data);
             printError(ERR_ALLOC, "", 0);
@@ -148,11 +148,11 @@ int parseFile(const char *path, Request **requests) {
 
     }
 
-    // Something failed
+    // Etwas ist fehlgeschlagen
     free(address);
     free(data);
     if (fclose(file) != 0) {
-        // IO ERROR
+        // IO-FEHLER
         return -1;
     }
     return -1;
@@ -161,40 +161,40 @@ int parseFile(const char *path, Request **requests) {
 
 RET_CODE getRWArg(FILE *file) {
 
-    // Get mode argument char
+    // Lese mode Charakter
 
     int modeChar = fgetc(file);
 
-    // Check if file has ended
+    // Prüfen, ob die Datei zu Ende ist
     if (feof(file)) {
         return OK_EOF;
     }
 
     if (modeChar == '\n') {
-        // PARSING ERROR: PREMATURE NEW LINE
+        // PARSE-FEHLER: VORZEITIGE ZEILENENDE
         return ERR_NEWLINE;
     }
 
-    // Get cell separator char
+    // Lese Trenncharakter
 
     int sepChar = fgetc(file);
 
     if (feof(file)) {
-        // PARSING ERROR: PREMATURE END OF FILE
+        // PARSE-FEHLER: VORZEITIGES DATEIENDE
         return ERR_EOF;
     }
 
     if (sepChar == '\n') {
-        // PARSING ERROR: PREMATURE NEW LINE
+        // PARSE-FEHLER: VORZEITIGES ZEILENENDE
         return ERR_NEWLINE;
     }
 
     if (sepChar != ',') {
-        // PARSING ERROR: INVALID ARG
+        // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         return ERR_INVARG;
     }
 
-    // Return mode
+    // mode zurückgeben
 
     if (modeChar == 'r' || modeChar == 'R') {
         return OK_READ;
@@ -204,86 +204,86 @@ RET_CODE getRWArg(FILE *file) {
         return OK_WRITE;
     }
 
-    // PARSING ERROR: INVALID ARG
+    // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
     return ERR_INVARG;
 
 }
 
 RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
 
-    // Init address_string array
+    // Initialisiere array fürs lesen
 
     char *address_string = malloc(sizeof(char) * MAX_ARG_LENGTH);
 
     if (address_string == NULL) {
-        // MEMORY ALLOC ERROR
+        // SPEICHER-FEHLER
         return ERR_ALLOC;
     }
 
-    // Read in until ',' '\n' or 11 chars
+    // Einlesen bis ',' '\n' oder 11 Zeichen
 
     for (int i = 0; i < MAX_ARG_LENGTH; i++) {
 
         int current = fgetc(file);
 
         if (feof(file)) {
-            // PARSING ERROR: PREMATURE END OF FILE
+            // PARSE-FEHLER: VORZEITIGES DATEIENDE
             free(address_string);
             return ERR_EOF;
         }
 
-        // On new line in read mode -> valid
+        // Wenn neue Zeile im Lesemodus → gültig
         if (current == '\n' && mode == OK_READ) {
 
-            // if empty
+            // wenn leeres Argument
             if (i == 0) {
-                // PARSING ERROR: INVALID ARG
+                // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
                 free(address_string);
                 return ERR_INVARG;
             }
 
-            // Append null byte
+            // Null-Byte anhängen
             address_string[i] = 0;
             break;
 
         }
 
-        // On new line in write mode -> invalid
+        // Wenn neue Zeile im Schreibmodus → ungültig
         if (current == '\n' && mode == OK_WRITE) {
-            // PARSING ERROR: PREMATURE NEW LINE
+            // PARSE-FEHLER: VORZEITIGER NEUE ZEILE
             free(address_string);
             return ERR_NEWLINE;
         }
 
         if (i == MAX_ARG_LENGTH - 1 && current != ',') {
-            // PARSING ERROR: INVALID ARG
+            // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
             free(address_string);
             return ERR_INVARG;
         }
 
         if (current == ',') {
 
-            // if empty
+            // wenn leeres Argument
             if (i == 0) {
-                // PARSING ERROR: INVALID ARG
+                // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
                 free(address_string);
                 return ERR_INVARG;
             }
 
-            // Append null byte
+            // Null-Byte anhängen
             address_string[i] = 0;
             break;
 
         }
 
-        // Append current char
+        // Aktuelles Zeichen anhängen
         address_string[i] = (char) current;
 
     }
 
-    // Convert string to int
+    // string in int konvertieren
 
-    uint32_t address_int = 0;
+    uint32_t address_int;
     char *end;
 
     if (address_string[0] == '0' && address_string[1] == 'x') {
@@ -293,18 +293,18 @@ RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
     }
 
     if (*end != 0) {
-        // PARSING ERROR: INVALID ARG
+        // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(address_string);
         return ERR_INVARG;
     }
 
-    if (address_int > MAX_ARG_VALUE) { // TODO: IS NECESSARY??
-        // PARSING ERROR: INVALID ARG
+    if (address_int > MAX_ARG_VALUE) {
+        // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(address_string);
         return ERR_INVARG;
     }
 
-    // Return address
+    // Adresse zurückgeben
     *res = address_int;
     free(address_string);
     return OK;
@@ -313,61 +313,63 @@ RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
 
 RET_CODE getDataArg(FILE *file, uint32_t *res) {
 
-    // Init data_string array
+    // Initialisiere array fürs lesen
 
     char *data_string = malloc(sizeof(char) * MAX_ARG_LENGTH);
 
     if (data_string == NULL) {
-        // MEMORY ERR_ALLOC ERROR
+        // SPEICHER-FEHLER
         free(data_string);
         return ERR_ALLOC;
     }
 
-    // Read in until ',' '\n' or 11 chars
+    // Einlesen bis ',' '\n' oder 11 Zeichen
 
     for (int i = 0; i < MAX_ARG_LENGTH; i++) {
 
         int current = fgetc(file);
 
         if (feof(file)) {
-            // PARSING ERROR: PREMATURE END OF FILE
+            // PARSE-FEHLER: VORZEITIGES DATEIENDE
             free(data_string);
             return ERR_EOF;
         }
 
         if (current == ',') {
-            // PARSING ERROR: TOO MANY ARGS
+            // PARSE-FEHLER: ZU VIELE ARGUMENTE
             free(data_string);
             return ERR_TOOMANY;
         }
 
         if (i == MAX_ARG_LENGTH - 1 && current != '\n') {
-            // PARSING ERROR: INVALID ARG
+            // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
             free(data_string);
             return ERR_INVARG;
         }
 
         if (current == '\n') {
 
-            // if empty
+            // wenn leers Argument
             if (i == 0) {
-                // PARSING ERROR: INVALID ARG
+                // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
                 free(data_string);
                 return ERR_INVARG;
             }
 
-            // Append null byte
+            // Null-Byte anhängen
             data_string[i] = '\0';
             break;
 
         }
 
-        // Append current char
+        // Aktuelles Zeichen anhängen
         data_string[i] = (char) current;
 
     }
 
-    uint32_t data_int = 0;
+    // string in int konvertieren
+
+    uint32_t data_int;
     char *end;
 
     if (data_string[0] == '0' && data_string[1] == 'x') {
@@ -377,18 +379,18 @@ RET_CODE getDataArg(FILE *file, uint32_t *res) {
     }
 
     if (*end != '\0') {
-        // PARSING ERROR: INVALID ARG
+        // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(data_string);
         return ERR_INVARG;
     }
 
-    if (data_int > MAX_ARG_VALUE) { // TODO: IS NECESSARY??
-        // PARSING ERROR: INVALID ARG
+    if (data_int > MAX_ARG_VALUE) {
+        // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(data_string);
         return ERR_INVARG;
     }
 
-    // Return address
+    // Adresse zurückgeben
     *res = data_int;
     free(data_string);
     return OK;
