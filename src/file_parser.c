@@ -91,6 +91,7 @@ int parseFile(const char *path, Request **requests) {
 
             if (fclose(file) != 0) {
                 // IO-FEHLER
+                (void) fprintf(stderr, ERR_GENERAL_UNKNOWN);
                 return -1;
             }
 
@@ -156,6 +157,7 @@ int parseFile(const char *path, Request **requests) {
     free(data);
     if (fclose(file) != 0) {
         // IO-FEHLER
+        (void) fprintf(stderr, ERR_GENERAL_UNKNOWN);
         return -1;
     }
     return -1;

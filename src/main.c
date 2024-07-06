@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
                     return EXIT_FAILURE;
                 }
                 if (fclose(file) != 0) {
-                    (void) fprintf(stderr, ERR_GENERAL_CANT_OPEN_FILE(tracefile));
+                    (void) fprintf(stderr, ERR_GENERAL_UNKNOWN);
                     return EXIT_FAILURE;
                 }
                 break;
