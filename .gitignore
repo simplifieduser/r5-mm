@@ -18,6 +18,3 @@ test/.pytest_cache
 # IDE config dir
 .vscode
 .idea
-
-# Test files
-test.csv
