@@ -64,8 +64,9 @@ endif
 
 # Test build flags
 
-TIDYFLAGS := -checks=*
+TIDYFLAGS := -checks=bugprone,cppcoreguidelines,clang-analyzer,performance,portability,readability,misc
 CHECKFLAGS := -fsyntax-only -Wall -Wextra -Wpedantic
+CHECKFLAGS += -Wno-unused-but-set-variable -Wno-unused-parameter   # Benötigt, da sonst systemc immer Fehler wirft
 
 ifdef TEST_BUILD
   LDFLAGS += -fsanitize=undefined,address
