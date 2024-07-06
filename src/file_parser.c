@@ -13,6 +13,9 @@ enum RET_CODE {
 const int MAX_ARG_LENGTH = 11;                    // Eine 32-Bit-Zahl kann nur aus 11 Zeichen bestehen
 const unsigned int MAX_ARG_VALUE = 0xFFFFFFFF;    // Maske zur Bestimmung, ob die übergebene Zahl den Höchstwert überschreitet
 
+const int HEX_BASE = 16;                 // Basis für die Umwandlung von hexadezimalen Zahlen
+const int DEC_BASE = 10;                 // Basis für die Umwandlung von dezimalen Zahlen
+
 RET_CODE getRWArg(FILE *file);
 
 RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode);
@@ -283,13 +286,13 @@ RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
 
     // string in int konvertieren
 
-    uint32_t address_int;
-    char *end;
+    uint32_t address_int = 0;
+    char *end = NULL;
 
     if (address_string[0] == '0' && address_string[1] == 'x') {
-        address_int = strtol(address_string, &end, 16);
+        address_int = strtol(address_string, &end, HEX_BASE);
     } else {
-        address_int = strtol(address_string, &end, 10);
+        address_int = strtol(address_string, &end, DEC_BASE);
     }
 
     if (*end != 0) {
@@ -369,13 +372,13 @@ RET_CODE getDataArg(FILE *file, uint32_t *res) {
 
     // string in int konvertieren
 
-    uint32_t data_int;
-    char *end;
+    uint32_t data_int = 0;
+    char *end = NULL;
 
     if (data_string[0] == '0' && data_string[1] == 'x') {
-        data_int = strtol(data_string, &end, 16);
+        data_int = strtol(data_string, &end, HEX_BASE);
     } else {
-        data_int = strtol(data_string, &end, 10);
+        data_int = strtol(data_string, &end, DEC_BASE);
     }
 
     if (*end != '\0') {
