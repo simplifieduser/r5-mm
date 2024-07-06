@@ -114,12 +114,15 @@ int main(int argc, char *argv[]) {
             case 'f': {
                 tracefile = optarg;
                 FILE *file = NULL; // Erstelle eine Datei mit den Namen der künftigen Tracefile
-                file = fopen(tracefile, "w");
+                file = fopen(tracefile, "we");
                 if (file == NULL) {
                     (void) fprintf(stderr, ILLEGAL_ARGUMENT_TRACEFILE"\n");
                     return EXIT_FAILURE;
                 }
-                fclose(file);
+                if (fclose(file) != 0) {
+                    (void) fprintf(stderr, ERR_GENERAL_CANT_OPEN_FILE(tracefile));
+                    return EXIT_FAILURE;
+                }
                 break;
             }
             case 'h': {
