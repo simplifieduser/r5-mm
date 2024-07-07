@@ -6,6 +6,7 @@ dist
 test.csv
 test_cpp
 test_c
+trace.vcd
 
 # Python dir
 .venv
