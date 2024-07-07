@@ -7,6 +7,8 @@
 #include "shared.h"
 #include "file_parser.h"
 
+extern Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsigned blocksize, unsigned v2bBlockOffset, unsigned memoryLatency, size_t numRequests, Request *requests, const char *tracefile);
+
 int main(int argc, char *argv[]) {
     int cycles = 10000;
     unsigned int tlbSize = 64;
@@ -165,30 +167,14 @@ int main(int argc, char *argv[]) {
     // Read input file
 
     Request *requests = NULL;
-    int requestCount = parseFile(inputfile, &requests);
+    size_t requestCount = parseFile(inputfile, &requests);
 
     if (requestCount < 0) {
         return EXIT_FAILURE;
     }
 
-    //TODO: Implement the simulation
-
-    // Zum Testen der Eingaben
-    printf("cycles=%d\n", cycles);
-    printf("blocksize=%u\n", blocksize);
-    printf("v2bBlockOffset=%u\n", v2bBlockOffset);
-    printf("tlbSize=%u\n", tlbSize);
-    printf("tlbLatency=%u\n", tlbLatency);
-    printf("memoryLatency=%u\n", memoryLatency);
-    printf("inputfile=%s\n", inputfile);
-    if (tracefile) {
-        printf("tracefile=%s\n", tracefile);
-    }
-    printf("-\n");
-
-    for (int i = 0; i < requestCount; ++i) {
-        printf("%d: %d %u %u\n", i, requests[i].we, requests[i].addr, requests[i].data);
-    }
+    // Run simulation
+    (void) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
 
     return EXIT_SUCCESS;
 }

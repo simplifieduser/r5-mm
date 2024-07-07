@@ -4,7 +4,7 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
 {
     // TODO: primitive_gate_count
 
-    Result result;                         // to be returned
+    Result result;                            // to be returned
     std::vector<uint32_t> buffer(tlbSize); // stores which virtual addresses are in the tlb
     sc_clock clk;
 

@@ -7,6 +7,8 @@
 #include "memory_module.hpp"
 using namespace sc_core;
 
+extern "C" Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsigned blocksize, unsigned v2bBlockOffset, unsigned memoryLatency, size_t numRequests, Request *requests, const char *tracefile);
+
 SC_MODULE(REQUEST_PROCESSOR)
 {
     sc_in<bool> clk;
