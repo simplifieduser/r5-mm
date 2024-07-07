@@ -21,7 +21,7 @@ def random_value(valid=True):
 def generate_valid_request(i, writer, requests):
     command_options = ['r', 'R', 'w', 'W']
     mode = random.choice(command_options)
-    if mode is 'r' or mode is 'R':
+    if mode == 'r' or mode == 'R':
         addr = random_value()
         writer.writerow([mode, addr])
         requests.append(f"{i}: 0 {int(addr, 0)} 0")

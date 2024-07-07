@@ -174,9 +174,33 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    // Führe Simulation aus & beende mit Erfolg
+    // Simulation starten
 
     (void) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+
+    // TESTING CODE ------------
+
+    printf("cycles=%d\n", cycles);
+    printf("blocksize=%u\n", blocksize);
+    printf("v2bBlockOffset=%u\n", v2bBlockOffset);
+    printf("tlbSize=%u\n", tlbSize);
+    printf("tlbLatency=%u\n", tlbLatency);
+    printf("memoryLatency=%u\n", memoryLatency);
+    printf("inputfile=%s\n", inputfile);
+    if (tracefile) {
+        printf("tracefile=%s\n", tracefile);
+    }
+    printf("-\n");
+
+    for (size_t i = 0; i < requestCount; ++i) {
+        printf("%zu: %d %u %u\n", i, requests[i].we, requests[i].addr, requests[i].data);
+    }
+
+    // TESTING CODE ------------
+
+    // Speicher freigeben & Programm beenden
+
+    free(requests);
 
     return EXIT_SUCCESS;
 }
