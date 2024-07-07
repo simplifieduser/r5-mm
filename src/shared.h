@@ -28,11 +28,11 @@
 // illegal arguments
 #define ERR_NO_FILE_INPUT "Fehler: ungültiges Argument: Es muss eine Eingabedatei als Positional Argument übergeben werden"
 #define ERR_ILLEGAL_ARGUMENT_CYCLES "Fehler: ungültiges Argument: 'cycles (-c/--cycles)' muss ein Integer im Interval [0; " ARG_INT_MAX "] sein"
-#define ERR_ILLEGAL_ARGUMENT_BLOCKSIZE E"Fehler: ungültiges Argument: 'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; " ARG_UINT_MAX "] sein"
-#define ERR_ILLEGAL_ARGUMENT_V2B_BLOCK_OFFSET E"Fehler: ungültiges Argument: 'v2b-block-offset (-o/--v2b-block-offset)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
-#define ERR_ILLEGAL_ARGUMENT_TLB_SIZE E"Fehler: ungültiges Argument: 'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
-#define ERR_ILLEGAL_ARGUMENT_TLB_LATENCY E"Fehler: ungültiges Argument: 'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
-#define ERR_ILLEGAL_ARGUMENT_MEMORY_LATENCY E"Fehler: ungültiges Argument: 'memory-latency (-m/--memory-latency)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
+#define ERR_ILLEGAL_ARGUMENT_BLOCKSIZE "Fehler: ungültiges Argument: 'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; " ARG_UINT_MAX "] sein"
+#define ERR_ILLEGAL_ARGUMENT_V2B_BLOCK_OFFSET "Fehler: ungültiges Argument: 'v2b-block-offset (-o/--v2b-block-offset)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
+#define ERR_ILLEGAL_ARGUMENT_TLB_SIZE "Fehler: ungültiges Argument: 'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
+#define ERR_ILLEGAL_ARGUMENT_TLB_LATENCY "Fehler: ungültiges Argument: 'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
+#define ERR_ILLEGAL_ARGUMENT_MEMORY_LATENCY "Fehler: ungültiges Argument: 'memory-latency (-m/--memory-latency)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
 #define ERR_ILLEGAL_ARGUMENT_TRACEFILE "Fehler: ungültiges Argument: 'tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden"
 
 
