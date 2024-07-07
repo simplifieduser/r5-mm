@@ -1,14 +1,4 @@
-#include <systemc>
-
 #include "modules.hpp"
-
-struct Result
-{
-    size_t cycles;
-    size_t misses;
-    size_t hits;
-    size_t primitive_gate_count;
-};
 
 Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsigned blocksize, unsigned v2bBlockOffset, unsigned memoryLatency, size_t numRequests, Request *requests, const char *tracefile)
 {
