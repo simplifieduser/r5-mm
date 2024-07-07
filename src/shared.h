@@ -1,9 +1,6 @@
 #ifndef SHARED_H
 #define SHARED_H
 
-#define INT_MAX "2147483647"
-#define UINT_MAX "4294967295"
-
 //hint
 #define HINT "Hinweis: Verwenden Sie '-h/--help', um weiter Informationen bezüglich möglicher Argumente und ihrer Benutzung zu erhalten"
 
@@ -20,6 +17,9 @@
 // ARGUMENT PARSING //
 //                  //
 
+#define ARG_INT_MAX "2147483647"
+#define ARG_UINT_MAX "4294967295"
+
 // invalid arguments
 #define UNKNOWN_OPTION "Fehler: es wurde eine unbekannte Option übergeben, bitte entferne: "
 #define TOO_MANY_OPTION "Fehler: es wurden zu viele Optionen übergeben"
@@ -28,12 +28,12 @@
 // illegal arguments
 #define ILLEGAL_ARGUMENT_PASSING "Fehler: ungültiges Argument: "
 #define NO_FILE_INPUT ILLEGAL_ARGUMENT_PASSING "Es muss eine Eingabedatei als Positional Argument übergeben werden"
-#define ILLEGAL_ARGUMENT_CYCLES ILLEGAL_ARGUMENT_PASSING "'cycles (-c/--cycles)' muss ein Integer im Interval [0; " INT_MAX "] sein"
-#define ILLEGAL_ARGUMENT_BLOCKSIZE ILLEGAL_ARGUMENT_PASSING  "'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; " UINT_MAX "] sein"
-#define ILLEGAL_ARGUMENT_V2B_BLOCK_OFFSET ILLEGAL_ARGUMENT_PASSING  "'v2b-block-offset (-o/--v2b-block-offset)' muss ein Integer im Interval [0; " UINT_MAX "] sein"
-#define ILLEGAL_ARGUMENT_TLB_SIZE ILLEGAL_ARGUMENT_PASSING  "'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; " UINT_MAX "] sein"
-#define ILLEGAL_ARGUMENT_TLB_LATENCY ILLEGAL_ARGUMENT_PASSING  "'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; " UINT_MAX "] sein"
-#define ILLEGAL_ARGUMENT_MEMORY_LATENCY ILLEGAL_ARGUMENT_PASSING  "'memory-latency (-m/--memory-latency)' muss ein Integer im Interval [0; " UINT_MAX "] sein"
+#define ILLEGAL_ARGUMENT_CYCLES ILLEGAL_ARGUMENT_PASSING "'cycles (-c/--cycles)' muss ein Integer im Interval [0; " ARG_INT_MAX "] sein"
+#define ILLEGAL_ARGUMENT_BLOCKSIZE ILLEGAL_ARGUMENT_PASSING  "'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; " ARG_UINT_MAX "] sein"
+#define ILLEGAL_ARGUMENT_V2B_BLOCK_OFFSET ILLEGAL_ARGUMENT_PASSING  "'v2b-block-offset (-o/--v2b-block-offset)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
+#define ILLEGAL_ARGUMENT_TLB_SIZE ILLEGAL_ARGUMENT_PASSING  "'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
+#define ILLEGAL_ARGUMENT_TLB_LATENCY ILLEGAL_ARGUMENT_PASSING  "'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
+#define ILLEGAL_ARGUMENT_MEMORY_LATENCY ILLEGAL_ARGUMENT_PASSING  "'memory-latency (-m/--memory-latency)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
 #define ILLEGAL_ARGUMENT_TRACEFILE ILLEGAL_ARGUMENT_PASSING "'Tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden"
 
 
@@ -64,9 +64,9 @@
 #define ERR_FILE_TOO_MANY_ARGS(line) "Fehler: Request-Datei ungültig: Zeile %d - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n", line
 
 
-//                       //
-// GLOBAL REQUEST STRUCT //
-//                       //
+//                //
+// GLOBAL STRUCTS //
+//                //
 
 typedef struct Request
 {
@@ -74,5 +74,14 @@ typedef struct Request
     uint32_t data;
     int we;
 } Request;
+
+typedef struct Result
+{
+    size_t cycles;
+    size_t misses;
+    size_t hits;
+    size_t primitive_gate_count;
+} Result;
+
 
 #endif //SHARED_H
