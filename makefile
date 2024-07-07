@@ -24,7 +24,7 @@ SRC := ./src
 DIST := ./dist
 
 # Source file paths
-C_SRC := main.c
+C_SRC := main.c file_parser.c
 CPP_SRC := modules.cpp
 
 # Test source file paths
@@ -56,10 +56,22 @@ CFLAGS := -std=c17
 
 CXX := clang++
 CXXFLAGS := -std=c++14 -I$(LIB)/include
-LDFLAGS := -I$(LIB)/include -L$(LIB)/lib -lsystemc
+LDFLAGS := -L$(LIB)/lib -I$(LIB)/include -lsystemc
 
 ifneq ($(shell uname -s), Darwin)
   LDFLAGS += -Wl,-rpath=$(LIB)/lib
+endif
+
+# Test build flags
+
+TIDYFLAGS := -checks=bugprone,cppcoreguidelines,clang-analyzer,performance,portability,readability,misc
+CHECKFLAGS := -fsyntax-only -Wall -Wextra -Wpedantic
+CHECKFLAGS += -Wno-unused-but-set-variable -Wno-unused-parameter   # Benötigt, da sonst systemc immer Fehler wirft
+
+ifdef TEST_BUILD
+  LDFLAGS += -fsanitize=undefined,address
+  TIDYFLAGS += --warnings-as-errors=*
+	CHECKFLAGS += -Werror
 endif
 
 
@@ -67,19 +79,19 @@ endif
 # Targets #
 #         #
 
-.PHONY: all debug release clean
+.PHONY: all debug release tidy clean
 
 # Default target
 all: debug
 
 # Debug target
-debug: CCFLAGS += -g
-debug: CXXFLAGS += -g
+debug: CFLAGS += -g -Wall -Wextra
+debug: CXXFLAGS += -g -Wall -Wextra
 debug: LDFLAGS += -g
 debug: $(DIST)/$(TARGET)
 
 # Release target
-release: CCFLAGS += -O2
+release: CFLAGS += -O2
 release: CXXFLAGS += -O2
 release: LDFLAGS += -O2
 release: $(DIST)/$(TARGET)
@@ -87,12 +99,22 @@ release: $(DIST)/$(TARGET)
 # Test targets
 test: test_c test_cpp
 
-test_c: CCFLAGS += -g
+test_c: CFLAGS += -g -Wall -Wextra
 test_c: $(DIST)/test_c
 
-test_cpp: CXXFLAGS += -g
+test_cpp: CXXFLAGS += -g -Wall -Wextra
 test_cpp: LDFLAGS += -g
 test_cpp: $(DIST)/test_cpp
+
+# Tidy targets
+tidy:: 
+	clang $(CHECKFLAGS) $(C_SRC) $(CFLAGS)
+tidy:: 
+	clang++ $(CHECKFLAGS) $(CPP_SRC) $(CXXFLAGS)
+tidy::
+	clang-tidy $(C_SRC) $(TIDYFLAGS) -- $(CFLAGS)
+tidy::
+	clang-tidy $(CPP_SRC) $(TIDYFLAGS) -- $(CXXFLAGS)
 
 # Clean up
 clean:
