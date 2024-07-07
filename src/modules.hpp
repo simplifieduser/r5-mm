@@ -2,16 +2,10 @@
 #define MODULES_HPP
 
 #include <systemc>
+#include "shared.h"
 #include "address_module.hpp"
 #include "memory_module.hpp"
 using namespace sc_core;
-
-struct Request
-{
-    uint32_t addr;
-    uint32_t data;
-    int we;
-};
 
 SC_MODULE(REQUEST_PROCESSOR)
 {

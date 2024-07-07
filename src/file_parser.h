@@ -2,13 +2,7 @@
 #define FILE_PARSER_H
 
 #include <stdint.h>
-
-typedef struct Request
-{
-  uint32_t addr;
-  uint32_t data;
-  int we;
-} Request;
+#include "shared.h"
 
 int parseFile(const char *path, Request **requests);
 

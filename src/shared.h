@@ -63,4 +63,16 @@
 #define ERR_FILE_INVALID_ARG(arg, line) "Fehler: Request-Datei ungültig: Zeile %d - Angegebener Wert, ist nicht valide für %s\n", line, arg
 #define ERR_FILE_TOO_MANY_ARGS(line) "Fehler: Request-Datei ungültig: Zeile %d - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n", line
 
+
+//                       //
+// GLOBAL REQUEST STRUCT //
+//                       //
+
+typedef struct Request
+{
+    uint32_t addr;
+    uint32_t data;
+    int we;
+} Request;
+
 #endif //SHARED_H
