@@ -164,16 +164,18 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    // Read input file
+    // Lese Requests aus Datei
 
     Request *requests = NULL;
-    size_t requestCount = parseFile(inputfile, &requests);
+    size_t requestCount = 0;
+    int status = parseFile(inputfile, &requestCount, &requests);
 
-    if (requestCount < 0) {
+    if (status < 0) {
         return EXIT_FAILURE;
     }
 
-    // Run simulation
+    // Führe Simulation aus & beende mit Erfolg
+
     (void) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
 
     return EXIT_SUCCESS;

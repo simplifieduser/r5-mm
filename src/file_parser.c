@@ -22,7 +22,7 @@ RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode);
 
 RET_CODE getDataArg(FILE *file, uint32_t *res);
 
-void printError(RET_CODE code, const char *arg, int line) {
+void printError(RET_CODE code, const char *arg, size_t line) {
 
     switch (code) {
         case ERR_ALLOC:
@@ -49,7 +49,7 @@ void printError(RET_CODE code, const char *arg, int line) {
     }
 }
 
-size_t parseFile(const char *path, Request **requests) {
+int parseFile(const char *path, size_t* requestCount, Request **requests) {
 
     // Initialisiere Pointer
     uint32_t *address = malloc(sizeof(uint32_t));
@@ -95,7 +95,10 @@ size_t parseFile(const char *path, Request **requests) {
                 return -1;
             }
 
-            return i;
+            // Setze Anzahl der Requests & gebe Erfolg zurück
+            *requestCount = i;
+
+            return 0;
         }
 
         if (mode != OK_READ && mode != OK_WRITE) {

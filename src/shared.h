@@ -57,10 +57,10 @@
 // REQUEST FILE PARSING //
 //                      //
 
-#define ERR_FILE_PREMATURE_END_OF_FILE(arg, line) "Fehler: Request-Datei ungültig: Zeile %d - Erwartet wurde %s, jedoch Ende der Datei gefunden\n", line, arg
-#define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler: Request-Datei ungültig: Zeile %d - Erwartet wurde %s, jedoch neue Zeile gefunden\n", line, arg
-#define ERR_FILE_INVALID_ARG(arg, line) "Fehler: Request-Datei ungültig: Zeile %d - Angegebener Wert, ist nicht valide für %s\n", line, arg
-#define ERR_FILE_TOO_MANY_ARGS(line) "Fehler: Request-Datei ungültig: Zeile %d - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n", line
+#define ERR_FILE_PREMATURE_END_OF_FILE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde %s, jedoch Ende der Datei gefunden\n", line, arg
+#define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde %s, jedoch neue Zeile gefunden\n", line, arg
+#define ERR_FILE_INVALID_ARG(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Angegebener Wert, ist nicht valide für %s\n", line, arg
+#define ERR_FILE_TOO_MANY_ARGS(line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n", line
 
 
 //                //
