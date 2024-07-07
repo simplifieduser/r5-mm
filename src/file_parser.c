@@ -129,7 +129,7 @@ int parseFile(const char *path, size_t* requestCount, Request **requests) {
 
         size_t newSize = 0;
         if (__builtin_mul_overflow((i + 1), sizeof(Request), &newSize)) {
-            // SPEICHER-FEHLER ERR_ALLOC
+            // SPEICHER-FEHLER
             free(address);
             free(data);
             printError(ERR_ALLOC, "", 0);
