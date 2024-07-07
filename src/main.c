@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <errno.h>
 #include <string.h>
-#include "messages.h"
+#include "shared.h"
 #include "file_parser.h"
 
 int main(int argc, char *argv[]) {

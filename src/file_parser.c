@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "file_parser.h"
-#include "messages.h"
+#include "shared.h"
 
 // Wird zur Bestimmung des Erfolgs der Zusatzfunktionen für Argumente verwendet
 enum RET_CODE {
