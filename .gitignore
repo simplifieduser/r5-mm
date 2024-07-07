@@ -6,6 +6,7 @@ dist
 test.csv
 test_cpp
 test_c
+trace.vcd
 tracefile*.txt
 
 # Python dir

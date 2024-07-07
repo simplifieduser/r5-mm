@@ -29,7 +29,7 @@ CPP_SRC := modules.cpp
 
 # Test source file paths
 TEST_C_SRC :=
-TEST_CPP_SRC := test.cpp
+TEST_CPP_SRC :=
 
 #               #
 # Env variables #

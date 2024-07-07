@@ -4,8 +4,10 @@
 #include <stdint.h>
 #include <errno.h>
 #include <string.h>
-#include "messages.h"
+#include "shared.h"
 #include "file_parser.h"
+
+extern Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsigned blocksize, unsigned v2bBlockOffset, unsigned memoryLatency, size_t numRequests, Request *requests, const char *tracefile);
 
 int main(int argc, char *argv[]) {
     int cycles = 10000;
@@ -50,7 +52,7 @@ int main(int argc, char *argv[]) {
                 errno = 0;
                 long tmp = strtol(optarg, &endOfPointer, 10);
                 if (errno != 0 || *endOfPointer != '\0' || tmp > INT32_MAX || tmp < 0) {
-                    (void) fprintf(stderr, ILLEGAL_ARGUMENT_CYCLES"\n");
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_CYCLES"\n");
                     return EXIT_FAILURE;
                 }
                 cycles = (int) tmp;
@@ -61,7 +63,7 @@ int main(int argc, char *argv[]) {
                 errno = 0;
                 long tmp = strtol(optarg, &endOfPointer, 10);
                 if (errno != 0 || *endOfPointer != '\0' || tmp > UINT32_MAX || tmp <= 0) {
-                    (void) fprintf(stderr, ILLEGAL_ARGUMENT_BLOCKSIZE"\n");
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_BLOCKSIZE"\n");
                     return EXIT_FAILURE;
                 }
                 blocksize = (unsigned) tmp;
@@ -72,7 +74,7 @@ int main(int argc, char *argv[]) {
                 errno = 0;
                 long tmp = strtol(optarg, &endOfPointer, 10);
                 if (errno != 0 || *endOfPointer != '\0' || tmp > UINT32_MAX || tmp < 0) {
-                    (void) fprintf(stderr, ILLEGAL_ARGUMENT_V2B_BLOCK_OFFSET"\n");
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_V2B_BLOCK_OFFSET"\n");
                     return EXIT_FAILURE;
                 }
                 v2bBlockOffset = (unsigned) tmp;
@@ -83,7 +85,7 @@ int main(int argc, char *argv[]) {
                 errno = 0;
                 long tmp = strtol(optarg, &endOfPointer, 10);
                 if (errno != 0 || *endOfPointer != '\0' || tmp > UINT32_MAX || tmp < 0) {
-                    (void) fprintf(stderr, ILLEGAL_ARGUMENT_TLB_SIZE"\n");
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_TLB_SIZE"\n");
                     return EXIT_FAILURE;
                 }
                 tlbSize = (unsigned) tmp;
@@ -94,7 +96,7 @@ int main(int argc, char *argv[]) {
                 errno = 0;
                 long tmp = strtol(optarg, &endOfPointer, 10);
                 if (errno != 0 || *endOfPointer != '\0' || tmp > UINT32_MAX || tmp < 0) {
-                    (void) fprintf(stderr, ILLEGAL_ARGUMENT_TLB_LATENCY"\n");
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_TLB_LATENCY"\n");
                     return EXIT_FAILURE;
                 }
                 tlbLatency = (unsigned) tmp;
@@ -105,7 +107,7 @@ int main(int argc, char *argv[]) {
                 errno = 0;
                 long tmp = strtol(optarg, &endOfPointer, 10);
                 if (errno != 0 || *endOfPointer != '\0' || tmp > UINT32_MAX || tmp < 0) {
-                    (void) fprintf(stderr, ILLEGAL_ARGUMENT_MEMORY_LATENCY"\n");
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_MEMORY_LATENCY"\n");
                     return EXIT_FAILURE;
                 }
                 memoryLatency = (unsigned) tmp;
@@ -116,7 +118,7 @@ int main(int argc, char *argv[]) {
                 FILE *file = NULL; // Erstelle eine Datei mit den Namen der künftigen Tracefile
                 file = fopen(tracefile, "we");
                 if (file == NULL) {
-                    (void) fprintf(stderr, ILLEGAL_ARGUMENT_TRACEFILE"\n");
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_TRACEFILE"\n");
                     return EXIT_FAILURE;
                 }
                 if (fclose(file) != 0) {
@@ -132,18 +134,18 @@ int main(int argc, char *argv[]) {
                 // Fehlerbehandlung
             case '?': {
                 if (optopt) {
-                    (void) fprintf(stderr, UNKNOWN_OPTION "'-%c'\n"HINT"\n", optopt);
+                    (void) fprintf(stderr, ERR_UNKNOWN_OPTION "'-%c'\n"MSG_HINT"\n", optopt);
                     return EXIT_FAILURE;
                 }
-                (void) fprintf(stderr, UNKNOWN_OPTION "'%s'\n"HINT"\n", argv[optind - 1]);
+                (void) fprintf(stderr, ERR_UNKNOWN_OPTION "'%s'\n"MSG_HINT"\n", argv[optind - 1]);
                 return EXIT_FAILURE;
             }
             case ':': {
-                (void) fprintf(stderr, NO_REQUIRED_ARGUMENT"'%s'\n"HINT"\n", argv[optind - 1]);
+                (void) fprintf(stderr, ERR_NO_REQUIRED_ARGUMENT"'%s'\n"MSG_HINT"\n", argv[optind - 1]);
                 return EXIT_FAILURE;
             }
             default:
-                (void) fprintf(stderr, UNKNOWN_OPTION "'%s'.\n", argv[optind - 1]);
+                (void) fprintf(stderr, ERR_UNKNOWN_OPTION "'%s'.\n", argv[optind - 1]);
                 return EXIT_FAILURE;
         }
     }
@@ -154,26 +156,30 @@ int main(int argc, char *argv[]) {
         inputfile = argv[optind]; // Mögliche Fehlerbehandlung folgt beim Einlesen der Datei
 
     } else {
-        (void) fprintf(stderr, NO_FILE_INPUT"\n"HINT"\n");
+        (void) fprintf(stderr, ERR_NO_FILE_INPUT"\n"MSG_HINT"\n");
         return EXIT_FAILURE;
     }
     if (optind < argc - 1) {
-        (void) fprintf(stderr, TOO_MANY_OPTION"\n"HINT"\n");
+        (void) fprintf(stderr, ERR_TOO_MANY_OPTION"\n"MSG_HINT"\n");
         return EXIT_FAILURE;
     }
 
-    // Read input file
+    // Lese Requests aus Datei
 
     Request *requests = NULL;
-    int requestCount = parseFile(inputfile, &requests);
+    size_t requestCount = 0;
+    int status = parseFile(inputfile, &requestCount, &requests);
 
-    if (requestCount < 0) {
+    if (status < 0) {
         return EXIT_FAILURE;
     }
 
-    //TODO: Implement the simulation
+    // Simulation starten
 
-    // Zum Testen der Eingaben
+    (void) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+
+    // TESTING CODE ------------
+
     printf("cycles=%d\n", cycles);
     printf("blocksize=%u\n", blocksize);
     printf("v2bBlockOffset=%u\n", v2bBlockOffset);
@@ -186,9 +192,15 @@ int main(int argc, char *argv[]) {
     }
     printf("-\n");
 
-    for (int i = 0; i < requestCount; ++i) {
-        printf("%d: %d %u %u\n", i, requests[i].we, requests[i].addr, requests[i].data);
+    for (size_t i = 0; i < requestCount; ++i) {
+        printf("%zu: %d %u %u\n", i, requests[i].we, requests[i].addr, requests[i].data);
     }
+
+    // TESTING CODE ------------
+
+    // Speicher freigeben & Programm beenden
+
+    free(requests);
 
     return EXIT_SUCCESS;
 }

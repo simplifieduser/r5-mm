@@ -246,7 +246,7 @@ test_cases = [
                 "--blocksize": 1024,
                 "--v2b-block-offset": 0,
             },
-            "error": "Fehler: es wurde eine unbekannte Option übergeben, bitte entferne: '-x'"
+            "error": "Fehler: Es wurde eine unbekannte Option übergeben, bitte entferne: '-x'"
         }
     },
     {
@@ -255,7 +255,7 @@ test_cases = [
             "values": {
                 "-c": "",
             },
-            "error": "Fehler: folgende Option benötigt ein Argument: '-c'"
+            "error": "Fehler: Folgende Option benötigt ein Argument: '-c'"
         }
     },
     {
@@ -264,7 +264,7 @@ test_cases = [
             "values": {
                 "-c": -1,
             },
-            "error": "Fehler: ungültiges Argument: 'cycles (-c/--cycles)' muss ein Integer im Interval [0; 2147483647] sein"
+            "error": "Fehler: Ungültiges Argument: 'cycles (-c/--cycles)' muss ein Integer im Interval [0; 2147483647] sein"
         }
     },
     {
@@ -273,7 +273,7 @@ test_cases = [
             "values": {
                 "--blocksize": -1,
             },
-            "error": "Fehler: ungültiges Argument: 'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; 4294967295] sein"
+            "error": "Fehler: Ungültiges Argument: 'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; 4294967295] sein"
         }
     },
     {
@@ -282,7 +282,7 @@ test_cases = [
             "values": {
                 "-s": 4294967296,
             },
-            "error": "Fehler: ungültiges Argument: 'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; 4294967295] sein"
+            "error": "Fehler: Ungültiges Argument: 'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; 4294967295] sein"
         }
     },
     {
@@ -291,7 +291,7 @@ test_cases = [
             "values": {
                 "--tlb-latency": "abc",
             },
-            "error": "Fehler: ungültiges Argument: 'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; 4294967295] sein"
+            "error": "Fehler: Ungültiges Argument: 'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; 4294967295] sein"
         }
     },
     {
@@ -300,7 +300,7 @@ test_cases = [
             "values": {
                 "-f": "",
             },
-            "error": "Fehler: folgende Option benötigt ein Argument: '-f'"
+            "error": "Fehler: Folgende Option benötigt ein Argument: '-f'"
         }
     },
     {
@@ -309,7 +309,7 @@ test_cases = [
             "values": {
                 "--blocksize": "notanumber",
             },
-            "error": "Fehler: ungültiges Argument: 'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; 4294967295] sein"
+            "error": "Fehler: Ungültiges Argument: 'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; 4294967295] sein"
         }
     },
     {
@@ -318,7 +318,7 @@ test_cases = [
             "values": {
                 "-x": 50,
             },
-            "error": "Fehler: es wurde eine unbekannte Option übergeben, bitte entferne: '-x'"
+            "error": "Fehler: Es wurde eine unbekannte Option übergeben, bitte entferne: '-x'"
         }
     },
     {
@@ -327,7 +327,7 @@ test_cases = [
             "values": {
                 "-t": -5,
             },
-            "error": "Fehler: ungültiges Argument: 'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; 4294967295] sein"
+            "error": "Fehler: Ungültiges Argument: 'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; 4294967295] sein"
         }
     },
     {
@@ -336,7 +336,7 @@ test_cases = [
             "values": {
                 "-c": 2147483648,
             },
-            "error": "Fehler: ungültiges Argument: 'cycles (-c/--cycles)' muss ein Integer im Interval [0; 2147483647] sein"
+            "error": "Fehler: Ungültiges Argument: 'cycles (-c/--cycles)' muss ein Integer im Interval [0; 2147483647] sein"
         }
     },
     {
@@ -345,7 +345,7 @@ test_cases = [
             "values": {
                 "--blocksize": 0,
             },
-            "error": "Fehler: ungültiges Argument: 'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; 4294967295] sein"
+            "error": "Fehler: Ungültiges Argument: 'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; 4294967295] sein"
         }
     },
     {
@@ -354,7 +354,7 @@ test_cases = [
             "values": {
                 "-m": -100,
             },
-            "error": "Fehler: ungültiges Argument: 'memory-latency (-m/--memory-latency)' muss ein Integer im Interval [0; 4294967295] sein"
+            "error": "Fehler: Ungültiges Argument: 'memory-latency (-m/--memory-latency)' muss ein Integer im Interval [0; 4294967295] sein"
         }
     },
     {
@@ -363,7 +363,7 @@ test_cases = [
             "values": {
                 "--tlb-size": 4294967296,
             },
-            "error": "Fehler: ungültiges Argument: 'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; 4294967295] sein"
+            "error": "Fehler: Ungültiges Argument: 'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; 4294967295] sein"
         }
     },
 
