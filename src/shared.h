@@ -2,7 +2,7 @@
 #define SHARED_H
 
 //hint
-#define HINT "Hinweis: Verwenden Sie '-h/--help', um weiter Informationen bezüglich möglicher Argumente und ihrer Benutzung zu erhalten"
+#define MSG_HINT "Hinweis: Verwenden Sie '-h/--help', um weiter Informationen bezüglich möglicher Argumente und ihrer Benutzung zu erhalten"
 
 //             //
 //   GENERAL   //
@@ -21,20 +21,19 @@
 #define ARG_UINT_MAX "4294967295"
 
 // invalid arguments
-#define UNKNOWN_OPTION "Fehler: es wurde eine unbekannte Option übergeben, bitte entferne: "
-#define TOO_MANY_OPTION "Fehler: es wurden zu viele Optionen übergeben"
-#define NO_REQUIRED_ARGUMENT "Fehler: folgende Option benötigt ein Argument: "
+#define ERR_UNKNOWN_OPTION "Fehler: Es wurde eine unbekannte Option übergeben, bitte entferne: "
+#define ERR_TOO_MANY_OPTION "Fehler: Es wurden zu viele Optionen übergeben"
+#define ERR_NO_REQUIRED_ARGUMENT "Fehler: Folgende Option benötigt ein Argument: "
 
 // illegal arguments
-#define ILLEGAL_ARGUMENT_PASSING "Fehler: ungültiges Argument: "
-#define NO_FILE_INPUT ILLEGAL_ARGUMENT_PASSING "Es muss eine Eingabedatei als Positional Argument übergeben werden"
-#define ILLEGAL_ARGUMENT_CYCLES ILLEGAL_ARGUMENT_PASSING "'cycles (-c/--cycles)' muss ein Integer im Interval [0; " ARG_INT_MAX "] sein"
-#define ILLEGAL_ARGUMENT_BLOCKSIZE ILLEGAL_ARGUMENT_PASSING  "'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; " ARG_UINT_MAX "] sein"
-#define ILLEGAL_ARGUMENT_V2B_BLOCK_OFFSET ILLEGAL_ARGUMENT_PASSING  "'v2b-block-offset (-o/--v2b-block-offset)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
-#define ILLEGAL_ARGUMENT_TLB_SIZE ILLEGAL_ARGUMENT_PASSING  "'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
-#define ILLEGAL_ARGUMENT_TLB_LATENCY ILLEGAL_ARGUMENT_PASSING  "'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
-#define ILLEGAL_ARGUMENT_MEMORY_LATENCY ILLEGAL_ARGUMENT_PASSING  "'memory-latency (-m/--memory-latency)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
-#define ILLEGAL_ARGUMENT_TRACEFILE ILLEGAL_ARGUMENT_PASSING "'Tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden"
+#define ERR_NO_FILE_INPUT "Fehler: ungültiges Argument: Es muss eine Eingabedatei als Positional Argument übergeben werden"
+#define ERR_ILLEGAL_ARGUMENT_CYCLES "Fehler: ungültiges Argument: 'cycles (-c/--cycles)' muss ein Integer im Interval [0; " ARG_INT_MAX "] sein"
+#define ERR_ILLEGAL_ARGUMENT_BLOCKSIZE E"Fehler: ungültiges Argument: 'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; " ARG_UINT_MAX "] sein"
+#define ERR_ILLEGAL_ARGUMENT_V2B_BLOCK_OFFSET E"Fehler: ungültiges Argument: 'v2b-block-offset (-o/--v2b-block-offset)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
+#define ERR_ILLEGAL_ARGUMENT_TLB_SIZE E"Fehler: ungültiges Argument: 'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
+#define ERR_ILLEGAL_ARGUMENT_TLB_LATENCY E"Fehler: ungültiges Argument: 'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
+#define ERR_ILLEGAL_ARGUMENT_MEMORY_LATENCY E"Fehler: ungültiges Argument: 'memory-latency (-m/--memory-latency)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
+#define ERR_ILLEGAL_ARGUMENT_TRACEFILE "Fehler: ungültiges Argument: 'tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden"
 
 
 
