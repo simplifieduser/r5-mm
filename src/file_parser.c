@@ -49,7 +49,7 @@ void printError(RET_CODE code, const char *arg, int line) {
     }
 }
 
-int parseFile(const char *path, Request **requests) {
+size_t parseFile(const char *path, Request **requests) {
 
     // Initialisiere Pointer
     uint32_t *address = malloc(sizeof(uint32_t));
@@ -79,7 +79,7 @@ int parseFile(const char *path, Request **requests) {
     }
 
     // Lese-Schleife
-    for (int i = 0;; i++) {
+    for (size_t i = 0;; i++) {
 
         // Lese-/Schreib-Argument
         int mode = getRWArg(file);
@@ -104,7 +104,7 @@ int parseFile(const char *path, Request **requests) {
             break;
         }
 
-        // Adress-Argument
+        // Address-Argument
         int addressStatus = getAddressArg(file, address, mode);
         if (addressStatus != OK) {
             // PARSE-FEHLER

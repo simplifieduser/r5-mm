@@ -4,6 +4,6 @@
 #include <stdint.h>
 #include "shared.h"
 
-int parseFile(const char *path, Request **requests);
+size_t parseFile(const char *path, Request **requests);
 
 #endif
