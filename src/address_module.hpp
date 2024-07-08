@@ -75,21 +75,31 @@ SC_MODULE(ADDRESS_GETTER)
     {
         // calculate tag of virtual address by shifting to the right by page index bits
         uint32_t tag = virtual_address->read() >> (int)log2(blocksize);
-        uint32_t current_tag_in_tlb = buffer[tag % tlb_size];
 
-        // check if tag is currently cached in the tlb
-        if (tag == current_tag_in_tlb && previuosly_visited.count(tag))
+        // Überprüfen, ob tlb_size = 0
+        if (tlb_size == 0)
         {
-            previuosly_visited.insert(tag);
-            latency = tlbs_latency;
-            hit->write(true);
+            latency = tlbs_latency + memory_latency;
+            hit->write(false);
         }
         else
         {
-            previuosly_visited.insert(tag);
-            buffer[tag % tlb_size] = tag;
-            latency = tlbs_latency + memory_latency;
-            hit->write(false);
+            uint32_t current_tag_in_tlb = buffer[tag % tlb_size];
+
+            // check if tag is currently cached in the tlb
+            if (tag == current_tag_in_tlb && previuosly_visited.count(tag))
+            {
+                previuosly_visited.insert(tag);
+                latency = tlbs_latency;
+                hit->write(true);
+            }
+            else
+            {
+                previuosly_visited.insert(tag);
+                buffer[tag % tlb_size] = tag;
+                latency = tlbs_latency + memory_latency;
+                hit->write(false);
+            }
         }
 
         // construct the physical address
