@@ -176,9 +176,12 @@ int main(int argc, char *argv[]) {
 
     // Simulation starten
 
-    (void) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+    Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
 
-    // TESTING CODE ------------
+    // ------------ TESTING CODE ------------
+    #ifdef TEST_BUILD
+
+    printf("-\n");
 
     printf("cycles=%d\n", cycles);
     printf("blocksize=%u\n", blocksize);
@@ -190,13 +193,24 @@ int main(int argc, char *argv[]) {
     if (tracefile) {
         printf("tracefile=%s\n", tracefile);
     }
+
     printf("-\n");
 
     for (size_t i = 0; i < requestCount; ++i) {
         printf("%zu: %d %u %u\n", i, requests[i].we, requests[i].addr, requests[i].data);
     }
 
-    // TESTING CODE ------------
+    printf("-\n");
+
+    printf("cycles=%zu\n", result.cycles);
+    printf("misses=%zu\n", result.misses);
+    printf("hits=%zu\n", result.hits);
+    printf("primitive_gate_count=%zu\n", result.primitive_gate_count);
+
+    printf("-\n");
+
+    #endif
+    // ------------ TESTING CODE ------------
 
     // Speicher freigeben & Programm beenden
 
