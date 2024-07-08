@@ -85,8 +85,8 @@ endif
 all: debug
 
 # Debug target
-debug: CFLAGS += -g -Wall -Wextra -D TEST_BUILD
-debug: CXXFLAGS += -g -Wall -Wextra -D TEST_BUILD
+debug: CFLAGS += -g -Wall -Wextra -Wno-unused-but-set-variable -Wno-unused-parameter -D TEST_BUILD
+debug: CXXFLAGS += -g -Wall -Wextra -Wno-unused-but-set-variable -Wno-unused-parameter -D TEST_BUILD
 debug: LDFLAGS += -g
 debug: $(DIST)/$(TARGET)
 
