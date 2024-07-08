@@ -420,6 +420,7 @@ def test_cases_runner(test_case):
 
     if expected["returncode"] == 0:
         output = result.stdout.splitlines()
+        output.pop(0)
         for key, value in expected_values.items():
             if key == "tracefile" and value == "":
                 continue  # Ignore tracefile check if not set
