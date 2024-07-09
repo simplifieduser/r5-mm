@@ -66,7 +66,7 @@ SC_MODULE(REQUEST_PROCESSOR)
         // Tag-Größe + Adressen-Größe + 1 -> Anzahl Bits pro Zeile (+1: speichert, ob Zeile schon einmal benutzt wurde)
         // Anzahl Bits pro Zeile * Anzahl Zeilen (= tlb_size)
         // Anzahl Bits * 4 -> 4 Gatter benötigt, um 1 Bit zu speichern
-        primitive_gate_count->write(2 * ((32 - log2(blocksize)) + 1) * 4 * tlb_size);
+        primitive_gate_count->write(2 * ((32 - std::log2(blocksize)) + 1) * 4 * tlb_size);
 
         // Überprüfen, ob je zwei Tags verglichen werden
         if (num_requests > 0 && tlb_size > 0)

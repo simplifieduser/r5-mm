@@ -103,7 +103,7 @@ SC_MODULE(ADDRESS_GETTER)
                 // Tag als schonmal gecached markieren
                 previuosly_visited.insert(tag);
 
-                // richtigen Tag in den Buffer laden (dieser ist nun im TLB gespeichert)
+                // Richtigen Tag in den Buffer laden (dieser ist nun im TLB gespeichert)
                 buffer[tag % tlb_size] = tag;
 
                 latency = tlbs_latency + memory_latency;
@@ -111,8 +111,8 @@ SC_MODULE(ADDRESS_GETTER)
             }
         }
 
-        // physikalische Addresse konstruieren (Abstraktion)
-        // oberen Bits aus dem TLB rauslesen (v2b_block_offset darauf addieren) und unteren Bits aus der virtuellen Adresse kopieren
+        // Physische Addresse konstruieren (Abstraktion)
+        // Oberen Bits aus dem TLB rauslesen (v2b_block_offset darauf addieren) und unteren Bits aus der virtuellen Adresse kopieren
         if (blocksize > 1)
         {
             physical_address->write(((tag + v2b_block_offset) << (int)std::log2(blocksize)) + (virtual_address->read() % (int)std::log2(blocksize)));
