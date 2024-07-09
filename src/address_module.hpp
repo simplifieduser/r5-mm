@@ -71,7 +71,7 @@ SC_MODULE(ADDRESS_GETTER)
     void set_values()
     {
         // Tag der virtuellen Adresse berechnen -> Rechtsshift der virtuellen Adresse um blocksize
-        uint32_t tag = virtual_address->read() >> (int)log2(blocksize);
+        uint32_t tag = virtual_address->read() >> (int)std::log2(blocksize);
 
         // Überprüfen, ob tlb_size = 0
         if (tlb_size == 0)
@@ -113,7 +113,15 @@ SC_MODULE(ADDRESS_GETTER)
 
         // physikalische Addresse konstruieren (Abstraktion)
         // oberen Bits aus dem TLB rauslesen (v2b_block_offset darauf addieren) und unteren Bits aus der virtuellen Adresse kopieren
-        physical_address->write(((tag + v2b_block_offset) << (int)log2(blocksize)) + (virtual_address->read() % (int)log2(blocksize)));
+        if (blocksize > 1)
+        {
+            physical_address->write(((tag + v2b_block_offset) << (int)std::log2(blocksize)) + (virtual_address->read() % (int)std::log2(blocksize)));
+        }
+        else
+        {
+            // Falls blocksize < 2 ist der Tag genauso lang wie die Adresse
+            physical_address->write(tag + v2b_block_offset);
+        }
     }
 };
 #endif
