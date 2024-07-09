@@ -71,7 +71,7 @@ CHECKFLAGS += -Wno-unused-but-set-variable -Wno-unused-parameter   # Benötigt, 
 ifdef TEST_BUILD
   LDFLAGS += -fsanitize=undefined,address
   TIDYFLAGS += --warnings-as-errors=*
-	CHECKFLAGS += -Werror
+  CHECKFLAGS += -Werror
 endif
 
 
@@ -85,8 +85,8 @@ endif
 all: debug
 
 # Debug target
-debug: CFLAGS += -g -Wall -Wextra
-debug: CXXFLAGS += -g -Wall -Wextra
+debug: CFLAGS += -g -Wall -Wextra -Wno-unused-but-set-variable -Wno-unused-parameter -D TEST_BUILD
+debug: CXXFLAGS += -g -Wall -Wextra -Wno-unused-but-set-variable -Wno-unused-parameter -D TEST_BUILD
 debug: LDFLAGS += -g
 debug: $(DIST)/$(TARGET)
 

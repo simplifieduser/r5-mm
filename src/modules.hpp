@@ -59,7 +59,7 @@ SC_MODULE(REQUEST_PROCESSOR)
     void run_program()
     {
         // set gates needed for size of the tlb (tag size + address size (32 Bits): gates per row)
-        primitive_gate_count->write((64 - (log2(blocksize)) + 1) * 4 * tlb_size);
+        primitive_gate_count->write(((32 - log2(blocksize))*2 + 1) * 4 * tlb_size);
 
         for (size_t i = 0; i < num_requests; i++)
         {
