@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
 
     #else
 
-    run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+    (void*) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
 
     #endif
 
