@@ -99,16 +99,10 @@ int main(int argc, char *argv[]) {
             continue;
         }
         
-        // Umwandlung der Eingabewerte für die folgenden Optionen 
+        // Umwandlung der Eingabewerte für die folgenden Optionen
         char *endptr = NULL;
         errno = 0;
         long value = strtol(optarg, &endptr, 10); // Quelle: man strtol
-
-        // Fehler: Argument kann nicht zu einer Zahl umgewandelt werden
-        if(errno !=0 || *endptr !='\0') {
-            (void) fprintf(stderr, ERR_NO_CONVERSION(argv[optind - 2]));
-            return EXIT_FAILURE;
-        }
 
         switch (opt) {
             // cycles: -c / --cycles
@@ -120,7 +114,7 @@ int main(int argc, char *argv[]) {
                 cycles_bool = 1;
 
                 //Fehler: Übergebene Zahl nicht zulässig
-                if (value > INT32_MAX || value < 0) {
+                if (errno !=0 || *endptr !='\0' || value > INT32_MAX || value < 0) {
                     (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT("cycles (-c/--cycles)",0,INT32_MAX));
                     return EXIT_FAILURE;
                 }
@@ -137,7 +131,7 @@ int main(int argc, char *argv[]) {
                 blocksize_bool = 1;
 
                 //Fehler: Übergebene Zahl nicht zulässig
-                if (value > UINT32_MAX || value <= 0) {
+                if (errno !=0 || *endptr !='\0' || value > UINT32_MAX || value <= 0) {
                     (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT("blocksize (-b/--blocksize)",1,UINT32_MAX));
                     return EXIT_FAILURE;
                 }
@@ -147,7 +141,7 @@ int main(int argc, char *argv[]) {
 
             // v2bBlockOffset: -o / --v2bBlockOffset
             case 'o': {
-                if(v2bBlockOffset_bool == 1) {
+                if(errno !=0 || *endptr !='\0' || v2bBlockOffset_bool == 1) {
                     (void) fprintf(stderr, ERR_AlREADY_SET("v2bBlockOffset"));
                     return EXIT_FAILURE;
                 }
@@ -171,7 +165,7 @@ int main(int argc, char *argv[]) {
                 tlbSize_bool = 1;
 
                 //Fehler: Übergebene Zahl nicht zulässig
-                if (value > UINT32_MAX || value < 0) {
+                if (errno !=0 || *endptr !='\0' || value > UINT32_MAX || value < 0) {
                     (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT("tlb-size (-s/--tlb-size)",0,UINT32_MAX));
                     return EXIT_FAILURE;
                 }
@@ -188,7 +182,7 @@ int main(int argc, char *argv[]) {
                 tlbLatency_bool = 1;
 
                 //Fehler: Übergebene Zahl nicht zulässig
-                if (value > UINT32_MAX || value < 0) {
+                if (errno !=0 || *endptr !='\0' || value > UINT32_MAX || value < 0) {
                     (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT("tlb-latency (-t/--tlb-latency)",0,UINT32_MAX));
                     return EXIT_FAILURE;
                 }
@@ -205,7 +199,7 @@ int main(int argc, char *argv[]) {
                 memoryLatency_bool = 1;
 
                 //Fehler: Übergebene Zahl nicht zulässig
-                if (value > UINT32_MAX || value < 0) {
+                if (errno !=0 || *endptr !='\0' || value > UINT32_MAX || value < 0) {
                     (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT("memory-latency (-m/--memory-latency)",0,UINT32_MAX));
                     return EXIT_FAILURE;
                 }
