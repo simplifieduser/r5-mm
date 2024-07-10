@@ -3,11 +3,7 @@ r5mm
 dist
 
 # Testing files & targets
-test.csv
-test_cpp
-test_c
-trace.vcd
-tracefile*.txt
+temp_*
 
 # Python dir
 .venv
