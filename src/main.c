@@ -176,7 +176,8 @@ int main(int argc, char *argv[]) {
 
     // Simulation starten
 
-    Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+
+    Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile); // NOLINT
 
     // ------------ TESTING CODE ------------
     #ifdef TEST_BUILD
