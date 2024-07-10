@@ -10,7 +10,7 @@
 
 #define ERR_GENERAL_UNKNOWN "Fehler: Es ist ein unerwarteter Fehler aufgetreten\n"
 #define ERR_GENERAL_MEMORY_ALLOCATION_ERROR "Fehler: Es konnte kein Speicher alloziert werden\n"
-#define ERR_GENERAL_CANT_OPEN_FILE(file) "Fehler: Die Datei %s konnte nicht geöffnet werden\n", file
+#define ERR_GENERAL_CANT_OPEN_FILE(file) "Fehler: Die Datei '%s' konnte nicht geöffnet werden\n", file
 
 
 //                  //
@@ -57,9 +57,9 @@
 // REQUEST FILE PARSING //
 //                      //
 
-#define ERR_FILE_PREMATURE_END_OF_FILE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde %s, jedoch Ende der Datei gefunden\n", line, arg
-#define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde %s, jedoch neue Zeile gefunden\n", line, arg
-#define ERR_FILE_INVALID_ARG(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Angegebener Wert, ist nicht valide für %s\n", line, arg
+#define ERR_FILE_PREMATURE_END_OF_FILE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde '%s', jedoch Ende der Datei gefunden\n", line, arg
+#define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde '%s', jedoch neue Zeile gefunden\n", line, arg
+#define ERR_FILE_INVALID_ARG(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Angegebener Wert, ist nicht valide für '%s'\n", line, arg
 #define ERR_FILE_TOO_MANY_ARGS(line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n", line
 
 

@@ -74,7 +74,7 @@ int parseFile(const char *path, size_t* requestCount, Request **requests) {
         // IO-FEHLER
         free(address);
         free(data);
-        printError(ERR_FOPEN, "", 0);
+        printError(ERR_FOPEN, path, 0);
         return -1;
     }
 
