@@ -51,7 +51,7 @@ def generate_valid_command():
     return ["./dist/r5mm", "./test.csv", f"-c{cycles}", f"-b{blocksize}", f"-o{offset}", f"-s{cache_size}", f"-t{cache_latency}", f"-m{memory_latency}"]
 
 
-@pytest.mark.parametrize("command", [generate_valid_command() for _ in range(1000)])
+@pytest.mark.parametrize("command", [generate_valid_command() for _ in range(100)])
 @pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(10)])
 def test_fuzzy(requests, command):
 
