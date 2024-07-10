@@ -29,7 +29,6 @@
 #define ERR_NO_FILE_INPUT "Fehler: Ungültiges Argument: Es muss eine Eingabedatei als positional Argument übergeben werden\n%s",MSG_HINT
 #define ERR_ILLEGAL_ARGUMENT_TRACEFILE "Fehler: Ungültiges Argument: 'tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden\n%s",MSG_HINT
 #define ERR_ILLEGAL_ARGUMENT(arg,lowerBound,upperBound) "Fehler: Ungültiges Argument: '%s' muss ein Integer im Interval [%u; %u] sein\n%s", arg, lowerBound, upperBound,MSG_HINT
-#define ERR_NO_CONVERSION(arg) "Fehler: Ungültiges Argument: Das Argument von '%s' konnte zu keiner Zahl umgewandelt werden\n%s",arg,MSG_HINT
 #define ERR_AlREADY_SET(arg) "Fehler: %s wurde bereits gesetzt\n%s",arg,MSG_HINT
 
 
