@@ -4,25 +4,33 @@
 #include <stdint.h>
 #include <errno.h>
 #include <string.h>
+#include <stdbool.h>
 #include "shared.h"
 #include "file_parser.h"
 
 extern Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsigned blocksize, unsigned v2bBlockOffset, unsigned memoryLatency, size_t numRequests, Request *requests, const char *tracefile);
 
 int main(int argc, char *argv[]) {
-    int cycles = 10000;
+    int cycles = 1000000;
     unsigned int tlbSize = 64;
     unsigned int tlbLatency = 1;
-    unsigned int blocksize = 4;
+    unsigned int blocksize = 4096;
     unsigned int v2bBlockOffset = 4;
     unsigned int memoryLatency = 100;
     const char *tracefile = NULL;
     const char *inputfile = NULL;
+    bool cycles_bool = 0;
+    bool tlbSize_bool = 0;
+    bool tlbLatency_bool = 0;
+    bool blocksize_bool = 0;
+    bool v2bBlockOffset_bool = 0;
+    bool memoryLatency_bool = 0;
+    bool tracefile_bool = 0;
     /*
      * die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da es in der Realität keinen v2bBlockOffset gibt
      * alle anderen Werte stammen von: Patterson, D. A., Hennessy, J. L. (). Computer Organization and Design: The Hardware/Software Interface. (4th ed.). Morgan Kaufman. Seite 503.
     */
-    int opt = 0;
+    int opt = 0; // Quelle für getopt_long: man getopt_long
     static struct option long_options[] = {
             {"cycles",           required_argument, 0, 'c'},
             {"blocksize",        required_argument, 0, 'b'},
@@ -34,133 +42,194 @@ int main(int argc, char *argv[]) {
             {"help",             no_argument,       0, 'h'},
             {0, 0,                                  0, 0}
     };
-    opterr = 0; // Stellt die Fehlermeldungen von getopt_long still, um eigene Fehlermeldungen auszugeben
 
-    // Durchsucht die übergebenen Optionen ob Hilfe gedruckt werden soll
-    for (int i = 1; i < argc; i++) {
-        if (strncmp(argv[i], "-h", 2) == 0 || strncmp(argv[i], "--help", 6) == 0) {
-            (void) fprintf(stderr, HELP_MSG"\n");
-            return EXIT_SUCCESS;
-        }
-    }
+    // Stellt die Fehlermeldungen von getopt_long still, um eigene Fehlermeldungen auszugeben
+    opterr = 0;
 
     // Einlesen der Optionen/Argumente
-    while ((opt = getopt_long(argc, argv, ":c:b:o:s:t:m:f:h", long_options, NULL)) != -1) {
+    while (1) {
+        // nächste Option, erstes ':' ermöglicht präzisere Fehlermeldung
+        opt = getopt_long(argc, argv, ":c:b:o:s:t:m:f:h", long_options, NULL);
+        // keine weiteren Optionen
+        if (opt ==-1) break;
+
+        // -h / --help
+        if (opt == 'h') {
+            (void) fprintf(stderr, HELP_MSG);
+            return EXIT_SUCCESS;
+        }
+
+        // Fehler: required_argument ohne Argument übergeben
+        if (opt == ':') {
+            (void) fprintf(stderr, ERR_NO_REQUIRED_ARGUMENT(argv[optind - 1]));
+            return EXIT_FAILURE;
+        }
+
+        //Fehler: unbekannte Option übergeben
+        if (opt == '?') {
+            (void) fprintf(stderr, ERR_UNKNOWN_OPTION);
+            return EXIT_FAILURE;
+        }
+
+        // tracefile: -f / --tf
+        if (opt == 'f') {
+            if(tracefile_bool == 1) {
+                (void) fprintf(stderr, ERR_AlREADY_SET("tracefile"));
+                return EXIT_FAILURE;
+            }
+            tracefile_bool = 1;
+            FILE *file = NULL;
+            // Erstellen der Datei, zur Überprüfung möglicher unzulässiger Dateinamen mit angehängtem '.vcd'
+            tracefile = optarg;
+
+            char tracefile_tmp[strlen(optarg)+5];
+            snprintf(tracefile_tmp, strlen(optarg)+5,"%s.vcd",tracefile); // Quelle: https://stackoverflow.com/questions/11836064/c-creating-new-file-extensions-based-on-a-filename
+
+            file = fopen(tracefile_tmp, "we");
+            if (file == NULL) {
+                (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_TRACEFILE);
+                return EXIT_FAILURE;
+            }
+            if (fclose(file) != 0) {
+                (void) fprintf(stderr, ERR_GENERAL_UNKNOWN);
+                return EXIT_FAILURE;
+            }
+            // Löschen der Datei, falls es vor der Beendigung des Programs zu Fehlern kommt wird keine leere Datei ausgeben
+            remove(tracefile_tmp);
+            continue;
+        }
+
+        // Umwandlung der Eingabewerte für die folgenden Optionen
+        char *endptr = NULL;
+        errno = 0;
+        long value = strtol(optarg, &endptr, 10); // Quelle: man strtol
+
+        // Fehler: Argument kann nicht zu einer Zahl umgewandelt werden
+        if(errno !=0 || *endptr !='\0') {
+            (void) fprintf(stderr, ERR_NO_CONVERSION(argv[optind - 2]));
+            return EXIT_FAILURE;
+        }
+
         switch (opt) {
+            // cycles: -c / --cycles
             case 'c': {
-                char *endOfPointer = NULL;
-                errno = 0;
-                long tmp = strtol(optarg, &endOfPointer, 10);
-                if (errno != 0 || *endOfPointer != '\0' || tmp > INT32_MAX || tmp < 0) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_CYCLES"\n");
+                if(cycles_bool == 1) {
+                    (void) fprintf(stderr, ERR_AlREADY_SET("cycles"));
                     return EXIT_FAILURE;
                 }
-                cycles = (int) tmp;
+                cycles_bool = 1;
+
+                //Fehler: Übergebene Zahl nicht zulässig
+                if (value > INT32_MAX || value < 0) {
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT("cycles (-c/--cycles)",0,INT32_MAX));
+                    return EXIT_FAILURE;
+                }
+                cycles = (int) value;
                 break;
             }
+
+            // blocksize: -b / --blocksize
             case 'b': {
-                char *endOfPointer = NULL;
-                errno = 0;
-                long tmp = strtol(optarg, &endOfPointer, 10);
-                if (errno != 0 || *endOfPointer != '\0' || tmp > UINT32_MAX || tmp <= 0) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_BLOCKSIZE"\n");
+                if(blocksize_bool == 1) {
+                    (void) fprintf(stderr, ERR_AlREADY_SET("blocksize"));
                     return EXIT_FAILURE;
                 }
-                blocksize = (unsigned) tmp;
+                blocksize_bool = 1;
+
+                //Fehler: Übergebene Zahl nicht zulässig
+                if (value > UINT32_MAX || value <= 0) {
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT("blocksize (-b/--blocksize)",1,UINT32_MAX));
+                    return EXIT_FAILURE;
+                }
+                blocksize = (unsigned) value;
                 break;
             }
+
+            // v2bBlockOffset: -o / --v2bBlockOffset
             case 'o': {
-                char *endOfPointer = NULL;
-                errno = 0;
-                long tmp = strtol(optarg, &endOfPointer, 10);
-                if (errno != 0 || *endOfPointer != '\0' || tmp > UINT32_MAX || tmp < 0) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_V2B_BLOCK_OFFSET"\n");
+                if(v2bBlockOffset_bool == 1) {
+                    (void) fprintf(stderr, ERR_AlREADY_SET("v2bBlockOffset"));
                     return EXIT_FAILURE;
                 }
-                v2bBlockOffset = (unsigned) tmp;
+                v2bBlockOffset_bool = 1;
+
+                //Fehler: Übergebene Zahl nicht zulässig
+                if (value > UINT32_MAX || value < 0) {
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT("v2b-block-offset (-o/--v2b-block-offset",0,UINT32_MAX));
+                    return EXIT_FAILURE;
+                }
+                v2bBlockOffset = (unsigned) value;
                 break;
             }
+
+            // tlb-size: -s / --tlb-size
             case 's': {
-                char *endOfPointer = NULL;
-                errno = 0;
-                long tmp = strtol(optarg, &endOfPointer, 10);
-                if (errno != 0 || *endOfPointer != '\0' || tmp > UINT32_MAX || tmp < 0) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_TLB_SIZE"\n");
+                if(tlbSize_bool == 1) {
+                    (void) fprintf(stderr, ERR_AlREADY_SET("tlb-size"));
                     return EXIT_FAILURE;
                 }
-                tlbSize = (unsigned) tmp;
+                tlbSize_bool = 1;
+
+                //Fehler: Übergebene Zahl nicht zulässig
+                if (value > UINT32_MAX || value < 0) {
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT("tlb-size (-s/--tlb-size)",0,UINT32_MAX));
+                    return EXIT_FAILURE;
+                }
+                tlbSize = (unsigned) value;
                 break;
             }
+
+            // tlb-latency: -t / --tlb-latency
             case 't': {
-                char *endOfPointer = NULL;
-                errno = 0;
-                long tmp = strtol(optarg, &endOfPointer, 10);
-                if (errno != 0 || *endOfPointer != '\0' || tmp > UINT32_MAX || tmp < 0) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_TLB_LATENCY"\n");
+                if(tlbLatency_bool == 1) {
+                    (void) fprintf(stderr, ERR_AlREADY_SET("tlb-latency"));
                     return EXIT_FAILURE;
                 }
-                tlbLatency = (unsigned) tmp;
+                tlbLatency_bool = 1;
+
+                //Fehler: Übergebene Zahl nicht zulässig
+                if (value > UINT32_MAX || value < 0) {
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT("tlb-latency (-t/--tlb-latency)",0,UINT32_MAX));
+                    return EXIT_FAILURE;
+                }
+                tlbLatency = (unsigned) value;
                 break;
             }
+
+            //memory-latency -m / --memory-latency
             case 'm': {
-                char *endOfPointer = NULL;
-                errno = 0;
-                long tmp = strtol(optarg, &endOfPointer, 10);
-                if (errno != 0 || *endOfPointer != '\0' || tmp > UINT32_MAX || tmp < 0) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_MEMORY_LATENCY"\n");
+                if(memoryLatency_bool == 1) {
+                    (void) fprintf(stderr, ERR_AlREADY_SET("memoryLatency"));
                     return EXIT_FAILURE;
                 }
-                memoryLatency = (unsigned) tmp;
+                memoryLatency_bool = 1;
+
+                //Fehler: Übergebene Zahl nicht zulässig
+                if (value > UINT32_MAX || value < 0) {
+                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT("memory-latency (-m/--memory-latency)",0,UINT32_MAX));
+                    return EXIT_FAILURE;
+                }
+                memoryLatency = (unsigned) value;
                 break;
             }
-            case 'f': {
-                tracefile = optarg;
-                FILE *file = NULL; // Erstelle eine Datei mit den Namen der künftigen Tracefile
-                file = fopen(tracefile, "we");
-                if (file == NULL) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_TRACEFILE"\n");
-                    return EXIT_FAILURE;
-                }
-                if (fclose(file) != 0) {
-                    (void) fprintf(stderr, ERR_GENERAL_UNKNOWN);
-                    return EXIT_FAILURE;
-                }
-                break;
-            }
-            case 'h': {
-                (void) fprintf(stderr, HELP_MSG"\n");
-                return EXIT_SUCCESS;
-            }
-                // Fehlerbehandlung
-            case '?': {
-                if (optopt) {
-                    (void) fprintf(stderr, ERR_UNKNOWN_OPTION "'-%c'\n"MSG_HINT"\n", optopt);
-                    return EXIT_FAILURE;
-                }
-                (void) fprintf(stderr, ERR_UNKNOWN_OPTION "'%s'\n"MSG_HINT"\n", argv[optind - 1]);
+
+            default: {
+                (void) fprintf(stderr,ERR_GENERAL_UNKNOWN);
                 return EXIT_FAILURE;
             }
-            case ':': {
-                (void) fprintf(stderr, ERR_NO_REQUIRED_ARGUMENT"'%s'\n"MSG_HINT"\n", argv[optind - 1]);
-                return EXIT_FAILURE;
-            }
-            default:
-                (void) fprintf(stderr, ERR_UNKNOWN_OPTION "'%s'.\n", argv[optind - 1]);
-                return EXIT_FAILURE;
+
         }
     }
 
-
+    // Eingabedatei
     if (optind < argc) {
-
         inputfile = argv[optind]; // Mögliche Fehlerbehandlung folgt beim Einlesen der Datei
-
     } else {
-        (void) fprintf(stderr, ERR_NO_FILE_INPUT"\n"MSG_HINT"\n");
+        (void) fprintf(stderr, ERR_NO_FILE_INPUT);
         return EXIT_FAILURE;
     }
     if (optind < argc - 1) {
-        (void) fprintf(stderr, ERR_TOO_MANY_OPTION"\n"MSG_HINT"\n");
+        (void) fprintf(stderr, ERR_TOO_MANY_OPTION);
         return EXIT_FAILURE;
     }
 

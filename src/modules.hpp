@@ -62,6 +62,7 @@ SC_MODULE(REQUEST_PROCESSOR)
 
     void run_program()
     {
+
         // Anzahl von primitiven Gattern setzen:
         // Tag-Größe + Adressen-Größe + 1 -> Anzahl Bits pro Zeile (+1: speichert, ob Zeile schon einmal benutzt wurde)
         // Anzahl Bits pro Zeile * Anzahl Zeilen (= tlb_size)

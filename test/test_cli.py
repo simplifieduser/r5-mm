@@ -37,7 +37,7 @@ test_cases = [
                 "-s": 16,
                 "-t": 1,
                 "-m": 100,
-                "-f": "tracefile.txt",
+                "-f": "temp_tracefile.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -52,7 +52,7 @@ test_cases = [
                 "--tlb-size": 16,
                 "--tlb-latency": 1,
                 "--memory-latency": 100,
-                "--tf": "tracefile.txt",
+                "--tf": "temp_tracefile.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -67,7 +67,7 @@ test_cases = [
                 "-s": 512,
                 "-t": 12,
                 "-m": 400,
-                "-f": "tracefile7.txt",
+                "-f": "temp_tracefile7.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -82,7 +82,7 @@ test_cases = [
                 "--tlb-size": 1024,
                 "--tlb-latency": 6,
                 "--memory-latency": 450,
-                "--tf": "tracefile8.txt",
+                "--tf": "temp_tracefile8.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -97,7 +97,7 @@ test_cases = [
                 "-s": 8,
                 "-t": 3,
                 "-m": 50,
-                "-f": "tracefile1.txt",
+                "-f": "temp_tracefile1.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -112,7 +112,7 @@ test_cases = [
                 "--tlb-size": 32,
                 "--tlb-latency": 2,
                 "--memory-latency": 150,
-                "--tf": "tracefile2.txt",
+                "--tf": "temp_tracefile2.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -127,7 +127,7 @@ test_cases = [
                 "-s": 64,
                 "-t": 4,
                 "-m": 200,
-                "-f": "tracefile3.txt",
+                "-f": "temp_tracefile3.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -142,7 +142,7 @@ test_cases = [
                 "--tlb-size": 128,
                 "--tlb-latency": 5,
                 "--memory-latency": 250,
-                "--tf": "tracefile4.txt",
+                "--tf": "temp_tracefile4.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -157,7 +157,7 @@ test_cases = [
                 "-s": 32,
                 "-t": 10,
                 "-m": 300,
-                "-f": "tracefile5.txt",
+                "-f": "temp_tracefile5.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -172,7 +172,7 @@ test_cases = [
                 "--tlb-size": 256,
                 "--tlb-latency": 8,
                 "--memory-latency": 350,
-                "--tf": "tracefile6.txt",
+                "--tf": "temp_tracefile6.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -186,7 +186,7 @@ test_cases = [
                 "-s": 128,
                 "-t": 15,
                 "-m": 500,
-                "-f": "tracefile9.txt",
+                "-f": "temp_tracefile9.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -201,7 +201,7 @@ test_cases = [
                 "--tlb-size": 2048,
                 "--tlb-latency": 20,
                 "--memory-latency": 550,
-                "--tf": "tracefile10.txt",
+                "--tf": "temp_tracefile10.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -216,7 +216,7 @@ test_cases = [
                 "-s": 64,
                 "-t": 3,
                 "-m": 600,
-                "-f": "tracefile11.txt",
+                "-f": "temp_tracefile11.txt",
                 "INPUT": "test/empty.csv"
             }
         }
@@ -231,7 +231,7 @@ test_cases = [
                 "--tlb-size": 16,
                 "--tlb-latency": 1,
                 "--memory-latency": 700,
-                "--tf": "tracefile12.txt",
+                "--tf": "temp_tracefile12.txt",
                 "INPUT": "test/empty.csv"
             }
         }
