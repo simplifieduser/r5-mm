@@ -39,6 +39,7 @@ def generate_valid_file(filename, requests):
         for req in requests:
             writer.writerow(req)
 
+
 def generate_valid_command():
 
     cycles = random.randint(0, 1000)
