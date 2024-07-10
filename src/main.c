@@ -176,11 +176,11 @@ int main(int argc, char *argv[]) {
 
     // Simulation starten
 
-
-    Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile); // NOLINT
+    #ifdef TEST_BUILD
 
     // ------------ TESTING CODE ------------
-    #ifdef TEST_BUILD
+
+    Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
 
     printf("-\n");
 
@@ -210,8 +210,13 @@ int main(int argc, char *argv[]) {
 
     printf("-\n");
 
-    #endif
     // ------------ TESTING CODE ------------
+
+    #else
+
+    run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+
+    #endif
 
     // Speicher freigeben & Programm beenden
 
