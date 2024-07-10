@@ -13,26 +13,29 @@ SC_MODULE(REQUEST_PROCESSOR)
 {
     sc_in<bool> clk;
 
-    // tlb properties
+    // Übergebenen Eigenschaften des TLB
     unsigned tlb_size, tlbs_latency, blocksize, v2b_block_offset, memory_latency;
     size_t num_requests;
     Request *requests;
 
-    ADDRESS_GETTER address_getter;
-    MAIN_MEMORY data_manager;
-    std::vector<uint32_t> buffer; // stores which virtual addresses are currently in tlb
+    ADDRESS_GETTER address_getter; // Holt die richtige physikalische Adresse
+    MAIN_MEMORY data_manager;      // Schreibt bzw. liest die Daten in bzw. von dem Hauptspeicher
+    std::vector<uint32_t> buffer;  // Speichert, welche Adresse aktuell im TLB gespeichert sind
 
-    // signals, to connect modules with each other
+    // Hilfsignale, um Module miteinander zu verbinden
     sc_signal<uint32_t> current_virt_address, current_phys_address, data, out_data;
     sc_signal<int> addr_cycles;
     sc_signal<bool> get_address_finished, manage_data_finished, we, start_request, hit, notify_memory;
 
+    // Output
     sc_out<size_t> misses, primitive_gate_count, hits;
     sc_out<int> cycles;
 
     SC_CTOR(REQUEST_PROCESSOR);
     REQUEST_PROCESSOR(sc_module_name name, unsigned tlb_size, unsigned tlbs_latency, unsigned blocksize, unsigned v2b_block_offset, unsigned memory_latency, size_t num_requests, Request *requests, std::vector<uint32_t> buffer_param) : sc_module(name), tlb_size(tlb_size), tlbs_latency(tlbs_latency), blocksize(blocksize), v2b_block_offset(v2b_block_offset), memory_latency(memory_latency), num_requests(num_requests), requests(requests), address_getter("address_getter", buffer_param, tlb_size, tlbs_latency, blocksize, v2b_block_offset, memory_latency), data_manager("data_manager", memory_latency), buffer(buffer_param)
     {
+        // Alle input und output-ports binden
+
         address_getter.clk.bind(clk);
         address_getter.virtual_address.bind(current_virt_address);
         address_getter.physical_address.bind(current_phys_address);
@@ -49,6 +52,7 @@ SC_MODULE(REQUEST_PROCESSOR)
         data_manager.out_data.bind(out_data);
         data_manager.finished.bind(manage_data_finished);
 
+        // Erstmal soll kein Modul etwas machen; beide startsignale auf false setzen
         start_request.write(false);
         notify_memory.write(false);
 
@@ -58,42 +62,57 @@ SC_MODULE(REQUEST_PROCESSOR)
 
     void run_program()
     {
-        // set gates needed for size of the tlb (tag size + address size (32 Bits): gates per row)
-        primitive_gate_count->write(((32 - log2(blocksize))*2 + 1) * 4 * tlb_size);
+
+        // Anzahl von primitiven Gattern setzen:
+        // Tag-Größe + Adressen-Größe + 1 -> Anzahl Bits pro Zeile (+1: speichert, ob Zeile schon einmal benutzt wurde)
+        // Anzahl Bits pro Zeile * Anzahl Zeilen (= tlb_size)
+        // Anzahl Bits * 4 -> 4 Gatter benötigt, um 1 Bit zu speichern
+        primitive_gate_count->write(2 * ((32 - std::log2(blocksize)) + 1) * 4 * tlb_size);
+
+        // Überprüfen, ob je zwei Tags verglichen werden
+        if (num_requests > 0 && tlb_size > 0)
+        {
+            // Gatter, die man zum vergleichen zweier Tags braucht (Abschätzung)
+            // 182 = 150 für die Addition von 2 32-Bit Zahlen + 32 XOR-Gatter für das Zweierkomplement
+            primitive_gate_count->write(primitive_gate_count->read() + 182);
+        }
 
         for (size_t i = 0; i < num_requests; i++)
         {
             wait(SC_ZERO_TIME);
-            // set signals according to values in current request
+            // Signale mit Werten des aktuellen Requests setzen
             data.write(requests[i].data);
             we.write(requests[i].we);
             current_virt_address.write(requests[i].addr);
 
+            // address_getter starten
             start_request.write(true);
 
-            // first, wait for correct physical address to be fetched
+            // Auf richtige Adresse warten, die durch adress_getter geholt wird
             wait(get_address_finished.posedge_event());
             wait(SC_ZERO_TIME);
 
-            // now update output with returned values
+            // Output mit zurückgegebenen Werten aktualisieren
             cycles->write(cycles->read() + address_getter.cycles->read());
             hits->write(hits->read() + address_getter.hit->read());
             misses->write(misses->read() + !address_getter.hit->read());
+
+            // address_getter soll jetzt bis zum nächsten Request warten
             start_request.write(false);
+
+            // Speicheroperation kann jetzt stattfinden
             notify_memory.write(true);
 
-            // wait, while data is being read/written
+            // Warten, bis Speicheroperation zu ende
             wait(manage_data_finished.posedge_event());
             wait(SC_ZERO_TIME);
+
+            // data_manager soll jetzt bis zum nächsten Request warten
             notify_memory.write(false);
 
-            // update cycles again
+            // Zyklen nochmal aktualisieren
             cycles->write(cycles->read() + memory_latency);
             wait();
-
-            // update number of used gates
-            // 182 = 150 for addition of 2 32-bit numbers + 32 xor gates for two's complement
-            primitive_gate_count->write(primitive_gate_count->read() + 182);
         }
         sc_stop();
     }
