@@ -21,7 +21,7 @@
 #define ARG_UINT_MAX "4294967295"
 
 // invalid arguments
-#define ERR_UNKNOWN_OPTION "Fehler: Es wurde eine unbekannte Option übergeben\n%s", MSG_HINT
+#define ERR_UNKNOWN_OPTION "Fehler: Es wurde eine unbekannte Option übergeben, das positional Argument darf nicht mit '-' beginnen\n%s", MSG_HINT
 #define ERR_TOO_MANY_OPTION "Fehler: Es wurden zu viele Optionen übergeben\n%s",MSG_HINT
 #define ERR_NO_REQUIRED_ARGUMENT(arg) "Fehler: Folgende Option benötigt ein Argument: %s\n%s",arg, MSG_HINT
 
