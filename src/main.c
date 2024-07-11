@@ -85,6 +85,7 @@ int main(int argc, char *argv[]) {
             tracefile = optarg;
 
             char tracefile_tmp[strlen(optarg)+5];
+            // NOLINTNEXTLINE
             snprintf(tracefile_tmp, strlen(optarg)+5,"%s.vcd",tracefile); // Quelle: https://stackoverflow.com/questions/11836064/c-creating-new-file-extensions-based-on-a-filename
 
             file = fopen(tracefile_tmp, "we");
