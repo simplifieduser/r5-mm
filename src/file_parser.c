@@ -27,6 +27,31 @@ RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode);
 
 RET_CODE getDataArg(FILE *file, uint32_t *res);
 
+int CORRECTED_CARR_RET = 0;  // Wird verwendet, um Korrektur von '\r' zu '\n' zu speichern
+
+int getNextChar(FILE *file) {
+
+    // Wenn letzter char '\r', dann überspringe '\n'
+    if (CORRECTED_CARR_RET) {
+        int next = fgetc(file);
+        if (next == '\n') {
+            next = fgetc(file);
+        }
+        CORRECTED_CARR_RET = 0;
+        return next;
+    }
+
+    // Korrigiere '\r' zu '\n'
+    int next = fgetc(file);
+    if (next == '\r') {
+        next = '\n';
+        CORRECTED_CARR_RET = 1;
+    }
+
+    return next;
+
+}
+
 void printError(RET_CODE code, ARG arg, const char* val, size_t line) {
 
     switch (code) {
@@ -191,7 +216,7 @@ RET_CODE getRWArg(FILE *file) {
 
     // Lese mode Charakter
 
-    int modeChar = fgetc(file);
+    int modeChar = getNextChar(file);
 
     // Prüfen, ob die Datei zu Ende ist
     if (feof(file)) {
@@ -205,7 +230,7 @@ RET_CODE getRWArg(FILE *file) {
 
     // Lese Trenncharakter
 
-    int sepChar = fgetc(file);
+    int sepChar = getNextChar(file);
 
     if (feof(file)) {
         // PARSE-FEHLER: VORZEITIGES DATEIENDE
@@ -252,7 +277,7 @@ RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
 
     for (int i = 0; i < MAX_ARG_LENGTH; i++) {
 
-        int current = fgetc(file);
+        int current = getNextChar(file);
 
         if (feof(file)) {
             // PARSE-FEHLER: VORZEITIGES DATEIENDE
@@ -355,7 +380,7 @@ RET_CODE getDataArg(FILE *file, uint32_t *res) {
 
     for (int i = 0; i < MAX_ARG_LENGTH; i++) {
 
-        int current = fgetc(file);
+        int current = getNextChar(file);
 
         if (feof(file)) {
             // PARSE-FEHLER: VORZEITIGES DATEIENDE

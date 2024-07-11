@@ -81,7 +81,8 @@ def generate_file(filename, requests):
 
     with open(filename, 'w', newline='') as file:
 
-        writer = csv.writer(file, lineterminator="\n")
+        arni = ["\r\n", "\n", "\r"]
+        writer = csv.writer(file, lineterminator=random.choice(arni))
         for req in requests:
             writer.writerow(req)
 
