@@ -52,12 +52,29 @@ def generate_valid_command():
     return ["./dist/r5mm", "./test.csv", f"-c{cycles}", f"-b{blocksize}", f"-o{offset}", f"-s{cache_size}", f"-t{cache_latency}", f"-m{memory_latency}"]
 
 
+def generate_edge_case_command():
+
+    cycles = random.randint(0, 1000)
+    offset = random.randint(0, 1000)
+    cache_latency = random.randint(0, 1000)
+    memory_latency = random.randint(0, 1000)
+
+    return ["./dist/r5mm", "./test.csv", f"-c{cycles}", f"-b1", f"-o{offset}", f"-s0", f"-t{cache_latency}", f"-m{memory_latency}"]
+
+
 @pytest.mark.parametrize("command", [generate_valid_command() for _ in range(100)])
 @pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(10)])
 def test_fuzzy(requests, command):
 
     generate_valid_file("./test.csv", requests)
-    request = generate_valid_command()
     process = subprocess.run(command, stdout=subprocess.PIPE, text=True)
     assert process.returncode == 0
 
+
+@pytest.mark.parametrize("command", [generate_edge_case_command() for _ in range(10)])
+@pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(20)])
+def test_edge_cases(requests, command):
+
+    generate_valid_file("./test.csv", requests)
+    process = subprocess.run(command, stdout=subprocess.PIPE, text=True)
+    assert process.returncode == 0
