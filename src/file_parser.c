@@ -320,7 +320,7 @@ RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
         address_int = strtol(address_string, &end, DEC_BASE);
     }
 
-    if (end != NULL) {
+    if (*end != '\0') {
         // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(address_string);
         return ERR_INVARG;
@@ -406,7 +406,7 @@ RET_CODE getDataArg(FILE *file, uint32_t *res) {
         data_int = strtol(data_string, &end, DEC_BASE);
     }
 
-    if (end != NULL) {
+    if (*end != '\0') {
         // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(data_string);
         return ERR_INVARG;

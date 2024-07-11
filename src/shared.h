@@ -56,9 +56,9 @@
 
 #define ERR_FILE_PREMATURE_END_OF_FILE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde '%s', jedoch Ende der Datei gefunden\n", line, arg
 #define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde '%s', jedoch neue Zeile gefunden\n", line, arg
-#define ERR_FILE_INVALID_ARG_RW(line) "Fehler: Request-Datei ungültig: Zeile %zu - Angegebener Wert, ist nicht valide für 'write_enable' [r,w,R,W]\n", line
-#define ERR_FILE_INVALID_ARG_ADDR(line) "Fehler: Request-Datei ungültig: Zeile %zu - Angegebener Wert, ist nicht valide für 'address' [0; 4294967295]\n", line
-#define ERR_FILE_INVALID_ARG_DATA(line) "Fehler: Request-Datei ungültig: Zeile %zu - Angegebener Wert, ist nicht valide für 'write_data' [0; 4294967295]\n", line
+#define ERR_FILE_INVALID_ARG_RW(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'write_enable' muss einer der Werte [r,w,R,W] sein\n", line
+#define ERR_FILE_INVALID_ARG_ADDR(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'address' muss ein Integer im Interval [0; 4294967295] sein\n", line
+#define ERR_FILE_INVALID_ARG_DATA(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'write_data' muss ein Integer im Interval [0; 4294967295] sein\n", line
 
 #define ERR_FILE_TOO_MANY_ARGS(line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n", line
 
