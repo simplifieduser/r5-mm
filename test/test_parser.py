@@ -5,6 +5,7 @@ import random
 import csv
 
 
+# Generiert (in-) valide Werte für Request
 def random_value(valid=True):
     if valid:
         value = random.randint(0, 0xFFFFFFFF)
@@ -18,73 +19,110 @@ def random_value(valid=True):
         return str(value)
 
 
-def generate_valid_request(i, writer, requests):
-    command_options = ['r', 'R', 'w', 'W']
-    mode = random.choice(command_options)
-    if mode == 'r' or mode == 'R':
-        addr = random_value()
-        writer.writerow([mode, addr])
-        requests.append(f"{i}: 0 {int(addr, 0)} 0")
-    else:
-        addr = random_value()
-        data = random_value()
-        writer.writerow([mode, addr, data])
-        requests.append(f"{i}: 1 {int(addr, 0)} {int(data, 0)}")
+# Generiert valide Request Daten
+def generate_valid_requests():
 
-
-def generate_valid_file(filename, reqeust_count):
-
+    request_count = random.randint(0, 1000)
     requests = []
 
-    with open(filename, 'w', newline='') as file:
-
-        writer = csv.writer(file, lineterminator="\n")
-        for i in range(reqeust_count):
-            generate_valid_request(i, writer, requests)
+    for _ in range(request_count):
+        command_options = ['r', 'R', 'w', 'W']
+        mode = random.choice(command_options)
+        if mode == 'r' or mode == 'R':
+            addr = random_value()
+            requests.append([mode, addr])
+        else:
+            addr = random_value()
+            data = random_value()
+            requests.append([mode, addr, data])
 
     return requests
 
 
-def generate_invalid_request(writer):
+# Generiert invalide Request Daten
+def generate_invalid_requests():
+
+    request_count = random.randint(0, 1000)
+    requests = []
+
+    # Append valid requests first
+    for _ in range(request_count):
+        command_options = ['r', 'R', 'w', 'W']
+        mode = random.choice(command_options)
+        if mode == 'r' or mode == 'R':
+            addr = random_value()
+            requests.append([mode, addr])
+        else:
+            addr = random_value()
+            data = random_value()
+            requests.append([mode, addr, data])
+
+    # Then append one last invalid request
     command_options = ['r', 'R', 'w', 'W', random_value(False), random_value(False)]
     mode = random.choice(command_options)
     if mode in ['r', 'R']:
         addr = random_value(False)
-        writer.writerow([mode, addr])
+        requests.append([mode, addr])
     elif mode in ['w', 'W']:
         choice = random.choice([True, False])
         addr = random_value(choice)
         data = random_value(not choice)
-        writer.writerow([mode, addr, data])
+        requests.append([mode, addr, data])
     else:
         addr = random_value(True)
         data = random_value(True)
-        writer.writerow([mode, addr, data])
+        requests.append([mode, addr, data])
+
+    return requests
 
 
-def generate_invalid_file(filename, request_count):
+# Erstellt eine csv Input-Datei aus Request Daten
+def generate_file(filename, requests):
+
     with open(filename, 'w', newline='') as file:
+
         writer = csv.writer(file, lineterminator="\n")
-        for i in range(request_count - 1):
-            generate_valid_request(i, writer, [])
-        generate_invalid_request(writer)
+        for req in requests:
+            writer.writerow(req)
 
 
-@pytest.mark.parametrize("request_count", [random.randint(1, 100) for _ in range(50)])
-def test_valid(request_count):
+# Konvertiert Request Daten zu Konsolenausgabe
+def convert_to_result(requests):
 
-    requests = generate_valid_file("./temp_test.csv", request_count)
+    result = []
+
+    for i, req in enumerate(requests):
+        if req[0] == "r" or req[0] == "R":
+            result.append(f"{i}: 0 {int(req[1], 0)} 0")
+        elif req[0] == "w" or req[0] == "W":
+            result.append(f"{i}: 1 {int(req[1], 0)} {int(req[2], 0)}")
+        else:
+            raise Exception()
+
+    return result
+
+
+@pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(100)])
+def test_valid(requests):
+
+    generate_file("./temp_test.csv", requests)
+    results = convert_to_result(requests)
+
     process = subprocess.run(["./dist/r5mm", "./temp_test.csv"], stdout=subprocess.PIPE, text=True)
     assert process.returncode == 0
+
     lines = process.stdout.split('-')[2]
     lines = lines.split('\n')
     lines.pop(0)
-    for i, req in enumerate(requests):
+
+    for i, req in enumerate(results):
         assert lines[i] == req
 
 
-@pytest.mark.parametrize("request_count", [random.randint(1, 100) for _ in range(50)])
-def test_invalid(request_count):
-    generate_invalid_file("./temp_test.csv", request_count)
-    process = subprocess.run(["./dist/r5mm", "./temp_test.csv"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+@pytest.mark.parametrize("requests", [generate_invalid_requests() for _ in range(100)])
+def test_invalid(requests):
+
+    generate_file("./temp_test.csv", requests)
+
+    process = subprocess.run(["./dist/r5mm", "./temp_test.csv"], stdout=subprocess.PIPE, text=True)
     assert process.returncode == 1
