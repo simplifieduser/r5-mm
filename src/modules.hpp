@@ -67,14 +67,16 @@ SC_MODULE(REQUEST_PROCESSOR)
         // Tag-Größe + Adressen-Größe + 1 -> Anzahl Bits pro Zeile (+1: speichert, ob Zeile schon einmal benutzt wurde)
         // Anzahl Bits pro Zeile * Anzahl Zeilen (= tlb_size)
         // Anzahl Bits * 4 -> 4 Gatter benötigt, um 1 Bit zu speichern
-        primitive_gate_count->write(2 * ((32 - std::log2(blocksize)) + 1) * 4 * tlb_size);
+        unsigned int count = (2 * ((32 - (int) std::log2(blocksize))) + 1) * 4 * tlb_size;
 
         // Überprüfen, ob je zwei Tags verglichen werden
         if (num_requests > 0 && tlb_size > 0)
         {
             // Gatter, die man zum vergleichen zweier Tags braucht (Abschätzung)
             // 182 = 150 für die Addition von 2 32-Bit Zahlen + 32 XOR-Gatter für das Zweierkomplement
-            primitive_gate_count->write(primitive_gate_count->read() + 182);
+            primitive_gate_count->write(count + 182);
+        } else {
+            primitive_gate_count->write(count);
         }
 
         for (size_t i = 0; i < num_requests; i++)
