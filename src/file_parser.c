@@ -10,6 +10,11 @@ enum RET_CODE {
     OK, ERR_ALLOC, ERR_FOPEN, ERR_EOF, ERR_NEWLINE, ERR_INVARG, ERR_TOOMANY       // Codes, die von allen anderen Argumenten verwendet werden
 } typedef RET_CODE;
 
+// Wird für Fehler-Meldungen verwendet
+enum ARG {
+    NONE, WRITE_ENABLE, ADDRESS, WRITE_DATA
+} typedef ARG;
+
 const int MAX_ARG_LENGTH = 11;                    // Eine 32-Bit-Zahl kann nur aus 11 Zeichen bestehen
 const unsigned int MAX_ARG_VALUE = 0xFFFFFFFF;    // Maske zur Bestimmung, ob die übergebene Zahl den Höchstwert überschreitet
 
@@ -22,23 +27,63 @@ RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode);
 
 RET_CODE getDataArg(FILE *file, uint32_t *res);
 
-void printError(RET_CODE code, const char *arg, size_t line) {
+int CORRECTED_CARR_RET = 0;  // Wird verwendet, um Korrektur von '\r' zu '\n' zu speichern
+
+int getNextChar(FILE *file) {
+
+    // Wenn letzter char '\r', dann überspringe '\n'
+    if (CORRECTED_CARR_RET) {
+        int next = fgetc(file);
+        if (next == '\n') {
+            next = fgetc(file);
+        }
+        CORRECTED_CARR_RET = 0;
+        return next;
+    }
+
+    // Korrigiere '\r' zu '\n'
+    int next = fgetc(file);
+    if (next == '\r') {
+        next = '\n';
+        CORRECTED_CARR_RET = 1;
+    }
+
+    return next;
+
+}
+
+void printError(RET_CODE code, ARG arg, const char* val, size_t line) {
 
     switch (code) {
         case ERR_ALLOC:
             (void) fprintf(stderr, ERR_GENERAL_MEMORY_ALLOCATION_ERROR);
             break;
         case ERR_FOPEN:
-            (void) fprintf(stderr, ERR_GENERAL_CANT_OPEN_FILE(arg));
+            (void) fprintf(stderr, ERR_GENERAL_CANT_OPEN_FILE(val));
             break;
         case ERR_EOF:
-            (void) fprintf(stderr, ERR_FILE_PREMATURE_END_OF_FILE(arg, line));
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_END_OF_FILE(val, line));
             break;
         case ERR_NEWLINE:
-            (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE(arg, line));
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE(val, line));
             break;
         case ERR_INVARG:
-            (void) fprintf(stderr, ERR_FILE_INVALID_ARG(arg, line));
+
+            switch (arg) {
+                case NONE:
+                    (void) fprintf(stderr, ERR_GENERAL_UNKNOWN);
+                    break;
+                case WRITE_ENABLE:
+                    (void) fprintf(stderr, ERR_FILE_INVALID_ARG_RW(line));
+                    break;
+                case ADDRESS:
+                    (void) fprintf(stderr, ERR_FILE_INVALID_ARG_ADDR(line));
+                    break;
+                case WRITE_DATA:
+                    (void) fprintf(stderr, ERR_FILE_INVALID_ARG_DATA(line));
+                    break;
+            }
+
             break;
         case ERR_TOOMANY:
             (void) fprintf(stderr, ERR_FILE_TOO_MANY_ARGS(line));
@@ -55,7 +100,7 @@ int parseFile(const char *path, size_t* requestCount, Request **requests) {
     uint32_t *address = malloc(sizeof(uint32_t));
     if (address == NULL) {
         // SPEICHER-FEHLER
-        printError(ERR_ALLOC, "", 0);
+        printError(ERR_ALLOC, NONE, "", 0);
         return -1;
     }
 
@@ -63,7 +108,7 @@ int parseFile(const char *path, size_t* requestCount, Request **requests) {
     if (data == NULL) {
         // SPEICHER-FEHLER
         free(address);
-        printError(ERR_ALLOC, "", 0);
+        printError(ERR_ALLOC, NONE, "", 0);
         return -1;
     }
 
@@ -74,7 +119,7 @@ int parseFile(const char *path, size_t* requestCount, Request **requests) {
         // IO-FEHLER
         free(address);
         free(data);
-        printError(ERR_FOPEN, "", 0);
+        printError(ERR_FOPEN, NONE, path, 0);
         return -1;
     }
 
@@ -103,7 +148,7 @@ int parseFile(const char *path, size_t* requestCount, Request **requests) {
 
         if (mode != OK_READ && mode != OK_WRITE) {
             // PARSE-FEHLER
-            printError(mode, "write_enable", i + 1);
+            printError(mode, WRITE_ENABLE, "", i + 1);
             break;
         }
 
@@ -111,7 +156,7 @@ int parseFile(const char *path, size_t* requestCount, Request **requests) {
         int addressStatus = getAddressArg(file, address, mode);
         if (addressStatus != OK) {
             // PARSE-FEHLER
-            printError(addressStatus, "address", i + 1);
+            printError(addressStatus, ADDRESS, "", i + 1);
             break;
         }
 
@@ -120,7 +165,7 @@ int parseFile(const char *path, size_t* requestCount, Request **requests) {
             int dataStatus = getDataArg(file, data);
             if (dataStatus != OK) {
                 // PARSE-FEHLER
-                printError(dataStatus, "write_data", i + 1);
+                printError(dataStatus, WRITE_DATA, "", i + 1);
                 break;
             }
         }
@@ -132,7 +177,7 @@ int parseFile(const char *path, size_t* requestCount, Request **requests) {
             // SPEICHER-FEHLER
             free(address);
             free(data);
-            printError(ERR_ALLOC, "", 0);
+            printError(ERR_ALLOC, NONE, "", 0);
             return -1;
         }
 
@@ -142,7 +187,7 @@ int parseFile(const char *path, size_t* requestCount, Request **requests) {
             // SPEICHER-FEHLER
             free(address);
             free(data);
-            printError(ERR_ALLOC, "", 0);
+            printError(ERR_ALLOC, NONE, "", 0);
             return -1;
         }
 
@@ -171,7 +216,7 @@ RET_CODE getRWArg(FILE *file) {
 
     // Lese mode Charakter
 
-    int modeChar = fgetc(file);
+    int modeChar = getNextChar(file);
 
     // Prüfen, ob die Datei zu Ende ist
     if (feof(file)) {
@@ -185,7 +230,7 @@ RET_CODE getRWArg(FILE *file) {
 
     // Lese Trenncharakter
 
-    int sepChar = fgetc(file);
+    int sepChar = getNextChar(file);
 
     if (feof(file)) {
         // PARSE-FEHLER: VORZEITIGES DATEIENDE
@@ -232,7 +277,7 @@ RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
 
     for (int i = 0; i < MAX_ARG_LENGTH; i++) {
 
-        int current = fgetc(file);
+        int current = getNextChar(file);
 
         if (feof(file)) {
             // PARSE-FEHLER: VORZEITIGES DATEIENDE
@@ -300,7 +345,7 @@ RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
         address_int = strtol(address_string, &end, DEC_BASE);
     }
 
-    if (*end != 0) {
+    if (*end != '\0') {
         // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(address_string);
         return ERR_INVARG;
@@ -335,7 +380,7 @@ RET_CODE getDataArg(FILE *file, uint32_t *res) {
 
     for (int i = 0; i < MAX_ARG_LENGTH; i++) {
 
-        int current = fgetc(file);
+        int current = getNextChar(file);
 
         if (feof(file)) {
             // PARSE-FEHLER: VORZEITIGES DATEIENDE

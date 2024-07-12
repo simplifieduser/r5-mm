@@ -85,6 +85,7 @@ int main(int argc, char *argv[]) {
             tracefile = optarg;
 
             char tracefile_tmp[strlen(optarg)+5];
+            // NOLINTNEXTLINE
             snprintf(tracefile_tmp, strlen(optarg)+5,"%s.vcd",tracefile); // Quelle: https://stackoverflow.com/questions/11836064/c-creating-new-file-extensions-based-on-a-filename
 
             file = fopen(tracefile_tmp, "we");
@@ -249,10 +250,11 @@ int main(int argc, char *argv[]) {
 
     // Simulation starten
 
-    Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+    #ifdef TEST_BUILD
 
     // ------------ TESTING CODE ------------
-#ifdef TEST_BUILD
+
+    Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
 
     printf("-\n");
 
@@ -282,8 +284,13 @@ int main(int argc, char *argv[]) {
 
     printf("-\n");
 
-#endif
     // ------------ TESTING CODE ------------
+
+    #else
+
+    (void) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+
+    #endif
 
     // Speicher freigeben & Programm beenden
 

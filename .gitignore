@@ -4,6 +4,7 @@ dist
 
 # Testing files & targets
 temp_*
+test.csv
 
 # Python dir
 .venv
