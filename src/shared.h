@@ -18,7 +18,7 @@
 
 #define cycle_str "cycles (-c/--cycles)"
 #define blocksize_str "blocksize (-b/--blocksize)"
-#define v2b_block_offset_str "v2b-block-offset (-o/--v2b-block-offset"
+#define v2b_block_offset_str "v2b-block-offset (-o/--v2b-block-offset)"
 #define tlb_size_str "tlb-size (-s/--tlb-size)"
 #define tlb_latency_str "tlb-latency (-t/--tlb-latency)"
 #define memory_latency_str "memory-latency (-m/--memory-latency)"
@@ -45,7 +45,7 @@
 
 
 #define HELP_MSG \
-"Verwendung r5mm:\n"  \
+"////////////////////////////////////////      r5mm:      ////////////////////////////////////////\n"  \
 "\n"             \
 "Dieses Programm simuliert einen Translation Lookaside Buffer, mögliche Eingabedateien können in dem Verzeichnis examples gefunden werden oder mit dem Javaprogramm erstellt werden\n" \
 "\n"                              \
@@ -58,11 +58,14 @@
 "   -m, --memory-latency       100                          [0; 4294967295] uint    Gibt die Latenzzeit des Hauptspeichers in Zyklen an\n"   \
 "   -f, --tf                   null                         <Dateiname>             Name der Ausgabedatei, falls ein Tracefile erstellt werden soll\n"                 \
 "   <Dateiname>                !muss immer gesetzt werden!  <Dateiname>             Name der Eingabedatei, mit den zu verarbeitenden Daten\n"\
-"   -h, --help                --------------------------------------------------    Gibt diese Nachricht aus\n"                          \
+"   -h, --help                 --------------------------------------------------   Gibt diese Nachricht aus\n" \
+"   -q, --quickStart           --------------------------------------------------   Setzt und überschreibt alle Parameter wie aus der folgenden beispiel Eingabe\n"\
 "\n"             \
 "Eine mögliche valide Eingabe wäre: ./r5mm -c 2000 --blocksize 16 --tlb-size=16 -t 2 --tf tracefile examples/kurzeEingabedatei_valid.csv"                 \
 "\n"\
-"Dieses Programm ist die Projektabgabe für das Fach 'Grundlagenpraktikum: Rechnerarchitektur', Projektaufgabe A14\n"
+"Dieses Programm ist die Projektabgabe für das Fach 'Grundlagenpraktikum: Rechnerarchitektur', Projektaufgabe A14\n"                                                                   \
+"////////////////////////////////////////      r5mm:      ////////////////////////////////////////\n"
+
 //                      //
 // REQUEST FILE PARSING //
 //                      //

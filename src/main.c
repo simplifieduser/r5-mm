@@ -32,13 +32,15 @@ unsigned v2bBlockOffset = 4;
 unsigned memoryLatency = 100;
 const char *tracefile = NULL;
 const char *inputfile = NULL;
+int cycles_bool = 0, tlbSize_bool = 0, tlbLatency_bool = 0, blocksize_bool = 0, v2bBlockOffset_bool = 0, memoryLatency_bool = 0, tracefile_bool = 0;
+
 /*
  * die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da diese nur für die Simulation relevant sind und bei einem echten TLB nicht existieren
  * alle anderen Werte stammen von: Patterson, D. A., Hennessy, J. L. (). Computer Organization and Design: The Hardware/Software Interface. (4th ed.). Morgan Kaufman. Seite 503(ff.).
 */
 int main(int argc, char *argv[]) {
-    int cycles_bool = 0, tlbSize_bool = 0, tlbLatency_bool = 0, blocksize_bool = 0, v2bBlockOffset_bool = 0, memoryLatency_bool = 0, tracefile_bool = 0;
 
+    int quickStart_bool = 0;
     // vgl. getopt_long man getopt_long, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
     static struct option long_options[] = {
             {"help",             no_argument,       0, 'h'},
@@ -49,6 +51,7 @@ int main(int argc, char *argv[]) {
             {"tlb-size",         required_argument, 0, 's'},
             {"tlb-latency",      required_argument, 0, 't'},
             {"memory-latency",   required_argument, 0, 'm'},
+            {"quickStart",       no_argument,       0, 'q'},
             {0, 0,                                  0, 0}
     };
     opterr = 0; // Stellt die Fehlermeldungen von getopt_long still, um eigene Fehlermeldungen auszugeben
@@ -58,7 +61,7 @@ int main(int argc, char *argv[]) {
     while (1) {
 
         // nächste Option, erstes ':' ermöglicht präzisere Fehlermeldung
-        opt = getopt_long(argc, argv, ":hf:c:b:o:s:t:m:", long_options, NULL);
+        opt = getopt_long(argc, argv, ":hqf:c:b:o:s:t:m:", long_options, NULL);
 
         // keine weiteren Optionen
         if (opt == -1) break;
@@ -67,6 +70,20 @@ int main(int argc, char *argv[]) {
         if (opt == 'h') {
             (void) fprintf(stderr, HELP_MSG);
             return EXIT_SUCCESS;
+        }
+
+        // quickStart, setzt die Werte aus dem Beispiel unter der HELP Nachricht, beachte, dass alle bisherige Werte überschrieben werden und künftige Argumente nicht berücksichtigt werden
+        if (opt == 'q') {
+            quickStart_bool = 1;
+            cycles = 2000;
+            tlbSize = 16;
+            tlbLatency = 2;
+            blocksize = 16;
+            v2bBlockOffset = 4;
+            memoryLatency = 100;
+            tracefile = "tracefile";
+            inputfile = "examples/kurzeEingabedatei_valid.csv";
+            break;
         }
 
         // Fehler: required_argument ohne Argument übergeben
@@ -157,14 +174,16 @@ int main(int argc, char *argv[]) {
 
     // inputfile
     // vgl. https://stackoverflow.com/questions/18079340/using-getopt-in-c-with-non-option-arguments
-    if (optind == argc) {
-        (void) fprintf(stderr, ERR_NO_FILE_INPUT);
-        return EXIT_FAILURE;
-    } else if (optind < argc - 1) {
-        (void) fprintf(stderr, ERR_TOO_MANY_OPTION);
-        return EXIT_FAILURE;
-    } else {
-        inputfile = argv[optind];
+    if (quickStart_bool == 0) {
+        if (optind == argc) {
+            (void) fprintf(stderr, ERR_NO_FILE_INPUT);
+            return EXIT_FAILURE;
+        } else if (optind < argc - 1) {
+            (void) fprintf(stderr, ERR_TOO_MANY_OPTION);
+            return EXIT_FAILURE;
+        } else {
+            inputfile = argv[optind];
+        }
     }
 
 
@@ -198,36 +217,39 @@ int main(int argc, char *argv[]) {
 
 // ------------ DEBUG CODE ------------
 
+void createDebugMSG_options () {
+
+    printf("'cycles (-c/--cycles)'                      hat den Wert: %u\n",cycles);
+    printf("'blocksize (-b/--blocksize)'                hat den Wert: %u\n",blocksize);
+    printf("'v2b-block-offset (-o/--v2b-block-offset)'  hat den Wert: %u\n",v2bBlockOffset);
+    printf("'tlb-size (-s/--tlb-size)'                  hat den Wert: %u\n",tlbSize);
+    printf("'tlb-latency (-t/--tlb-latency)'            hat den Wert: %u\n",tlbLatency);
+    printf("'memory-latency (-m/--memory-latency)'      hat den Wert: %u\n",memoryLatency);
+    printf("'tracefile (-f/--tf)'                       hat den Wert: %s\n",tracefile);
+    printf("'Eingabedatei'                              hat den Wert: %s\n",inputfile);
+}
+
+void createDebugMSG_sim (unsigned  sim_cycles, unsigned sim_misses, unsigned sim_hits, unsigned sim_primitive_gate_count) {
+
+    printf("'cycles'                                    hat den Wert: %u\n",sim_cycles);
+    printf("'misses'                                    hat den Wert: %u\n",sim_misses);
+    printf("'hits'                                      hat den Wert: %u\n",sim_hits);
+    printf("'primitive_gate_count'                      hat den Wert: %u\n",sim_primitive_gate_count);
+}
+
+
 void printDebug(Request* requests, size_t requestCount, Result result) {
 
-    printf("-\n");
+    printf("\n\n#1 Optionen und ihre jeweiligen Argumente:\n\n");
+    createDebugMSG_options();
 
-    printf("cycles=%u\n"
-           "blocksize=%u\n"
-           "v2bBlockOffset=%u\n"
-           "tlbSize=%u\n"
-           "tlbLatency=%u\n"
-           "memoryLatency=%u\n"
-           "inputfile=%s\n",
-           cycles, blocksize, v2bBlockOffset, tlbSize, tlbLatency, memoryLatency, inputfile);
-    if (tracefile) {
-        printf("tracefile=%s\n", tracefile);
-    }
-
-    printf("-\n");
-
+    printf("\n#2 Übergebene requests, in der From: index, write(1) oder read(0), Adresse, Datum:\n\n");
     for (size_t i = 0; i < requestCount; ++i) {
         printf("%zu: %d %u %u\n", i, requests[i].we, requests[i].addr, requests[i].data);
     }
 
-    printf("-\n");
-
-    printf("cycles=%zu\n", result.cycles);
-    printf("misses=%zu\n", result.misses);
-    printf("hits=%zu\n", result.hits);
-    printf("primitive_gate_count=%zu\n", result.primitive_gate_count);
-
-    printf("-\n");
+    printf("\n#3 Durch die Simulation ermittelte Werte:\n\n");
+    createDebugMSG_sim(result.cycles,result.misses,result.hits,result.primitive_gate_count);
 
 }
 
@@ -246,6 +268,7 @@ RetCode alreadySetCheck(int *booleanValue, char errorMSG[]){
 
 
 RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound, uint32_t *value) {
+
     if ( alreadySetCheck(booleanValue,errorMSG)== ERR) return ERR;
 
     // vgl. man strtol, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
