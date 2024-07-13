@@ -259,8 +259,8 @@ int main(int argc, char *argv[]) {
 
     // Simulation starten
 
-#ifndef TEST_BUILD
-   run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+#ifndef DEBUG_BUILD
+    run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
 #else
     Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
     printDebug(requests, requestCount, result);
