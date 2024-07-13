@@ -139,7 +139,7 @@ def generate_invalid_command():
         return to_string(arg)
 
 
-@pytest.mark.parametrize("command", [generate_invalid_command() for _ in range(1000000)])
+@pytest.mark.parametrize("command", [generate_invalid_command() for _ in range(2000000)])
 def test_invalid(command):
     process = subprocess.run(command, text=True, shell=True)
     assert process.returncode == 1
