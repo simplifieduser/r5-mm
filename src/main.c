@@ -269,22 +269,29 @@ RetCode alreadySetCheck(int *booleanValue, char errorMSG[]){
 
 RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound, uint32_t *value) {
 
-    if ( alreadySetCheck(booleanValue,errorMSG)== ERR) return ERR;
+    // Überprüfen, ob Option schon vorher gesetzt wird
+    if ( alreadySetCheck(booleanValue,errorMSG) == ERR) return ERR;
 
     // vgl. man strtol, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
     char *endptr = NULL;
     errno = 0;
     uint32_t tmp;
+
+    // Umwandlung des Arguments in hex oder dezimal
     if (inputString[0] == '0' && inputString[1] == 'x') {
         tmp = strtol(inputString, &endptr, 16);
     } else {
         tmp = strtol(inputString, &endptr, 10);
     }
+
+    // Fehler bei der Umwandlung
     if(errno || *endptr != '\0') {
         (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_CONVERSION(errorMSG));
         return ERR;
     }
-    if (tmp < lowerBound || tmp > upperBound) {
+
+    // Nicht im Wertebereich
+    if (inputString[0]=='-'||tmp < lowerBound || tmp > upperBound) {
         (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT(errorMSG, lowerBound, upperBound));
         return ERR;
     }
