@@ -62,8 +62,8 @@ def generate_edge_case_command():
     return ["./dist/r5mm", "./test.csv", f"-c{cycles}", f"-b1", f"-o{offset}", f"-s0", f"-t{cache_latency}", f"-m{memory_latency}"]
 
 
-@pytest.mark.parametrize("command", [generate_valid_command() for _ in range(100)])
-@pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(10)])
+@pytest.mark.parametrize("command", [generate_valid_command() for _ in range(1000)])
+@pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(100)])
 def test_fuzzy(requests, command):
 
     generate_valid_file("./test.csv", requests)
@@ -71,8 +71,8 @@ def test_fuzzy(requests, command):
     assert process.returncode == 0
 
 
-@pytest.mark.parametrize("command", [generate_edge_case_command() for _ in range(100)])
-@pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(19)])
+@pytest.mark.parametrize("command", [generate_edge_case_command() for _ in range(1000)])
+@pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(190)])
 def test_edge_cases(requests, command):
 
     generate_valid_file("./test.csv", requests)

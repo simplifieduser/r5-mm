@@ -103,7 +103,7 @@ def convert_to_result(requests):
     return result
 
 
-@pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(1000)])
+@pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(10000)])
 def test_valid(requests):
 
     generate_file("./temp_test.csv", requests)
@@ -121,7 +121,7 @@ def test_valid(requests):
         assert lines[i] == req
 
 
-@pytest.mark.parametrize("requests", [generate_invalid_requests() for _ in range(1000)])
+@pytest.mark.parametrize("requests", [generate_invalid_requests() for _ in range(10000)])
 def test_invalid(requests):
 
     generate_file("./temp_test.csv", requests)
