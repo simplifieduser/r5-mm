@@ -12,15 +12,20 @@ extern Result
 run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsigned blocksize, unsigned v2bBlockOffset,
                unsigned memoryLatency, size_t numRequests, Request *requests, const char *tracefile);
 
+void printDebug(Request* requests, size_t requestCount, Result result);
+
+// Globale variablen für das Parameter Parsing
+
+int cycles = 1000000;
+unsigned int tlbSize = 64;
+unsigned int tlbLatency = 1;
+unsigned int blocksize = 4096;
+unsigned int v2bBlockOffset = 4;
+unsigned int memoryLatency = 100;
+const char *tracefile = NULL;
+const char *inputfile = NULL;
+
 int main(int argc, char *argv[]) {
-    int cycles = 1000000;
-    unsigned int tlbSize = 64;
-    unsigned int tlbLatency = 1;
-    unsigned int blocksize = 4096;
-    unsigned int v2bBlockOffset = 4;
-    unsigned int memoryLatency = 100;
-    const char *tracefile = NULL;
-    const char *inputfile = NULL;
     bool cycles_bool = 0;
     bool tlbSize_bool = 0;
     bool tlbLatency_bool = 0;
@@ -254,12 +259,25 @@ int main(int argc, char *argv[]) {
 
     // Simulation starten
 
-#ifdef TEST_BUILD
+#ifndef TEST_BUILD
+   run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+#else
+    Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+    printDebug(requests, requestCount, result);
+#endif
 
-    // ------------ TESTING CODE ------------
+    // Speicher freigeben & Programm beenden
 
-    Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount,
-                                   requests, tracefile);
+    free(requests);
+
+    return EXIT_SUCCESS;
+}
+
+
+
+// ------------ DEBUG CODE ------------
+
+void printDebug(Request* requests, size_t requestCount, Result result) {
 
     printf("-\n");
 
@@ -289,17 +307,6 @@ int main(int argc, char *argv[]) {
 
     printf("-\n");
 
-    // ------------ TESTING CODE ------------
-
-#else
-
-    (void) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
-
-#endif
-
-    // Speicher freigeben & Programm beenden
-
-    free(requests);
-
-    return EXIT_SUCCESS;
 }
+
+// ------------ DEBUG CODE ------------
