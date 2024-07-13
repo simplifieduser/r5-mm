@@ -16,7 +16,7 @@ env:
   GH_TOKEN: ${{ github.token }}
   SYSTEMC_HOME: ./systemc
   LD_LIBRARY_PATH: ./systemc/lib
-  TEST_BUILD: yes
+  ERROR_ON_LINT: yes
 
 jobs:
 
