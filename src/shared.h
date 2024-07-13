@@ -12,6 +12,19 @@
 #define ERR_GENERAL_MEMORY_ALLOCATION_ERROR "Fehler: Es konnte kein Speicher alloziert werden\n"
 #define ERR_GENERAL_CANT_OPEN_FILE(file) "Fehler: Die Datei '%s' konnte nicht geöffnet werden\n", file
 
+//                  //
+// ARGUMENT STRING  //
+//                  //
+
+#define cycle_str "cycles (-c/--cycles)"
+#define blocksize_str "blocksize (-b/--blocksize)"
+#define v2b_block_offset_str "v2b-block-offset (-o/--v2b-block-offset"
+#define tlb_size_str "tlb-size (-s/--tlb-size)"
+#define tlb_latency_str "tlb-latency (-t/--tlb-latency)"
+#define memory_latency_str "memory-latency (-m/--memory-latency)"
+#define tracefile_str "tracefile (-f/--tf)"
+
+
 
 //                  //
 // ARGUMENT PARSING //
@@ -26,7 +39,7 @@
 #define ERR_NO_FILE_INPUT "Fehler: Ungültiges Argument: Es muss eine Eingabedatei als positional Argument übergeben werden\n%s",MSG_HINT
 #define ERR_ILLEGAL_ARGUMENT_TRACEFILE "Fehler: Ungültiges Argument: 'tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden\n%s",MSG_HINT
 #define ERR_ILLEGAL_ARGUMENT(arg,lowerBound,upperBound) "Fehler: Ungültiges Argument: '%s' muss ein Integer im Interval [%u; %u] sein\n%s", arg, lowerBound, upperBound,MSG_HINT
-#define ERR_AlREADY_SET(arg) "Fehler: %s wurde bereits gesetzt\n%s",arg,MSG_HINT
+#define ERR_AlREADY_SET(arg) "Fehler: '%s' wurde bereits gesetzt\n%s",arg,MSG_HINT
 
 
 
