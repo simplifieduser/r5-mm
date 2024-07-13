@@ -94,7 +94,10 @@ int main(int argc, char *argv[]) {
             FILE *file = NULL;
             tracefile = optarg;
             char tracefile_tmp[strlen(optarg) + 5];
+
+            // NOLINTNEXTLINE: snprintf_s steht in dieser Umgebung nicht zur Verfügung
             snprintf(tracefile_tmp, strlen(optarg) + 5, "%s.vcd", tracefile);
+
             // vgl.: https://stackoverflow.com/questions/11836064/c-creating-new-file-extensions-based-on-a-filename
 
             file = fopen(tracefile_tmp, "we");
@@ -260,7 +263,7 @@ int main(int argc, char *argv[]) {
     // Simulation starten
 
 #ifndef DEBUG_BUILD
-    run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+    (void) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
 #else
     Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
     printDebug(requests, requestCount, result);
