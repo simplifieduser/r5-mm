@@ -1,19 +1,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "file_parser.h"
 #include "shared.h"
+#include "file_parser.h"
 
 // Wird zur Bestimmung des Erfolgs der Zusatzfunktionen für Argumente verwendet
-enum RET_CODE {
+enum RetCode {
     OK_READ, OK_WRITE, OK_EOF,                                                    // Codes, die ausschließlich von getREArg verwendet werden
     OK, ERR_ALLOC, ERR_FOPEN, ERR_EOF, ERR_NEWLINE, ERR_INVARG, ERR_TOOMANY       // Codes, die von allen anderen Argumenten verwendet werden
-} typedef RET_CODE;
+} typedef RetCode;
 
 // Wird für Fehler-Meldungen verwendet
-enum ARG {
+enum Argument {
     NONE, WRITE_ENABLE, ADDRESS, WRITE_DATA
-} typedef ARG;
+} typedef Argument;
 
 const int MAX_ARG_LENGTH = 11;                    // Eine 32-Bit-Zahl kann nur aus 11 Zeichen bestehen
 const unsigned int MAX_ARG_VALUE = 0xFFFFFFFF;    // Maske zur Bestimmung, ob die übergebene Zahl den Höchstwert überschreitet
@@ -21,11 +21,11 @@ const unsigned int MAX_ARG_VALUE = 0xFFFFFFFF;    // Maske zur Bestimmung, ob di
 const int HEX_BASE = 16;                 // Basis für die Umwandlung von hexadezimalen Zahlen
 const int DEC_BASE = 10;                 // Basis für die Umwandlung von dezimalen Zahlen
 
-RET_CODE getRWArg(FILE *file);
+RetCode getRWArg(FILE *file);
 
-RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode);
+RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode);
 
-RET_CODE getDataArg(FILE *file, uint32_t *res);
+RetCode getDataArg(FILE *file, uint32_t *res);
 
 int CORRECTED_CARR_RET = 0;  // Wird verwendet, um Korrektur von '\r' zu '\n' zu speichern
 
@@ -52,7 +52,7 @@ int getNextChar(FILE *file) {
 
 }
 
-void printError(RET_CODE code, ARG arg, const char* val, size_t line) {
+void printError(RetCode code, Argument arg, const char* val, size_t line) {
 
     switch (code) {
         case ERR_ALLOC:
@@ -212,7 +212,7 @@ int parseFile(const char *path, size_t* requestCount, Request **requests) {
 
 }
 
-RET_CODE getRWArg(FILE *file) {
+RetCode getRWArg(FILE *file) {
 
     // Lese mode Charakter
 
@@ -262,7 +262,7 @@ RET_CODE getRWArg(FILE *file) {
 
 }
 
-RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
+RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode) {
 
     // Initialisiere array fürs lesen
 
@@ -364,7 +364,7 @@ RET_CODE getAddressArg(FILE *file, uint32_t *res, RET_CODE mode) {
 
 }
 
-RET_CODE getDataArg(FILE *file, uint32_t *res) {
+RetCode getDataArg(FILE *file, uint32_t *res) {
 
     // Initialisiere array fürs lesen
 
