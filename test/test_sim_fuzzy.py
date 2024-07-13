@@ -71,8 +71,8 @@ def test_fuzzy(requests, command):
     assert process.returncode == 0
 
 
-@pytest.mark.parametrize("command", [generate_edge_case_command() for _ in range(10)])
-@pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(20)])
+@pytest.mark.parametrize("command", [generate_edge_case_command() for _ in range(100)])
+@pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(19)])
 def test_edge_cases(requests, command):
 
     generate_valid_file("./test.csv", requests)
