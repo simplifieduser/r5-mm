@@ -31,14 +31,15 @@
 //                  //
 
 // invalid arguments
-#define ERR_UNKNOWN_OPTION "Fehler: Es wurde eine unbekannte Option übergeben, das positional Argument darf nicht mit '-' beginnen\n%s", MSG_HINT
-#define ERR_TOO_MANY_OPTION "Fehler: Es wurden zu viele Optionen übergeben\n%s",MSG_HINT
-#define ERR_NO_REQUIRED_ARGUMENT(arg) "Fehler: Folgende Option benötigt ein Argument: %s\n%s",arg, MSG_HINT
+#define ERR_UNKNOWN_OPTION "Fehler: Es wurde eine unbekannte Option übergeben\n%s", MSG_HINT
+#define ERR_TOO_MANY_OPTION "Fehler: Es wurden zu viele Optionen übergeben\n%s", MSG_HINT
+#define ERR_NO_REQUIRED_ARGUMENT(arg) "Fehler: Folgende Option benötigt ein Argument: %s\n%s", arg, MSG_HINT
 
 // illegal arguments
-#define ERR_NO_FILE_INPUT "Fehler: Ungültiges Argument: Es muss eine Eingabedatei als positional Argument übergeben werden\n%s",MSG_HINT
-#define ERR_ILLEGAL_ARGUMENT_TRACEFILE "Fehler: Ungültiges Argument: 'tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden\n%s",MSG_HINT
-#define ERR_ILLEGAL_ARGUMENT(arg,lowerBound,upperBound) "Fehler: Ungültiges Argument: '%s' muss ein Integer im Interval [%u; %u] sein\n%s", arg, lowerBound, upperBound,MSG_HINT
+#define ERR_NO_FILE_INPUT "Fehler: Ungültiges Argument: Es muss eine Eingabedatei als positional Argument übergeben werden\n%s", MSG_HINT
+#define ERR_ILLEGAL_ARGUMENT_TRACEFILE "Fehler: Ungültiges Argument: 'tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden\n%s", MSG_HINT
+#define ERR_ILLEGAL_ARGUMENT_CONVERSION(arg) "Fehler: Ungültiges Argument: Das Argument von '%s' konnte zu keinem Integer umgewandelt werden\n%s", arg, MSG_HINT
+#define ERR_ILLEGAL_ARGUMENT(arg,lowerBound,upperBound) "Fehler: Ungültiges Argument: Das Argument von '%s' muss im Interval [%u; %u] liegen\n%s", arg, lowerBound, upperBound,MSG_HINT
 #define ERR_AlREADY_SET(arg) "Fehler: '%s' wurde bereits gesetzt\n%s",arg,MSG_HINT
 
 
