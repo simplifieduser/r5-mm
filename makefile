@@ -84,9 +84,9 @@ endif
 all: debug
 
 # Debug target
-debug: CFLAGS += -g -Wall -Wextra -Wno-unused-but-set-variable -Wno-unused-parameter -fsanitize=undefined,address -D DEBUG_BUILD
-debug: CXXFLAGS += -g -Wall -Wextra -Wno-unused-but-set-variable -Wno-unused-parameter -fsanitize=undefined,address -D DEBUG_BUILD
-debug: LDFLAGS += -g
+debug: CFLAGS += -g -Wall -Wextra -Wno-unused-but-set-variable -Wno-unused-parameter -D DEBUG_BUILD
+debug: CXXFLAGS += -g -Wall -Wextra -Wno-unused-but-set-variable -Wno-unused-parameter -D DEBUG_BUILD
+debug: LDFLAGS += -g -fsanitize=undefined,address
 debug: $(DIST)/$(TARGET)
 
 # Release target
