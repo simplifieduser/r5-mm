@@ -4,61 +4,64 @@
 #include <stdint.h>
 #include <errno.h>
 #include <string.h>
-#include <stdbool.h>
 #include "shared.h"
 #include "file_parser.h"
 
 extern Result
 run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsigned blocksize, unsigned v2bBlockOffset,
                unsigned memoryLatency, size_t numRequests, Request *requests, const char *tracefile);
+enum RetCode {
+    OK, ERR
+} typedef RetCode;
 
+// Umwandlung der Eingabe String zu Integer Werten mit Fehlerbehandlung
+RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound, uint32_t *value);
+
+// Überprüfung, ob eine Option bereits gesetzt wurde
+RetCode alreadySetCheck(int *booleanValue, char errorMSG[]);
+
+// Ausgabe der gesetzten und ermittelten Werte
 void printDebug(Request* requests, size_t requestCount, Result result);
 
 // Globale variablen für das Parameter Parsing
-
-int cycles = 1000000;
-unsigned int tlbSize = 64;
-unsigned int tlbLatency = 1;
-unsigned int blocksize = 4096;
-unsigned int v2bBlockOffset = 4;
-unsigned int memoryLatency = 100;
+unsigned cycles = 1000000;
+unsigned tlbSize = 64;
+unsigned tlbLatency = 1;
+unsigned blocksize = 4096;
+unsigned v2bBlockOffset = 4;
+unsigned memoryLatency = 100;
 const char *tracefile = NULL;
 const char *inputfile = NULL;
+int cycles_bool = 0, tlbSize_bool = 0, tlbLatency_bool = 0, blocksize_bool = 0, v2bBlockOffset_bool = 0, memoryLatency_bool = 0, tracefile_bool = 0;
 
+/*
+ * die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da diese nur für die Simulation relevant sind und bei einem echten TLB nicht existieren
+ * alle anderen Werte stammen von: Patterson, D. A., Hennessy, J. L. (). Computer Organization and Design: The Hardware/Software Interface. (4th ed.). Morgan Kaufman. Seite 503(ff.).
+*/
 int main(int argc, char *argv[]) {
-    bool cycles_bool = 0;
-    bool tlbSize_bool = 0;
-    bool tlbLatency_bool = 0;
-    bool blocksize_bool = 0;
-    bool v2bBlockOffset_bool = 0;
-    bool memoryLatency_bool = 0;
-    bool tracefile_bool = 0;
-    /*
-     * die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da es in der Realität keinen v2bBlockOffset gibt
-     * alle anderen Werte stammen von: Patterson, D. A., Hennessy, J. L. (). Computer Organization and Design: The Hardware/Software Interface. (4th ed.). Morgan Kaufman. Seite 503.
-    */
 
-    static struct option long_options[] = { // Quelle für getopt_long: man getopt_long
+    int quickStart_bool = 0;
+    // vgl. getopt_long man getopt_long, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
+    static struct option long_options[] = {
+            {"help",             no_argument,       0, 'h'},
+            {"tf",               required_argument, 0, 'f'},
             {"cycles",           required_argument, 0, 'c'},
             {"blocksize",        required_argument, 0, 'b'},
             {"v2b-block-offset", required_argument, 0, 'o'},
             {"tlb-size",         required_argument, 0, 's'},
             {"tlb-latency",      required_argument, 0, 't'},
             {"memory-latency",   required_argument, 0, 'm'},
-            {"tf",               required_argument, 0, 'f'},
-            {"help",             no_argument,       0, 'h'},
+            {"quickStart",       no_argument,       0, 'q'},
             {0, 0,                                  0, 0}
     };
-
-    // Stellt die Fehlermeldungen von getopt_long still, um eigene Fehlermeldungen auszugeben
-    opterr = 0;
-    int opt = 0;
+    opterr = 0; // Stellt die Fehlermeldungen von getopt_long still, um eigene Fehlermeldungen auszugeben
+    int opt;
 
     // Einlesen der Optionen/Argumente
     while (1) {
 
         // nächste Option, erstes ':' ermöglicht präzisere Fehlermeldung
-        opt = getopt_long(argc, argv, ":c:b:o:s:t:m:f:h", long_options, NULL);
+        opt = getopt_long(argc, argv, ":hqf:c:b:o:s:t:m:", long_options, NULL);
 
         // keine weiteren Optionen
         if (opt == -1) break;
@@ -67,6 +70,20 @@ int main(int argc, char *argv[]) {
         if (opt == 'h') {
             (void) fprintf(stderr, HELP_MSG);
             return EXIT_SUCCESS;
+        }
+
+        // quickStart, setzt die Werte aus dem Beispiel unter der HELP Nachricht, beachte, dass alle bisherige Werte überschrieben werden und künftige Argumente nicht berücksichtigt werden
+        if (opt == 'q') {
+            quickStart_bool = 1;
+            cycles = 2000;
+            tlbSize = 16;
+            tlbLatency = 2;
+            blocksize = 16;
+            v2bBlockOffset = 4;
+            memoryLatency = 100;
+            tracefile = "tracefile";
+            inputfile = "examples/kurzeEingabedatei_valid.csv";
+            break;
         }
 
         // Fehler: required_argument ohne Argument übergeben
@@ -83,22 +100,16 @@ int main(int argc, char *argv[]) {
 
         // tracefile: -f / --tf
         if (opt == 'f') {
-            if (tracefile_bool == 1) {
-                (void) fprintf(stderr, ERR_AlREADY_SET(tracefile_str));
-                return EXIT_FAILURE;
-            }
-            tracefile_bool = 1;
-
+            if (alreadySetCheck(&tracefile_bool,tracefile_str) == ERR) return EXIT_FAILURE;
 
             // Erstellen der Datei, zur Überprüfung möglicher unzulässiger Dateinamen mit angehängtem '.vcd'
+            // vgl.: https://stackoverflow.com/questions/11836064/c-creating-new-file-extensions-based-on-a-filename
             FILE *file = NULL;
             tracefile = optarg;
             char tracefile_tmp[strlen(optarg) + 5];
 
             // NOLINTNEXTLINE: snprintf_s steht in dieser Umgebung nicht zur Verfügung
             snprintf(tracefile_tmp, strlen(optarg) + 5, "%s.vcd", tracefile);
-
-            // vgl.: https://stackoverflow.com/questions/11836064/c-creating-new-file-extensions-based-on-a-filename
 
             file = fopen(tracefile_tmp, "we");
             if (file == NULL) {
@@ -109,124 +120,47 @@ int main(int argc, char *argv[]) {
                 (void) fprintf(stderr, ERR_GENERAL_UNKNOWN);
                 return EXIT_FAILURE;
             }
+
             // Löschen der Datei, falls es vor der Beendigung des Programs zu Fehlern kommt wird keine leere Datei ausgeben
             remove(tracefile_tmp);
             continue;
         }
 
-        // Umwandlung der Eingabewerte für die folgenden Optionen
-        char *endptr = NULL;
-        errno = 0;
-        long value;
-        if (optarg[0] == '0' && optarg[1] == 'x') {
-            value = strtol(optarg, &endptr, 16); // Quelle: man strtol
-        } else {
-            value = strtol(optarg, &endptr, 10);
-        }
-
-        // Fehler bei der Umwandlung, welcher errno standardmäßig nicht != 0 setzt
-        if (*endptr != '\0') errno = 1;
-
+        // Alle diese Optionen benötigen einen Integer als Argument
         switch (opt) {
             // cycles: -c / --cycles
             case 'c': {
-                if (cycles_bool == 1) {
-                    (void) fprintf(stderr, ERR_AlREADY_SET(cycle_str));
-                    return EXIT_FAILURE;
-                }
-                cycles_bool = 1;
-
-                //Fehler: Übergebene Zahl nicht zulässig
-                if (errno || value > INT32_MAX || value < 0) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT(cycle_str, 0, INT32_MAX));
-                    return EXIT_FAILURE;
-                }
-                cycles = (int) value;
+                if ( inputConversion(&cycles_bool,cycle_str,optarg,0,INT32_MAX, &cycles) == ERR) return EXIT_FAILURE;
                 break;
             }
 
             // blocksize: -b / --blocksize
             case 'b': {
-                if (blocksize_bool == 1) {
-                    (void) fprintf(stderr, ERR_AlREADY_SET(blocksize_str));
-                    return EXIT_FAILURE;
-                }
-                blocksize_bool = 1;
-
-                //Fehler: Übergebene Zahl nicht zulässig
-                if (errno || value > UINT32_MAX || value <= 0) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT(blocksize_str, 1, UINT32_MAX));
-                    return EXIT_FAILURE;
-                }
-                blocksize = (unsigned) value;
+                if ( inputConversion(&blocksize_bool,blocksize_str,optarg,1,UINT32_MAX,&blocksize) == ERR) return EXIT_FAILURE;
                 break;
             }
 
             // v2bBlockOffset: -o / --v2bBlockOffset
             case 'o': {
-                if (v2bBlockOffset_bool == 1) {
-                    (void) fprintf(stderr, ERR_AlREADY_SET(v2b_block_offset_str));
-                    return EXIT_FAILURE;
-                }
-                v2bBlockOffset_bool = 1;
-
-                //Fehler: Übergebene Zahl nicht zulässig
-                if (errno || value > UINT32_MAX || value < 0) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT(v2b_block_offset_str, 0, UINT32_MAX));
-                    return EXIT_FAILURE;
-                }
-                v2bBlockOffset = (unsigned) value;
+                if ( inputConversion(&v2bBlockOffset_bool,v2b_block_offset_str,optarg,0,UINT32_MAX, &v2bBlockOffset) == ERR) return EXIT_FAILURE;
                 break;
             }
 
             // tlb-size: -s / --tlb-size
             case 's': {
-                if (tlbSize_bool == 1) {
-                    (void) fprintf(stderr, ERR_AlREADY_SET(tlb_size_str));
-                    return EXIT_FAILURE;
-                }
-                tlbSize_bool = 1;
-
-                //Fehler: Übergebene Zahl nicht zulässig
-                if (errno || value > UINT32_MAX || value < 0) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT(tlb_size_str, 0, UINT32_MAX));
-                    return EXIT_FAILURE;
-                }
-                tlbSize = (unsigned) value;
+                if (inputConversion(&tlbSize_bool,tlb_size_str,optarg,0,UINT32_MAX, &tlbSize) == ERR ) return EXIT_FAILURE;
                 break;
             }
 
             // tlb-latency: -t / --tlb-latency
             case 't': {
-                if (tlbLatency_bool == 1) {
-                    (void) fprintf(stderr, ERR_AlREADY_SET(tlb_latency_str));
-                    return EXIT_FAILURE;
-                }
-                tlbLatency_bool = 1;
-
-                //Fehler: Übergebene Zahl nicht zulässig
-                if (errno || value > UINT32_MAX || value < 0) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT(tlb_latency_str, 0, UINT32_MAX));
-                    return EXIT_FAILURE;
-                }
-                tlbLatency = (unsigned) value;
+                if ( inputConversion(&tlbLatency_bool,tlb_latency_str,optarg,0,UINT32_MAX, & tlbLatency) == ERR) return EXIT_FAILURE;
                 break;
             }
 
             //memory-latency -m / --memory-latency
             case 'm': {
-                if (memoryLatency_bool == 1) {
-                    (void) fprintf(stderr, ERR_AlREADY_SET(memory_latency_str));
-                    return EXIT_FAILURE;
-                }
-                memoryLatency_bool = 1;
-
-                //Fehler: Übergebene Zahl nicht zulässig
-                if (errno || value > UINT32_MAX || value < 0) {
-                    (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT(memory_latency_str, 0, UINT32_MAX));
-                    return EXIT_FAILURE;
-                }
-                memoryLatency = (unsigned) value;
+                if ( inputConversion(&memoryLatency_bool,memory_latency_str,optarg,0,UINT32_MAX, &memoryLatency) == ERR) return EXIT_FAILURE;
                 break;
             }
 
@@ -238,17 +172,20 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // Eingabedatei
-    if (optind < argc) {
-        inputfile = argv[optind]; // Mögliche Fehlerbehandlung folgt beim Einlesen der Datei
-    } else {
-        (void) fprintf(stderr, ERR_NO_FILE_INPUT);
-        return EXIT_FAILURE;
+    // inputfile
+    // vgl. https://stackoverflow.com/questions/18079340/using-getopt-in-c-with-non-option-arguments
+    if (quickStart_bool == 0) {
+        if (optind == argc) {
+            (void) fprintf(stderr, ERR_NO_FILE_INPUT);
+            return EXIT_FAILURE;
+        } else if (optind < argc - 1) {
+            (void) fprintf(stderr, ERR_TOO_MANY_OPTION);
+            return EXIT_FAILURE;
+        } else {
+            inputfile = argv[optind];
+        }
     }
-    if (optind < argc - 1) {
-        (void) fprintf(stderr, ERR_TOO_MANY_OPTION);
-        return EXIT_FAILURE;
-    }
+
 
     // Lese Requests aus Datei
 
@@ -265,7 +202,7 @@ int main(int argc, char *argv[]) {
 #ifndef DEBUG_BUILD
     (void) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
 #else
-    Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+    Result result = run_simulation((int) cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
     printDebug(requests, requestCount, result);
 #endif
 
@@ -280,36 +217,84 @@ int main(int argc, char *argv[]) {
 
 // ------------ DEBUG CODE ------------
 
+void createDebugMSG_options () {
+
+    printf("'cycles (-c/--cycles)'                      hat den Wert: %u\n",cycles);
+    printf("'blocksize (-b/--blocksize)'                hat den Wert: %u\n",blocksize);
+    printf("'v2b-block-offset (-o/--v2b-block-offset)'  hat den Wert: %u\n",v2bBlockOffset);
+    printf("'tlb-size (-s/--tlb-size)'                  hat den Wert: %u\n",tlbSize);
+    printf("'tlb-latency (-t/--tlb-latency)'            hat den Wert: %u\n",tlbLatency);
+    printf("'memory-latency (-m/--memory-latency)'      hat den Wert: %u\n",memoryLatency);
+    printf("'tracefile (-f/--tf)'                       hat den Wert: %s\n",tracefile);
+    printf("'Eingabedatei'                              hat den Wert: %s\n",inputfile);
+}
+
+void createDebugMSG_sim (unsigned  sim_cycles, unsigned sim_misses, unsigned sim_hits, unsigned sim_primitive_gate_count) {
+
+    printf("'cycles'                                    hat den Wert: %u\n",sim_cycles);
+    printf("'misses'                                    hat den Wert: %u\n",sim_misses);
+    printf("'hits'                                      hat den Wert: %u\n",sim_hits);
+    printf("'primitive_gate_count'                      hat den Wert: %u\n",sim_primitive_gate_count);
+}
+
+
 void printDebug(Request* requests, size_t requestCount, Result result) {
 
-    printf("-\n");
+    printf("\n\n#1 Optionen und ihre jeweiligen Argumente:\n\n");
+    createDebugMSG_options();
 
-    printf("cycles=%d\n", cycles);
-    printf("blocksize=%u\n", blocksize);
-    printf("v2bBlockOffset=%u\n", v2bBlockOffset);
-    printf("tlbSize=%u\n", tlbSize);
-    printf("tlbLatency=%u\n", tlbLatency);
-    printf("memoryLatency=%u\n", memoryLatency);
-    printf("inputfile=%s\n", inputfile);
-    if (tracefile) {
-        printf("tracefile=%s\n", tracefile);
-    }
-
-    printf("-\n");
-
+    printf("\n#2 Übergebene requests, in der From: index, write(1) oder read(0), Adresse, Datum:\n\n");
     for (size_t i = 0; i < requestCount; ++i) {
         printf("%zu: %d %u %u\n", i, requests[i].we, requests[i].addr, requests[i].data);
     }
 
-    printf("-\n");
-
-    printf("cycles=%zu\n", result.cycles);
-    printf("misses=%zu\n", result.misses);
-    printf("hits=%zu\n", result.hits);
-    printf("primitive_gate_count=%zu\n", result.primitive_gate_count);
-
-    printf("-\n");
+    printf("\n#3 Durch die Simulation ermittelte Werte:\n\n");
+    createDebugMSG_sim(result.cycles,result.misses,result.hits,result.primitive_gate_count);
 
 }
 
 // ------------ DEBUG CODE ------------
+
+
+RetCode alreadySetCheck(int *booleanValue, char errorMSG[]){
+    // überprüfe, ob dieser Wert bereits gesetzt wurde
+    if (*booleanValue == 1) {
+        (void) fprintf(stderr, ERR_AlREADY_SET(errorMSG));
+        return ERR;
+    }
+    *booleanValue = 1;
+    return OK;
+}
+
+
+RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound, uint32_t *value) {
+
+    // Überprüfen, ob Option schon vorher gesetzt wird
+    if ( alreadySetCheck(booleanValue,errorMSG) == ERR) return ERR;
+
+    // vgl. man strtol, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
+    char *endptr = NULL;
+    errno = 0;
+    uint32_t tmp;
+
+    // Umwandlung des Arguments in hex oder dezimal
+    if (inputString[0] == '0' && inputString[1] == 'x') {
+        tmp = strtol(inputString, &endptr, 16);
+    } else {
+        tmp = strtol(inputString, &endptr, 10);
+    }
+
+    // Fehler bei der Umwandlung
+    if(errno || *endptr != '\0') {
+        (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_CONVERSION(errorMSG));
+        return ERR;
+    }
+
+    // Nicht im Wertebereich
+    if (inputString[0]=='-'||tmp < lowerBound || tmp > upperBound) {
+        (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT(errorMSG, lowerBound, upperBound));
+        return ERR;
+    }
+    *value = tmp;
+    return OK;
+}

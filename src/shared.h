@@ -18,7 +18,7 @@
 
 #define cycle_str "cycles (-c/--cycles)"
 #define blocksize_str "blocksize (-b/--blocksize)"
-#define v2b_block_offset_str "v2b-block-offset (-o/--v2b-block-offset"
+#define v2b_block_offset_str "v2b-block-offset (-o/--v2b-block-offset)"
 #define tlb_size_str "tlb-size (-s/--tlb-size)"
 #define tlb_latency_str "tlb-latency (-t/--tlb-latency)"
 #define memory_latency_str "memory-latency (-m/--memory-latency)"
@@ -31,20 +31,21 @@
 //                  //
 
 // invalid arguments
-#define ERR_UNKNOWN_OPTION "Fehler: Es wurde eine unbekannte Option übergeben, das positional Argument darf nicht mit '-' beginnen\n%s", MSG_HINT
-#define ERR_TOO_MANY_OPTION "Fehler: Es wurden zu viele Optionen übergeben\n%s",MSG_HINT
-#define ERR_NO_REQUIRED_ARGUMENT(arg) "Fehler: Folgende Option benötigt ein Argument: %s\n%s",arg, MSG_HINT
+#define ERR_UNKNOWN_OPTION "Fehler: Es wurde eine unbekannte Option übergeben\n%s", MSG_HINT
+#define ERR_TOO_MANY_OPTION "Fehler: Es wurden zu viele Optionen übergeben\n%s", MSG_HINT
+#define ERR_NO_REQUIRED_ARGUMENT(arg) "Fehler: Folgende Option benötigt ein Argument: %s\n%s", arg, MSG_HINT
 
 // illegal arguments
-#define ERR_NO_FILE_INPUT "Fehler: Ungültiges Argument: Es muss eine Eingabedatei als positional Argument übergeben werden\n%s",MSG_HINT
-#define ERR_ILLEGAL_ARGUMENT_TRACEFILE "Fehler: Ungültiges Argument: 'tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden\n%s",MSG_HINT
-#define ERR_ILLEGAL_ARGUMENT(arg,lowerBound,upperBound) "Fehler: Ungültiges Argument: '%s' muss ein Integer im Interval [%u; %u] sein\n%s", arg, lowerBound, upperBound,MSG_HINT
+#define ERR_NO_FILE_INPUT "Fehler: Ungültiges Argument: Es muss eine Eingabedatei als positional Argument übergeben werden\n%s", MSG_HINT
+#define ERR_ILLEGAL_ARGUMENT_TRACEFILE "Fehler: Ungültiges Argument: 'tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden\n%s", MSG_HINT
+#define ERR_ILLEGAL_ARGUMENT_CONVERSION(arg) "Fehler: Ungültiges Argument: Das Argument von '%s' konnte zu keinem Integer umgewandelt werden\n%s", arg, MSG_HINT
+#define ERR_ILLEGAL_ARGUMENT(arg,lowerBound,upperBound) "Fehler: Ungültiges Argument: Das Argument von '%s' muss im Interval [%u; %u] liegen\n%s", arg, lowerBound, upperBound,MSG_HINT
 #define ERR_AlREADY_SET(arg) "Fehler: '%s' wurde bereits gesetzt\n%s",arg,MSG_HINT
 
 
 
 #define HELP_MSG \
-"Verwendung r5mm:\n"  \
+"////////////////////////////////////////      r5mm:      ////////////////////////////////////////\n"  \
 "\n"             \
 "Dieses Programm simuliert einen Translation Lookaside Buffer, mögliche Eingabedateien können in dem Verzeichnis examples gefunden werden oder mit dem Javaprogramm erstellt werden\n" \
 "\n"                              \
@@ -57,11 +58,14 @@
 "   -m, --memory-latency       100                          [0; 4294967295] uint    Gibt die Latenzzeit des Hauptspeichers in Zyklen an\n"   \
 "   -f, --tf                   null                         <Dateiname>             Name der Ausgabedatei, falls ein Tracefile erstellt werden soll\n"                 \
 "   <Dateiname>                !muss immer gesetzt werden!  <Dateiname>             Name der Eingabedatei, mit den zu verarbeitenden Daten\n"\
-"   -h, --help                --------------------------------------------------    Gibt diese Nachricht aus\n"                          \
+"   -h, --help                 --------------------------------------------------   Gibt diese Nachricht aus\n" \
+"   -q, --quickStart           --------------------------------------------------   Setzt und überschreibt alle Parameter wie aus der folgenden beispiel Eingabe\n"\
 "\n"             \
 "Eine mögliche valide Eingabe wäre: ./r5mm -c 2000 --blocksize 16 --tlb-size=16 -t 2 --tf tracefile examples/kurzeEingabedatei_valid.csv"                 \
 "\n"\
-"Dieses Programm ist die Projektabgabe für das Fach 'Grundlagenpraktikum: Rechnerarchitektur', Projektaufgabe A14\n"
+"Dieses Programm ist die Projektabgabe für das Fach 'Grundlagenpraktikum: Rechnerarchitektur', Projektaufgabe A14\n"                                                                   \
+"////////////////////////////////////////      r5mm:      ////////////////////////////////////////\n"
+
 //                      //
 // REQUEST FILE PARSING //
 //                      //

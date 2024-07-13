@@ -112,8 +112,9 @@ def test_valid(requests):
     process = subprocess.run(["./dist/r5mm", "./temp_test.csv"], stdout=subprocess.PIPE, text=True)
     assert process.returncode == 0
 
-    lines = process.stdout.split('-')[2]
-    lines = lines.split('\n')
+    lines = process.stdout.split('#')[2]
+    lines = lines.split("\n")
+    lines.pop(0)
     lines.pop(0)
 
     for i, req in enumerate(results):
