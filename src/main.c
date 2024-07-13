@@ -31,19 +31,12 @@ const char *tracefile = NULL;
 const char *inputfile = NULL;
 
 int main(int argc, char *argv[]) {
-    bool cycles_bool = 0;
-    bool tlbSize_bool = 0;
-    bool tlbLatency_bool = 0;
-    bool blocksize_bool = 0;
-    bool v2bBlockOffset_bool = 0;
-    bool memoryLatency_bool = 0;
-    bool tracefile_bool = 0;
+
     /*
      * die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da es in der Realität keinen v2bBlockOffset gibt
      * alle anderen Werte stammen von: Patterson, D. A., Hennessy, J. L. (). Computer Organization and Design: The Hardware/Software Interface. (4th ed.). Morgan Kaufman. Seite 503.
-*/
+    */
 
-int main(int argc, char *argv[]) {
     static struct option long_options[] = { // Quelle für getopt_long: man getopt_long
             {"help",             no_argument,       0, 'h'},
             {"tf",               required_argument, 0, 'f'},
