@@ -12,8 +12,15 @@ extern Result
 run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsigned blocksize, unsigned v2bBlockOffset,
                unsigned memoryLatency, size_t numRequests, Request *requests, const char *tracefile);
 
+
 uint32_t inputConversion (bool *booleanValue,char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound);
+
 void alreadySetCheck(bool *booleanValue, char errorMSG[]);
+
+void printDebug(Request* requests, size_t requestCount, Result result);
+
+// Globale variablen für das Parameter Parsing
+
 int cycles = 1000000;
 unsigned int tlbSize = 64;
 unsigned int tlbLatency = 1;
@@ -22,7 +29,16 @@ unsigned int v2bBlockOffset = 4;
 unsigned int memoryLatency = 100;
 const char *tracefile = NULL;
 const char *inputfile = NULL;
-/*
+
+int main(int argc, char *argv[]) {
+    bool cycles_bool = 0;
+    bool tlbSize_bool = 0;
+    bool tlbLatency_bool = 0;
+    bool blocksize_bool = 0;
+    bool v2bBlockOffset_bool = 0;
+    bool memoryLatency_bool = 0;
+    bool tracefile_bool = 0;
+    /*
      * die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da es in der Realität keinen v2bBlockOffset gibt
      * alle anderen Werte stammen von: Patterson, D. A., Hennessy, J. L. (). Computer Organization and Design: The Hardware/Software Interface. (4th ed.). Morgan Kaufman. Seite 503.
 */
@@ -79,7 +95,10 @@ int main(int argc, char *argv[]) {
             FILE *file = NULL;
             tracefile = optarg;
             char tracefile_tmp[strlen(optarg) + 5];
+
+            // NOLINTNEXTLINE: snprintf_s steht in dieser Umgebung nicht zur Verfügung
             snprintf(tracefile_tmp, strlen(optarg) + 5, "%s.vcd", tracefile);
+
             // vgl.: https://stackoverflow.com/questions/11836064/c-creating-new-file-extensions-based-on-a-filename
 
             file = fopen(tracefile_tmp, "we");
@@ -165,12 +184,25 @@ int main(int argc, char *argv[]) {
 
     // Simulation starten
 
-#ifdef TEST_BUILD
+#ifndef DEBUG_BUILD
+    (void) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+#else
+    Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+    printDebug(requests, requestCount, result);
+#endif
 
-    // ------------ TESTING CODE ------------
+    // Speicher freigeben & Programm beenden
 
-    Result result = run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount,
-                                   requests, tracefile);
+    free(requests);
+
+    return EXIT_SUCCESS;
+}
+
+
+
+// ------------ DEBUG CODE ------------
+
+void printDebug(Request* requests, size_t requestCount, Result result) {
 
     printf("-\n");
 
@@ -200,20 +232,9 @@ int main(int argc, char *argv[]) {
 
     printf("-\n");
 
-    // ------------ TESTING CODE ------------
-
-#else
-
-    (void) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
-
-#endif
-
-    // Speicher freigeben & Programm beenden
-
-    free(requests);
-
-    return EXIT_SUCCESS;
 }
+
+// ------------ DEBUG CODE ------------
 
 
 void alreadySetCheck(bool *booleanValue, char errorMSG[]){
