@@ -17,6 +17,12 @@ enum RetCode {
 // Umwandlung der Eingabe String zu Integer Werten mit Fehlerbehandlung
 RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound, uint32_t *value);
 
+// Umwandlung der tracefile eingabe
+RetCode traceFileInput (char inputString[]);
+
+// Umwandlung des positional Arguments, der input Datei
+RetCode positionalArgument (char *argv[], int argc, int pos);
+
 // Überprüfung, ob eine Option bereits gesetzt wurde
 RetCode alreadySetCheck(int *booleanValue, char errorMSG[]);
 
@@ -32,15 +38,13 @@ unsigned v2bBlockOffset = 4;
 unsigned memoryLatency = 100;
 const char *tracefile = NULL;
 const char *inputfile = NULL;
-int cycles_bool = 0, tlbSize_bool = 0, tlbLatency_bool = 0, blocksize_bool = 0, v2bBlockOffset_bool = 0, memoryLatency_bool = 0, tracefile_bool = 0;
+int cycles_bool = 0, tlbSize_bool = 0, tlbLatency_bool = 0, blocksize_bool = 0, v2bBlockOffset_bool = 0, memoryLatency_bool = 0, tracefile_bool = 0, quickStart_bool = 0;
 
 /*
  * die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da diese nur für die Simulation relevant sind und bei einem echten TLB nicht existieren
  * alle anderen Werte stammen von: Patterson, D. A., Hennessy, J. L. (). Computer Organization and Design: The Hardware/Software Interface. (4th ed.). Morgan Kaufman. Seite 503(ff.).
 */
 int main(int argc, char *argv[]) {
-
-    int quickStart_bool = 0;
     // vgl. getopt_long man getopt_long, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
     static struct option long_options[] = {
             {"help",             no_argument,       0, 'h'},
@@ -82,7 +86,7 @@ int main(int argc, char *argv[]) {
             v2bBlockOffset = 4;
             memoryLatency = 100;
             tracefile = "tracefile";
-            inputfile = "examples/kurzeEingabedatei_valid.csv";
+            inputfile = "examples/kurze_Eingabedatei_valid.csv";
             break;
         }
 
@@ -100,29 +104,7 @@ int main(int argc, char *argv[]) {
 
         // tracefile: -f / --tf
         if (opt == 'f') {
-            if (alreadySetCheck(&tracefile_bool,tracefile_str) == ERR) return EXIT_FAILURE;
-
-            // Erstellen der Datei, zur Überprüfung möglicher unzulässiger Dateinamen mit angehängtem '.vcd'
-            // vgl.: https://stackoverflow.com/questions/11836064/c-creating-new-file-extensions-based-on-a-filename
-            FILE *file = NULL;
-            tracefile = optarg;
-            char tracefile_tmp[strlen(optarg) + 5];
-
-            // NOLINTNEXTLINE: snprintf_s steht in dieser Umgebung nicht zur Verfügung
-            snprintf(tracefile_tmp, strlen(optarg) + 5, "%s.vcd", tracefile);
-
-            file = fopen(tracefile_tmp, "we");
-            if (file == NULL) {
-                (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_TRACEFILE);
-                return EXIT_FAILURE;
-            }
-            if (fclose(file) != 0) {
-                (void) fprintf(stderr, ERR_GENERAL_UNKNOWN);
-                return EXIT_FAILURE;
-            }
-
-            // Löschen der Datei, falls es vor der Beendigung des Programs zu Fehlern kommt wird keine leere Datei ausgeben
-            remove(tracefile_tmp);
+            if (traceFileInput(optarg)==ERR) return EXIT_FAILURE;
             continue;
         }
 
@@ -172,19 +154,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // inputfile
-    // vgl. https://stackoverflow.com/questions/18079340/using-getopt-in-c-with-non-option-arguments
-    if (quickStart_bool == 0) {
-        if (optind == argc) {
-            (void) fprintf(stderr, ERR_NO_FILE_INPUT);
-            return EXIT_FAILURE;
-        } else if (optind < argc - 1) {
-            (void) fprintf(stderr, ERR_TOO_MANY_OPTION);
-            return EXIT_FAILURE;
-        } else {
-            inputfile = argv[optind];
-        }
-    }
+    // einlesen der Eingabe als positional Argument
+    if (positionalArgument(argv,argc,optind)== ERR) return EXIT_FAILURE;
+
 
 
     // Lese Requests aus Datei
@@ -200,7 +172,7 @@ int main(int argc, char *argv[]) {
     // Simulation starten
 
 #ifndef DEBUG_BUILD
-    (void) run_simulation(cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+    (void) run_simulation((int) cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
 #else
     Result result = run_simulation((int) cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
     printDebug(requests, requestCount, result);
@@ -291,6 +263,7 @@ RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], 
     }
 
     // Nicht im Wertebereich
+    // edge case: es war möglich eine sehr große negative Zahl zu übergeben, die strtol durch das zweierkomplement zu einer positiven umgewandelt hat, die dann im Wertebereich lag. Die Überprüfung auf negatives Vorzeichen behebt dies
     if (inputString[0]=='-'||tmp < lowerBound || tmp > upperBound) {
         (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT(errorMSG, lowerBound, upperBound));
         return ERR;
@@ -298,3 +271,55 @@ RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], 
     *value = tmp;
     return OK;
 }
+
+RetCode traceFileInput (char inputString[]){
+    if (alreadySetCheck(&tracefile_bool,tracefile_str) == ERR) return ERR;
+
+    // Edge case: ./r5mm -f -c 1234 examples/kurze_Eingabedatei_valid.csv, wäre sonst valide, weil
+    // als Argument von -f -c genommen wird. Dies würde zwar auch zu einem fehler führen, aber mit unpräziser Fehlernachricht
+    if (inputString[0]=='-') {
+        (void) fprintf(stderr,ERR_ILLEGAL_TRACEFILE_NAME);
+        return ERR;
+    }
+
+    // Erstellen der Datei, zur Überprüfung möglicher unzulässiger Dateinamen mit angehängtem '.vcd'
+    // vgl.: https://stackoverflow.com/questions/11836064/c-creating-new-file-extensions-based-on-a-filename
+    FILE *file = NULL;
+    tracefile = optarg;
+    char tracefile_tmp[strlen(optarg) + 5];
+
+    // NOLINTNEXTLINE: snprintf_s steht in dieser Umgebung nicht zur Verfügung
+    snprintf(tracefile_tmp, strlen(optarg) + 5, "%s.vcd", tracefile);
+
+    file = fopen(tracefile_tmp, "we");
+    if (file == NULL) {
+        (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_TRACEFILE);
+        return ERR;
+    }
+    if (fclose(file) != 0) {
+        (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_TRACEFILE);
+        return ERR;
+    }
+
+    // Löschen der Datei, falls es vor der Beendigung des Programs zu Fehlern kommt wird keine leere Datei ausgeben
+    remove(tracefile_tmp);
+    return OK;
+}
+
+// vgl. https://stackoverflow.com/questions/18079340/using-getopt-in-c-with-non-option-arguments
+RetCode positionalArgument (char *argv[], int argc, int pos) {
+    if (quickStart_bool == 0) {
+        if (pos == argc) {
+            (void) fprintf(stderr, ERR_NO_FILE_INPUT);
+            return ERR;
+        } else if (pos < argc - 1) {
+            (void) fprintf(stderr, ERR_TOO_MANY_OPTION);
+            return ERR;
+        } else {
+            inputfile = argv[pos];
+        }
+    }
+    return OK;
+}
+
+

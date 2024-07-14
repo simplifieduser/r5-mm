@@ -41,6 +41,7 @@
 #define ERR_ILLEGAL_ARGUMENT_CONVERSION(arg) "Fehler: Ungültiges Argument: Das Argument von '%s' konnte zu keinem Integer umgewandelt werden\n%s", arg, MSG_HINT
 #define ERR_ILLEGAL_ARGUMENT(arg,lowerBound,upperBound) "Fehler: Ungültiges Argument: Das Argument von '%s' muss im Interval [%u; %u] liegen\n%s", arg, lowerBound, upperBound,MSG_HINT
 #define ERR_AlREADY_SET(arg) "Fehler: '%s' wurde bereits gesetzt\n%s",arg,MSG_HINT
+#define ERR_ILLEGAL_TRACEFILE_NAME "Fehler: Ungültiges Argument: Das Argument von 'tracefile (-f/--tf)' darf nicht mit '-' beginnen\n%s",MSG_HINT
 
 
 
@@ -61,7 +62,7 @@
 "   -h, --help                 --------------------------------------------------   Gibt diese Nachricht aus\n" \
 "   -q, --quickStart           --------------------------------------------------   Setzt und überschreibt alle Parameter wie aus der folgenden beispiel Eingabe\n"\
 "\n"             \
-"Eine mögliche valide Eingabe wäre: ./r5mm -c 2000 --blocksize 16 --tlb-size=16 -t 2 --tf tracefile examples/kurzeEingabedatei_valid.csv"                 \
+"Eine mögliche valide Eingabe wäre: ./r5mm -c 2000 --blocksize 16 --tlb-size=16 -t 2 --tf tracefile examples/kurze_Eingabedatei_valid.csv"                 \
 "\n"\
 "Dieses Programm ist die Projektabgabe für das Fach 'Grundlagenpraktikum: Rechnerarchitektur', Projektaufgabe A14\n"                                                                   \
 "////////////////////////////////////////      r5mm:      ////////////////////////////////////////\n"
