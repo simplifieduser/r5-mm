@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // inputfile
+    // einlesen der Eingabe als positional Argument
     if (positionalArgument(argv,argc,optind)== ERR) return EXIT_FAILURE;
 
 
