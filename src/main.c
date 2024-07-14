@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
             v2bBlockOffset = 4;
             memoryLatency = 100;
             tracefile = "tracefile";
-            inputfile = "examples/kurzeEingabedatei_valid.csv";
+            inputfile = "examples/kurze_Eingabedatei_valid.csv";
             break;
         }
 
@@ -275,7 +275,7 @@ RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], 
 RetCode traceFileInput (char inputString[]){
     if (alreadySetCheck(&tracefile_bool,tracefile_str) == ERR) return ERR;
 
-    // Edge case: ./r5mm -f -c 1234 examples/kurzeEingabedatei_valid.csv, wäre sonst valide, weil
+    // Edge case: ./r5mm -f -c 1234 examples/kurze_Eingabedatei_valid.csv, wäre sonst valide, weil
     // als Argument von -f -c genommen wird. Dies würde zwar auch zu einem fehler führen, aber mit unpräziser Fehlernachricht
     if (inputString[0]=='-') {
         (void) fprintf(stderr,ERR_ILLEGAL_TRACEFILE_NAME);

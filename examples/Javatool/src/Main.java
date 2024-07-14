@@ -15,7 +15,7 @@ public class Main {
 
         try {
             // Best case
-            FileWriter bestcaseWriter = new FileWriter("../../optimalFall.csv");
+            FileWriter bestcaseWriter = new FileWriter("../../optimaler_Fall.csv");
             StringBuilder sbB = new StringBuilder();
             for (int i = 0; i < numberOfElements; i++) { // 1024 Integer pro 4KB-Seite -> 100 Seiten
                 sbB.append("R,0x").append(Integer.toHexString(4 * i)).append("\n");
@@ -24,7 +24,7 @@ public class Main {
             bestcaseWriter.close();
 
             // Worst case
-            FileWriter worstcaseWriter = new FileWriter("../../schlimmsterFall.csv");
+            FileWriter worstcaseWriter = new FileWriter("../../schlechtester_Fall.csv");
             StringBuilder sbW = new StringBuilder();
             for (int i = 0; i < numberOfElements; i++) { // 1 Integer Pro 4KB page-> 102400 Seiten
                 sbW.append("R,0x").append(Integer.toHexString(blocksize * i)).append("\n");
@@ -33,7 +33,7 @@ public class Main {
             worstcaseWriter.close();
 
             // Average case
-            FileWriter averagecaseWriter = new FileWriter("../../durchschnittlicherFall.csv");
+            FileWriter averagecaseWriter = new FileWriter("../../durchschnittlicher_schlechter_Fall.csv");
             Random rand = new Random(12);
             HashSet<Integer> visited = new HashSet<>();
             HashMap<Integer,Integer> eintraegeProSeite = new HashMap<>();
