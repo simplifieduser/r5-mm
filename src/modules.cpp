@@ -2,7 +2,7 @@
 
 Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsigned blocksize, unsigned v2bBlockOffset, unsigned memoryLatency, size_t numRequests, Request *requests, const char *tracefile)
 {
-    Result result;                         // Speichert Rückgabewerte
+    Result result;                            // Speichert Rückgabewerte
     std::vector<uint32_t> buffer(tlbSize); // Enthält alle aktuell im TLB gespeicherten Tags
     sc_clock clk;
 

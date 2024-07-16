@@ -29,6 +29,7 @@ RetCode getDataArg(FILE *file, uint32_t *res);
 
 int CORRECTED_CARR_RET = 0;  // Wird verwendet, um Korrektur von '\r' zu '\n' zu speichern
 
+// edge-case: Falls für Zeilenumbrüche im CSV-Standard '\r\n' oder '\r' verwendet wird
 int getNextChar(FILE *file) {
 
     // Wenn letzter char '\r', dann überspringe '\n'
@@ -308,6 +309,7 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode) {
             return ERR_NEWLINE;
         }
 
+        // TODO: MAX_ARG_LENGTH  SHOULD BE without -1 because of sep char
         if (i == MAX_ARG_LENGTH - 1 && current != ',') {
             // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
             free(address_string);
@@ -345,6 +347,7 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode) {
         address_int = strtol(address_string, &end, DEC_BASE);
     }
 
+    // TODO: Check if ERNO
     if (*end != '\0') {
         // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(address_string);

@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
     }
 
     // einlesen der Eingabe als positional Argument
-    if (positionalArgument(argv,argc,optind)== ERR) return EXIT_FAILURE;
+    if (positionalArgument(argv,argc,optind) == ERR) return EXIT_FAILURE;
 
 
 
@@ -239,10 +239,10 @@ RetCode alreadySetCheck(int *booleanValue, char errorMSG[]){
 }
 
 
-RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound, uint32_t *value) {
+RetCode inputConversion (int *booleanValue, char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound, uint32_t *value) {
 
     // Überprüfen, ob Option schon vorher gesetzt wird
-    if ( alreadySetCheck(booleanValue,errorMSG) == ERR) return ERR;
+    if (alreadySetCheck(booleanValue,errorMSG) == ERR) return ERR;
 
     // vgl. man strtol, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
     char *endptr = NULL;
@@ -264,7 +264,7 @@ RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], 
 
     // Nicht im Wertebereich
     // edge case: es war möglich eine sehr große negative Zahl zu übergeben, die strtol durch das zweierkomplement zu einer positiven umgewandelt hat, die dann im Wertebereich lag. Die Überprüfung auf negatives Vorzeichen behebt dies
-    if (inputString[0]=='-'||tmp < lowerBound || tmp > upperBound) {
+    if (inputString[0] == '-' || tmp < lowerBound || tmp > upperBound) {
         (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT(errorMSG, lowerBound, upperBound));
         return ERR;
     }
@@ -277,7 +277,7 @@ RetCode traceFileInput (char inputString[]){
 
     // Edge case: ./r5mm -f -c 1234 examples/kurze_Eingabedatei_valid.csv, wäre sonst valide, weil
     // als Argument von -f -c genommen wird. Dies würde zwar auch zu einem fehler führen, aber mit unpräziser Fehlernachricht
-    if (inputString[0]=='-') {
+    if (inputString[0] == '-') {
         (void) fprintf(stderr,ERR_ILLEGAL_TRACEFILE_NAME);
         return ERR;
     }
@@ -297,7 +297,7 @@ RetCode traceFileInput (char inputString[]){
         return ERR;
     }
     if (fclose(file) != 0) {
-        (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_TRACEFILE);
+        (void) fprintf(stderr, ERR_GENERAL_UNKNOWN);
         return ERR;
     }
 
