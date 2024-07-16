@@ -46,7 +46,7 @@
 
 
 #define HELP_MSG \
-"////////////////////////////////////////      r5mm:      ////////////////////////////////////////\n"  \
+"////////////////////////////////////////               r5mm               ////////////////////////////////////////\n"  \
 "\n"             \
 "Dieses Programm simuliert einen Translation Lookaside Buffer, mögliche Eingabedateien können in dem Verzeichnis examples gefunden werden oder mit dem Javaprogramm erstellt werden\n" \
 "\n"                              \
@@ -57,15 +57,16 @@
 "   -s, --tlb-size             64                           [0; 4294967295] uint    Gibt, wie viele Einträge der TLB gleichzeitig speichern kann\n" \
 "   -t, --tlb-latency          1                            [0; 4294967295] uint    Gibt die Latenzzeit des TLB in Zyklen an\n"                    \
 "   -m, --memory-latency       100                          [0; 4294967295] uint    Gibt die Latenzzeit des Hauptspeichers in Zyklen an\n"   \
-"   -f, --tf                   null                         <Dateiname>             Name der Ausgabedatei, falls ein Tracefile erstellt werden soll\n"                 \
-"   <Dateiname>                !muss immer gesetzt werden!  <Dateiname>             Name der Eingabedatei, mit den zu verarbeitenden Daten\n"\
-"   -h, --help                 --------------------------------------------------   Gibt diese Nachricht aus\n" \
-"   -q, --quickStart           --------------------------------------------------   Setzt und überschreibt alle Parameter wie aus der folgenden beispiel Eingabe\n"\
+"   -f, --tf                   null                         <Dateiname>             Name der Ausgabedatei, falls ein Tracefile erstellt werden soll; Dürfen nicht mit '-' beginnen\n"                 \
+"   <Dateiname>                !muss immer gesetzt werden!  <Dateiname>             Name der Eingabedatei, mit den zu verarbeitenden Daten; Dürfen nicht mit '-' beginnen\n"\
+"   -h, --help                 ---------------------------  ---------------------   Gibt diese Nachricht aus\n" \
+"   -q, --quickStart           ---------------------------  ---------------------   Setzt und überschreibt alle Parameter wie aus der folgenden beispiel Eingabe\n"\
 "\n"             \
 "Eine mögliche valide Eingabe wäre: ./r5mm -c 2000 --blocksize 16 --tlb-size=16 -t 2 --tf tracefile examples/kurze_Eingabedatei_valid.csv"                 \
 "\n"\
-"Dieses Programm ist die Projektabgabe für das Fach 'Grundlagenpraktikum: Rechnerarchitektur', Projektaufgabe A14\n"                                                                   \
-"////////////////////////////////////////      r5mm:      ////////////////////////////////////////\n"
+"Dieses Programm ist die Projektabgabe für das Fach 'Grundlagenpraktikum: Rechnerarchitektur', Projektaufgabe A14\n"\
+"\n"\
+"////////////////////////////////////////      Robert-5 Memory-Mapper      ////////////////////////////////////////\n"
 
 //                      //
 // REQUEST FILE PARSING //
