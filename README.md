@@ -1,5 +1,7 @@
 # Robert-5 Memory Mapper
 
+> Wie man die Simulation erstellen und ausführen kann, wird in [USAGE](USAGE.md) erklärt.
+
 ## Recherche-Ergebnisse
 
 Unsere Aufgabe besteht darin, einen Translation Lookaside Buffer (TLB) zu simulieren und damit das Speicherzugriffsverhalten einer Summe über einer verketteten Liste zu untersuchen. </br></br>
@@ -16,22 +18,17 @@ Im Allgemeinen kann man klar feststellen, dass bereits bei einer sehr kleinen TL
 
 - Logik der Simulation
 - Implementierung der Simulation in SystemC
-- Readme
+- Readme und Usage
 
 ### Jonah Zabel
 
 - Makefile
 - Request-File-Parsing
-- Testing für file_parser/system
+- Tests für file_parser und Simulation
 - Projekt Management
 
 ### Lukas Wolf
 
 - CLI
-- Testing für cli_parser
+- Tests für cli_parser
 - Recherche
-
-
-## Ausführung der Simluation
-
-Wie man die Simulation ausführen kann wird in Usage.md erklärt.
