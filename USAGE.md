@@ -5,7 +5,7 @@
 * C++-Version: 14
 * SystemC-Version: 2.3.3
 
-Die Makefile verwendet standardmäßig clang++ und clang. Möchte man eine andere Compiler verwendet, muss dies in der Makefile geändert werden.
+Die Makefile verwendet standardmäßig clang++ und clang. Möchte man einen anderen Compiler verwenden, muss dies in der Makefile geändert werden.
 Zudem muss die SystemC-Bibliothek installiert sein und die Umgebungsvariable `SYSTEMC_HOME` auf den Pfad zur SystemC-Bibliothek gesetzt sein.
 
 ## Erstellen
@@ -15,7 +15,7 @@ Die mitgelieferte Makefile kann verwendet werden, um das Programm zu erstellen. 
 ```bash
 make
 ```
-Alternative stehen folgende Ziele zur Verfügung:
+Alternativ stehen folgende Ziele zur Verfügung:
 * `release` erstellt das Programm mit den Standard-Optimierungen. _Dies ist das Standard-Ziel._
 * `debug` erstellt das Programm mit Debug-Informationen.
 * `clean` löscht alle erstellten Dateien.
@@ -39,7 +39,7 @@ Alternativ kann auch die Hilfe aufgerufen werden:
 ./r5-mm -h
 ```
 
-### Program Argumente
+### Programm Argumente
 Es können folgende Simulations-Optionen übergeben werden:
 
 | Optionen               | Standardwert                  | Mögliche Argumente   | Beschreibung                                                                                             |
@@ -47,7 +47,7 @@ Es können folgende Simulations-Optionen übergeben werden:
 | -c, --cylces           | 1000000                       | [0; 2147483647] int  | Gibt an, wie viele Zyklen simuliert werden sollen                                                        |
 | -b, --blocksize        | 4096                          | [1; 4294967295] uint | Gibt die Größe eines Speicherblockes in Byte an                                                          |
 | -o, --v2b-block-offset | 4                             | [0; 4294967295] uint | Gibt an, um wie viele Blöcke die physische Adresse verschoben wird um die virtuelle Adresse darzustellen |
-| -s, --tlb-size         | 64                            | [0; 4294967295] uint | Gibt, wie viele Einträge der TLB gleichzeitig speichern kann                                             |
+| -s, --tlb-size         | 64                            | [0; 4294967295] uint | Gibt an, wie viele Einträge der TLB gleichzeitig speichern kann                                             |
 | -t, --tlb-latency      | 1                             | [0; 4294967295] uint | Gibt die Latenzzeit des TLB in Zyklen an                                                                 |
 | -m, --memory-latency   | 100                           | [0; 4294967295] uint | Gibt die Latenzzeit des Hauptspeichers in Zyklen an                                                      |
 | -f, --tf               | null                          | &lt;Dateiname&gt;    | Name der Ausgabedatei, falls ein Tracefile erstellt werden soll                                          |
