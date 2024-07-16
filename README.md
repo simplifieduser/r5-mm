@@ -1,20 +1,5 @@
 # Robert-5 Memory Mapper
 
-## Ausführung der Simulation
-### Anforderungen
-- clang, clang++ installiert
-- SystemC library von C++ installiert
-- C-Version: 17
-- C++-Version: 14
-- SystemC-Version: 2.3.3
-
-### Verwendung
-- Sicherstellen, dass die environmental Variable SYSTEMC_HOME auf den korrekten Pfad zur SystemC library gesetzt ist.
-- Für den Build immer zuerst `make release` ausführen.
-- Um das Programm mit beispielhaften Werten zu testen, `./r5mm -q` oder `./r5mm --quickStart` ausführen.
-- Für genauere Details zu den Parametern und weiteren Optionen '-h / --help' verwenden.
-
-
 ## Recherche-Ergebnisse
 Unsere Aufgabe besteht darin, einen Translation Lookaside Buffer (TLB) zu simulieren und damit das Speicherzugriffsverhalten einer Summe über einer verketteten Liste zu untersuchen. </br></br>
 Üblicherweise hat eine TLB zwischen 16 und 512 Einträge, wobei ein geladener Block 4096 Byte groß ist. Dabei liegt die Hit-Rate zwischen 99% und 99,9% und die Zugriffszeit zum Hauptspeicher beträgt ca. 1 Zyklus. Eine übliche Zugriffszeit zum Hauptspeicher liegt bei ca. 100 Zyklen. </br></br>
@@ -40,3 +25,7 @@ Im Allgemeinen kann man klar feststellen, dass bereits bei einer sehr kleinen TL
 - CLI
 - Testing für cli_parser
 - Recherche
+
+
+## Ausführung der Simluation
+Wie man die Simulation ausführen kann wird in Install.md erklärt.
