@@ -64,5 +64,5 @@ Die Datei muss folgendes Format haben:
 
 Als Trennzeichen wird ein `,` (Komma) verwendet. Als Zeilenumbruch werden sowohl `\n`, `\r` als auch `\r\n` unterstützt.
 
-Einige Beispiel-Dateien lassen sich in [Examples](examples/) finden.
+Einige Beispiel-Dateien lassen sich in [Examples](examples) finden.
 
