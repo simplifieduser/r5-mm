@@ -1,13 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <errno.h>
 #include "shared.h"
 #include "file_parser.h"
 
 // Wird zur Bestimmung des Erfolgs der Zusatzfunktionen für Argumente verwendet
 enum RetCode {
-    OK_READ, OK_WRITE, OK_EOF,                                                    // Codes, die ausschließlich von getREArg verwendet werden
-    OK, ERR_ALLOC, ERR_FOPEN, ERR_EOF, ERR_NEWLINE, ERR_INVARG, ERR_TOOMANY       // Codes, die von allen anderen Argumenten verwendet werden
+    OK_READ, OK_WRITE, OK_EOF,                                                                    // Codes, die ausschließlich von getREArg verwendet werden
+    OK, ERR_ALLOC, ERR_FOPEN, ERR_EOF, ERR_NEWLINE, ERR_WHITESPACE, ERR_INVARG, ERR_TOOMANY       // Codes, die von allen anderen Argumenten verwendet werden
 } typedef RetCode;
 
 // Wird für Fehler-Meldungen verwendet
@@ -53,7 +54,7 @@ int getNextChar(FILE *file) {
 
 }
 
-void printError(RetCode code, Argument arg, const char* val, size_t line) {
+void printError(RetCode code, Argument arg, const char *val, size_t line) {
 
     switch (code) {
         case ERR_ALLOC:
@@ -67,6 +68,9 @@ void printError(RetCode code, Argument arg, const char* val, size_t line) {
             break;
         case ERR_NEWLINE:
             (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE(val, line));
+            break;
+        case ERR_WHITESPACE:
+            (void) fprintf(stderr, ERR_FILE_WHITE_SPACE(line));
             break;
         case ERR_INVARG:
 
@@ -95,7 +99,7 @@ void printError(RetCode code, Argument arg, const char* val, size_t line) {
     }
 }
 
-int parseFile(const char *path, size_t* requestCount, Request **requests) {
+int parseFile(const char *path, size_t *requestCount, Request **requests) {
 
     // Initialisiere Pointer
     uint32_t *address = malloc(sizeof(uint32_t));
@@ -286,6 +290,11 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode) {
             return ERR_EOF;
         }
 
+        if (current == ' ') {
+            free(address_string);
+            return ERR_WHITESPACE;
+        }
+
         // Wenn neue Zeile im Lesemodus → gültig
         if (current == '\n' && mode == OK_READ) {
 
@@ -309,9 +318,9 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode) {
             return ERR_NEWLINE;
         }
 
-        // TODO: MAX_ARG_LENGTH  SHOULD BE without -1 because of sep char
-        if (i == MAX_ARG_LENGTH - 1 && current != ',') {
+        if (i >= MAX_ARG_LENGTH - 1 && current != ',') {
             // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
+            printf("TEST 2");
             free(address_string);
             return ERR_INVARG;
         }
@@ -338,7 +347,8 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode) {
 
     // string in int konvertieren
 
-    uint32_t address_int = 0;
+    long address_int = 0;
+    errno = 0;
     char *end = NULL;
 
     if (address_string[0] == '0' && address_string[1] == 'x') {
@@ -347,8 +357,7 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode) {
         address_int = strtol(address_string, &end, DEC_BASE);
     }
 
-    // TODO: Check if ERNO
-    if (*end != '\0') {
+    if (errno || *end != '\0') {
         // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(address_string);
         return ERR_INVARG;
@@ -361,7 +370,7 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode) {
     }
 
     // Adresse zurückgeben
-    *res = address_int;
+    *res = (uint32_t) address_int;
     free(address_string);
     return OK;
 
@@ -389,6 +398,11 @@ RetCode getDataArg(FILE *file, uint32_t *res) {
             // PARSE-FEHLER: VORZEITIGES DATEIENDE
             free(data_string);
             return ERR_EOF;
+        }
+
+        if (current == ' ') {
+            free(data_string);
+            return ERR_WHITESPACE;
         }
 
         if (current == ',') {
@@ -425,7 +439,8 @@ RetCode getDataArg(FILE *file, uint32_t *res) {
 
     // string in int konvertieren
 
-    uint32_t data_int = 0;
+    long data_int = 0;
+    errno = 0;
     char *end = NULL;
 
     if (data_string[0] == '0' && data_string[1] == 'x') {
@@ -434,7 +449,7 @@ RetCode getDataArg(FILE *file, uint32_t *res) {
         data_int = strtol(data_string, &end, DEC_BASE);
     }
 
-    if (*end != '\0') {
+    if (errno || *end != '\0') {
         // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(data_string);
         return ERR_INVARG;
@@ -447,7 +462,7 @@ RetCode getDataArg(FILE *file, uint32_t *res) {
     }
 
     // Adresse zurückgeben
-    *res = data_int;
+    *res = (uint32_t) data_int;
     free(data_string);
     return OK;
 

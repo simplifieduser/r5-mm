@@ -73,6 +73,7 @@
 
 #define ERR_FILE_PREMATURE_END_OF_FILE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde '%s', jedoch Ende der Datei gefunden\n", line, arg
 #define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde '%s', jedoch neue Zeile gefunden\n", line, arg
+#define ERR_FILE_WHITE_SPACE(line) "Fehler: Request-Datei ungültig: Zeile %zu - Leerzeichen sind nicht erlaubt\n", line
 #define ERR_FILE_INVALID_ARG_RW(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'write_enable' muss einer der Werte [r,w,R,W] sein\n", line
 #define ERR_FILE_INVALID_ARG_ADDR(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'address' muss ein Integer im Interval [0; 4294967295] sein\n", line
 #define ERR_FILE_INVALID_ARG_DATA(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'write_data' muss ein Integer im Interval [0; 4294967295] sein\n", line
