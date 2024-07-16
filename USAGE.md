@@ -11,10 +11,14 @@ Zudem muss die SystemC-Bibliothek installiert sein und die Umgebungsvariable `SY
 ## Erstellen
 > Die `SYSTEMC_HOME`-Umgebungsvariable muss auf den Pfad zur SystemC-Bibliothek gesetzt sein, damit das Programm erstellt werden kann.
 
-Die mitgelieferte Makefile kann verwendet werden, um das Programm zu erstellen. Es gibt dabei verschiedene Ziele:
-* `make release` erstellt das Programm mit den Standard-Optimierungen. Dies ist das Standard-Ziel.
-* `make debug` erstellt das Programm mit Debug-Informationen.
-* `make clean` löscht alle erstellten Dateien.
+Die mitgelieferte Makefile kann verwendet werden, um das Programm zu erstellen. Dazu wird folgender Befehl ausgeführt:
+```bash
+make
+```
+Alternative stehen folgende Ziele zur Verfügung:
+* `release` erstellt das Programm mit den Standard-Optimierungen. _Dies ist das Standard-Ziel._
+* `debug` erstellt das Programm mit Debug-Informationen.
+* `clean` löscht alle erstellten Dateien.
 
 ## Verwendung
 
