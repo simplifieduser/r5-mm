@@ -34,4 +34,4 @@ Im Allgemeinen kann man klar feststellen, dass bereits bei einer sehr kleinen TL
 
 ## Ausführung der Simluation
 
-Wie man die Simulation ausführen kann wird in Install.md erklärt.
+Wie man die Simulation ausführen kann wird in Usage.md erklärt.
