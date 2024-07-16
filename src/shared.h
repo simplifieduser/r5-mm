@@ -2,7 +2,7 @@
 #define SHARED_H
 
 //hint
-#define MSG_HINT "Hinweis: Verwenden Sie '-h/--help', um weiter Informationen bezüglich möglicher Argumente und ihrer Benutzung zu erhalten"
+#define MSG_HINT "Hinweis: Verwenden Sie '-h/--help', um weiter Informationen bezüglich möglicher Argumente und ihrer Benutzung zu erhalten\n"
 
 //             //
 //   GENERAL   //
@@ -10,56 +10,73 @@
 
 #define ERR_GENERAL_UNKNOWN "Fehler: Es ist ein unerwarteter Fehler aufgetreten\n"
 #define ERR_GENERAL_MEMORY_ALLOCATION_ERROR "Fehler: Es konnte kein Speicher alloziert werden\n"
-#define ERR_GENERAL_CANT_OPEN_FILE(file) "Fehler: Die Datei %s konnte nicht geöffnet werden\n", file
+#define ERR_GENERAL_CANT_OPEN_FILE(file) "Fehler: Die Datei '%s' konnte nicht geöffnet werden\n", file
+
+//                  //
+// ARGUMENT STRING  //
+//                  //
+
+#define cycle_str "cycles (-c/--cycles)"
+#define blocksize_str "blocksize (-b/--blocksize)"
+#define v2b_block_offset_str "v2b-block-offset (-o/--v2b-block-offset)"
+#define tlb_size_str "tlb-size (-s/--tlb-size)"
+#define tlb_latency_str "tlb-latency (-t/--tlb-latency)"
+#define memory_latency_str "memory-latency (-m/--memory-latency)"
+#define tracefile_str "tracefile (-f/--tf)"
+
 
 
 //                  //
 // ARGUMENT PARSING //
 //                  //
 
-#define ARG_INT_MAX "2147483647"
-#define ARG_UINT_MAX "4294967295"
-
 // invalid arguments
-#define ERR_UNKNOWN_OPTION "Fehler: Es wurde eine unbekannte Option übergeben, bitte entferne: "
-#define ERR_TOO_MANY_OPTION "Fehler: Es wurden zu viele Optionen übergeben"
-#define ERR_NO_REQUIRED_ARGUMENT "Fehler: Folgende Option benötigt ein Argument: "
+#define ERR_UNKNOWN_OPTION "Fehler: Es wurde eine unbekannte Option übergeben\n%s", MSG_HINT
+#define ERR_TOO_MANY_OPTION "Fehler: Es wurden zu viele Optionen übergeben\n%s", MSG_HINT
+#define ERR_NO_REQUIRED_ARGUMENT(arg) "Fehler: Folgende Option benötigt ein Argument: %s\n%s", arg, MSG_HINT
 
 // illegal arguments
-#define ERR_NO_FILE_INPUT "Fehler: Ungültiges Argument: Es muss eine Eingabedatei als Positional Argument übergeben werden"
-#define ERR_ILLEGAL_ARGUMENT_CYCLES "Fehler: Ungültiges Argument: 'cycles (-c/--cycles)' muss ein Integer im Interval [0; " ARG_INT_MAX "] sein"
-#define ERR_ILLEGAL_ARGUMENT_BLOCKSIZE "Fehler: Ungültiges Argument: 'blocksize (-b/--blocksize)' muss ein Integer im Interval [1; " ARG_UINT_MAX "] sein"
-#define ERR_ILLEGAL_ARGUMENT_V2B_BLOCK_OFFSET "Fehler: Ungültiges Argument: 'v2b-block-offset (-o/--v2b-block-offset)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
-#define ERR_ILLEGAL_ARGUMENT_TLB_SIZE "Fehler: Ungültiges Argument: 'tlb-size (-s/--tlb-size)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
-#define ERR_ILLEGAL_ARGUMENT_TLB_LATENCY "Fehler: Ungültiges Argument: 'tlb-latency (-t/--tlb-latency)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
-#define ERR_ILLEGAL_ARGUMENT_MEMORY_LATENCY "Fehler: Ungültiges Argument: 'memory-latency (-m/--memory-latency)' muss ein Integer im Interval [0; " ARG_UINT_MAX "] sein"
-#define ERR_ILLEGAL_ARGUMENT_TRACEFILE "Fehler: Ungültiges Argument: 'tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden"
+#define ERR_NO_FILE_INPUT "Fehler: Ungültiges Argument: Es muss eine Eingabedatei als positional Argument übergeben werden\n%s", MSG_HINT
+#define ERR_ILLEGAL_ARGUMENT_TRACEFILE "Fehler: Ungültiges Argument: 'tracefile (-f/--tf)' es konnte keine Datei mit diesem Namen erstellt werden\n%s", MSG_HINT
+#define ERR_ILLEGAL_ARGUMENT_CONVERSION(arg) "Fehler: Ungültiges Argument: Das Argument von '%s' konnte zu keinem Integer umgewandelt werden\n%s", arg, MSG_HINT
+#define ERR_ILLEGAL_ARGUMENT(arg,lowerBound,upperBound) "Fehler: Ungültiges Argument: Das Argument von '%s' muss im Interval [%u; %u] liegen\n%s", arg, lowerBound, upperBound,MSG_HINT
+#define ERR_AlREADY_SET(arg) "Fehler: '%s' wurde bereits gesetzt\n%s",arg,MSG_HINT
+#define ERR_ILLEGAL_TRACEFILE_NAME "Fehler: Ungültiges Argument: Das Argument von 'tracefile (-f/--tf)' darf nicht mit '-' beginnen\n%s",MSG_HINT
 
 
 
 #define HELP_MSG \
-"Verwendung: r5mm\n"  \
+"////////////////////////////////////////      r5mm:      ////////////////////////////////////////\n"  \
 "\n"             \
-"Beschreibung: -----TO ´°_°` BE CONTINUED\n" \
+"Dieses Programm simuliert einen Translation Lookaside Buffer, mögliche Eingabedateien können in dem Verzeichnis examples gefunden werden oder mit dem Javaprogramm erstellt werden\n" \
+"\n"                              \
 "Optionen:                     Standardwert:                mögliche Argumente:     Beschreibung:\n"     \
-"   -c, --cycles               10000                        [0; 2147483647] int     Gibt an, wie viele Zyklen simuliert werden sollen\n" \
-"   -b, --blocksize            4                            [1; 4294967295] uint    Gibt die Größe eines Speicherblockes in Byte an\n"                         \
+"   -c, --cycles               1000000                      [0; 2147483647] int     Gibt an, wie viele Zyklen simuliert werden sollen\n" \
+"   -b, --blocksize            4096                         [1; 4294967295] uint    Gibt die Größe eines Speicherblockes in Byte an\n"                         \
 "   -o, --v2b-block-offset     4                            [0; 4294967295] uint    Gibt an, um wie viele Blöcke die physische Adresse verschoben wird um die virtuelle Adresse darzustellen\n" \
 "   -s, --tlb-size             64                           [0; 4294967295] uint    Gibt, wie viele Einträge der TLB gleichzeitig speichern kann\n" \
 "   -t, --tlb-latency          1                            [0; 4294967295] uint    Gibt die Latenzzeit des TLB in Zyklen an\n"                    \
 "   -m, --memory-latency       100                          [0; 4294967295] uint    Gibt die Latenzzeit des Hauptspeichers in Zyklen an\n"   \
 "   -f, --tf                   null                         <Dateiname>             Name der Ausgabedatei, falls ein Tracefile erstellt werden soll\n"                 \
 "   <Dateiname>                !muss immer gesetzt werden!  <Dateiname>             Name der Eingabedatei, mit den zu verarbeitenden Daten\n"\
-"   -h, --help                --------------------------------------------------    Gibt diese Nachricht aus\n"
-
+"   -h, --help                 --------------------------------------------------   Gibt diese Nachricht aus\n" \
+"   -q, --quickStart           --------------------------------------------------   Setzt und überschreibt alle Parameter wie aus der folgenden beispiel Eingabe\n"\
+"\n"             \
+"Eine mögliche valide Eingabe wäre: ./r5mm -c 2000 --blocksize 16 --tlb-size=16 -t 2 --tf tracefile examples/kurze_Eingabedatei_valid.csv"                 \
+"\n"\
+"Dieses Programm ist die Projektabgabe für das Fach 'Grundlagenpraktikum: Rechnerarchitektur', Projektaufgabe A14\n"                                                                   \
+"////////////////////////////////////////      r5mm:      ////////////////////////////////////////\n"
 
 //                      //
 // REQUEST FILE PARSING //
 //                      //
 
-#define ERR_FILE_PREMATURE_END_OF_FILE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde %s, jedoch Ende der Datei gefunden\n", line, arg
-#define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde %s, jedoch neue Zeile gefunden\n", line, arg
-#define ERR_FILE_INVALID_ARG(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Angegebener Wert, ist nicht valide für %s\n", line, arg
+#define ERR_FILE_PREMATURE_END_OF_FILE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde '%s', jedoch Ende der Datei gefunden\n", line, arg
+#define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde '%s', jedoch neue Zeile gefunden\n", line, arg
+#define ERR_FILE_INVALID_ARG_RW(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'write_enable' muss einer der Werte [r,w,R,W] sein\n", line
+#define ERR_FILE_INVALID_ARG_ADDR(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'address' muss ein Integer im Interval [0; 4294967295] sein\n", line
+#define ERR_FILE_INVALID_ARG_DATA(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'write_data' muss ein Integer im Interval [0; 4294967295] sein\n", line
+
 #define ERR_FILE_TOO_MANY_ARGS(line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n", line
 
 

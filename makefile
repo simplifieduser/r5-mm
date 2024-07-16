@@ -68,10 +68,9 @@ TIDYFLAGS := -checks=bugprone,cppcoreguidelines,clang-analyzer,performance,porta
 CHECKFLAGS := -fsyntax-only -Wall -Wextra -Wpedantic
 CHECKFLAGS += -Wno-unused-but-set-variable -Wno-unused-parameter   # Benötigt, da sonst systemc immer Fehler wirft
 
-ifdef TEST_BUILD
-  LDFLAGS += -fsanitize=undefined,address
+ifdef ERROR_ON_LINT
   TIDYFLAGS += --warnings-as-errors=*
-	CHECKFLAGS += -Werror
+  CHECKFLAGS += -Werror
 endif
 
 
@@ -85,9 +84,9 @@ endif
 all: debug
 
 # Debug target
-debug: CFLAGS += -g -Wall -Wextra
-debug: CXXFLAGS += -g -Wall -Wextra
-debug: LDFLAGS += -g
+debug: CFLAGS += -g -Wall -Wextra -Wno-unused-but-set-variable -Wno-unused-parameter -D DEBUG_BUILD
+debug: CXXFLAGS += -g -Wall -Wextra -Wno-unused-but-set-variable -Wno-unused-parameter -D DEBUG_BUILD
+debug: LDFLAGS += -g -fsanitize=undefined,address
 debug: $(DIST)/$(TARGET)
 
 # Release target
