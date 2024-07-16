@@ -9,10 +9,10 @@
 - SystemC-Version: 2.3.3
 
 ### Verwendung
-- Sicherstellen, dass die environmental Variable SYSTEMC_HOME auf den korrekten Pfad zur SystemC library gesetzt ist.
-- Für den Build, zuerst immer `make release` ausführen.
-- Um das Programm mit beispielhaften Werten zu testen, `./r5mm -q` oder `./r5mm --quickStart` ausführen
-- Für genauere Details zu den Parametern und weiteren Optionen benutze die Flag -h oder --help
+- Stellen Sie sicher, dass die environmental Variable SYSTEMC_HOME auf den korrekten Pfad zur SystemC library gesetzt ist.
+- Führen Sie für den Build zuerst immer `make release` aus.
+- Um das Programm mit beispielhaften Werten zu testen, führen Sie `./r5mm -q` oder `./r5mm --quickStart` aus.
+- Für genauere Details zu den Parametern und weiteren Optionen verwenden Sie '-h/--help'.
 
 
 ## Recherche-Ergebnisse
