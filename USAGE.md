@@ -64,5 +64,5 @@ Die Datei muss folgendes Format haben:
 
 Als Trennzeichen wird ein `,` (Komma) verwendet. Als Zeilenumbruch werden sowohl `\n`, `\r` als auch `\r\n` unterstützt.
 
-Eine Beispiel-Datei lässt sich unter [Examples](examples/kurze_Eingabedatei_valid.csv) finden.
+Eine Beispiel-Datei lässt sich in [Examples](examples) finden.
 
