@@ -1,6 +1,7 @@
 # Robert-5 Memory Mapper
 
 ## Recherche-Ergebnisse
+
 Unsere Aufgabe besteht darin, einen Translation Lookaside Buffer (TLB) zu simulieren und damit das Speicherzugriffsverhalten einer Summe über einer verketteten Liste zu untersuchen. </br></br>
 Üblicherweise hat eine TLB zwischen 16 und 512 Einträge, wobei ein geladener Block 4096 Byte groß ist. Dabei liegt die Hit-Rate zwischen 99% und 99,9% und die Zugriffszeit zum Hauptspeicher beträgt ca. 1 Zyklus. Eine übliche Zugriffszeit zum Hauptspeicher liegt bei ca. 100 Zyklen. </br></br>
 Um die Effizienz und Ausführungszeit des TLBs zu untersuchen, haben wir die Größe des TLBs, sowie die Anordnung von 102400 Daten variiert. Ohne TLB liegt die Zugriffszeit auf diese Daten bei nahezu 21 Millionen Zyklen. </br></br>
@@ -10,22 +11,27 @@ Die schlechtmöglichste Verteilung der Daten, die mit einem Eintrag pro Seite au
 Im Allgemeinen kann man klar feststellen, dass bereits bei einer sehr kleinen TLB-Größe die Zugriffszeit auf die Daten durch den TLB erheblich verringert wird. Dadurch wird erkenntlich, wie wichtig ein solcher Translation Lookaside Buffer ist, um die Performanz von Speicherzugriffen zu verbessern.
 
 ## Beitrag der Gruppenmitglieder
+
 ### Elena Reinbold Fraire
+
 - Logik der Simulation
 - Implementierung der Simulation in SystemC
 - Readme
 
 ### Jonah Zabel
+
 - Makefile
 - Request-File-Parsing
 - Testing für file_parser/system
 - Projekt Management
 
 ### Lukas Wolf
+
 - CLI
 - Testing für cli_parser
 - Recherche
 
 
 ## Ausführung der Simluation
+
 Wie man die Simulation ausführen kann wird in Install.md erklärt.
