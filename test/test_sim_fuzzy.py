@@ -66,6 +66,7 @@ def generate_edge_case_command():
 @pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(10)])
 def test_fuzzy(requests, command):
 
+    random.seed(0)
     generate_valid_file("./test.csv", requests)
     process = subprocess.run(command, stdout=subprocess.PIPE, text=True)
     assert process.returncode == 0
@@ -75,6 +76,7 @@ def test_fuzzy(requests, command):
 @pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(19)])
 def test_edge_cases(requests, command):
 
+    random.seed(0)
     generate_valid_file("./test.csv", requests)
     process = subprocess.run(command, stdout=subprocess.PIPE, text=True)
     assert process.returncode == 0

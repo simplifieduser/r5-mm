@@ -27,6 +27,7 @@ def generate_valid_command():
 
 @pytest.mark.parametrize("command", [generate_valid_command() for _ in range(1000)])
 def test_valid(command):
+    random.seed(0)
     args, values = command
     process = subprocess.run(args, stdout=subprocess.PIPE, text=True)
     assert process.returncode == 0
@@ -141,5 +142,6 @@ def generate_invalid_command():
 
 @pytest.mark.parametrize("command", [generate_invalid_command() for _ in range(1000)])
 def test_invalid(command):
+    random.seed(0)
     process = subprocess.run(command, text=True, shell=True)
     assert process.returncode == 1
