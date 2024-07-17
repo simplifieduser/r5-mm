@@ -42,16 +42,18 @@ Alternativ kann auch die Hilfe aufgerufen werden:
 ### Programm Argumente
 Es können folgende Simulations-Optionen übergeben werden:
 
+> Die übergebenen Dateinamen dürfen nicht mit `-` beginnen und führen in diesem Fall zu einem Fehler.
+
 | Optionen               | Standardwert                  | Mögliche Argumente   | Beschreibung                                                                                             |
 |------------------------|-------------------------------|----------------------|----------------------------------------------------------------------------------------------------------|
 | -c, --cylces           | 1000000                       | [0; 2147483647] int  | Gibt an, wie viele Zyklen simuliert werden sollen                                                        |
 | -b, --blocksize        | 4096                          | [1; 4294967295] uint | Gibt die Größe eines Speicherblockes in Byte an                                                          |
 | -o, --v2b-block-offset | 4                             | [0; 4294967295] uint | Gibt an, um wie viele Blöcke die physische Adresse verschoben wird um die virtuelle Adresse darzustellen |
-| -s, --tlb-size         | 64                            | [0; 4294967295] uint | Gibt an, wie viele Einträge der TLB gleichzeitig speichern kann                                             |
+| -s, --tlb-size         | 64                            | [0; 4294967295] uint | Gibt an, wie viele Einträge der TLB gleichzeitig speichern kann                                          |
 | -t, --tlb-latency      | 1                             | [0; 4294967295] uint | Gibt die Latenzzeit des TLB in Zyklen an                                                                 |
 | -m, --memory-latency   | 100                           | [0; 4294967295] uint | Gibt die Latenzzeit des Hauptspeichers in Zyklen an                                                      |
-| -f, --tf               | null                          | &lt;Dateiname&gt;    | Name der Ausgabedatei, falls ein Tracefile erstellt werden soll                                          |
-| &lt;Dateiname&gt;      | **muss immer gesetzt werden** | &lt;Dateiname&gt;    | Name der Eingabedatei, mit den zu verarbeitenden Daten                                                   |
+| -f, --tf               | null                          | &lt;Dateiname&gt;    | Name der Ausgabedatei, falls ein Tracefile erstellt werden soll; Dürfen nicht mit '-' beginnen           |
+| &lt;Dateiname&gt;      | **muss immer gesetzt werden** | &lt;Dateiname&gt;    | Name der Eingabedatei, mit den zu verarbeitenden Daten; ; Dürfen nicht mit '-' beginnen                  |
 
 ### Request-Datei
 
