@@ -81,7 +81,7 @@ endif
 .PHONY: all debug release tidy clean
 
 # Default target
-all: debug
+all: release
 
 # Debug target
 debug: CFLAGS += -g -Wall -Wextra -Wno-unused-but-set-variable -Wno-unused-parameter -D DEBUG_BUILD
