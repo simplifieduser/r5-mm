@@ -31,7 +31,7 @@
 //                  //
 
 // invalid arguments
-#define ERR_UNKNOWN_OPTION "Fehler: Es wurde eine unbekannte Option übergeben\n%s", MSG_HINT
+#define ERR_UNKNOWN_OPTION "Fehler: Es wurde eine unbekannte Option übergeben; Die Eingabedatei darf nicht mit '-' beginnen\n%s", MSG_HINT
 #define ERR_TOO_MANY_OPTION "Fehler: Es wurden zu viele Optionen übergeben\n%s", MSG_HINT
 #define ERR_NO_REQUIRED_ARGUMENT(arg) "Fehler: Folgende Option benötigt ein Argument: %s\n%s", arg, MSG_HINT
 
@@ -46,7 +46,7 @@
 
 
 #define HELP_MSG \
-"////////////////////////////////////////      r5mm:      ////////////////////////////////////////\n"  \
+"////////////////////////////////////////               r5mm               ////////////////////////////////////////\n"  \
 "\n"             \
 "Dieses Programm simuliert einen Translation Lookaside Buffer, mögliche Eingabedateien können in dem Verzeichnis examples gefunden werden oder mit dem Javaprogramm erstellt werden\n" \
 "\n"                              \
@@ -57,15 +57,16 @@
 "   -s, --tlb-size             64                           [0; 4294967295] uint    Gibt, wie viele Einträge der TLB gleichzeitig speichern kann\n" \
 "   -t, --tlb-latency          1                            [0; 4294967295] uint    Gibt die Latenzzeit des TLB in Zyklen an\n"                    \
 "   -m, --memory-latency       100                          [0; 4294967295] uint    Gibt die Latenzzeit des Hauptspeichers in Zyklen an\n"   \
-"   -f, --tf                   null                         <Dateiname>             Name der Ausgabedatei, falls ein Tracefile erstellt werden soll\n"                 \
-"   <Dateiname>                !muss immer gesetzt werden!  <Dateiname>             Name der Eingabedatei, mit den zu verarbeitenden Daten\n"\
-"   -h, --help                 --------------------------------------------------   Gibt diese Nachricht aus\n" \
-"   -q, --quickStart           --------------------------------------------------   Setzt und überschreibt alle Parameter wie aus der folgenden beispiel Eingabe\n"\
+"   -f, --tf                   null                         <Dateiname>             Name der Ausgabedatei, falls ein Tracefile erstellt werden soll; Dürfen nicht mit '-' beginnen\n"                 \
+"   <Dateiname>                !muss immer gesetzt werden!  <Dateiname>             Name der Eingabedatei, mit den zu verarbeitenden Daten; Dürfen nicht mit '-' beginnen\n"\
+"   -h, --help                 ---------------------------  ---------------------   Gibt diese Nachricht aus\n" \
+"   -q, --quickStart           ---------------------------  ---------------------   Setzt und überschreibt alle Parameter wie aus der folgenden beispiel Eingabe\n"\
 "\n"             \
 "Eine mögliche valide Eingabe wäre: ./r5mm -c 2000 --blocksize 16 --tlb-size=16 -t 2 --tf tracefile examples/kurze_Eingabedatei_valid.csv"                 \
 "\n"\
-"Dieses Programm ist die Projektabgabe für das Fach 'Grundlagenpraktikum: Rechnerarchitektur', Projektaufgabe A14\n"                                                                   \
-"////////////////////////////////////////      r5mm:      ////////////////////////////////////////\n"
+"Dieses Programm ist die Projektabgabe für das Fach 'Grundlagenpraktikum: Rechnerarchitektur', Projektaufgabe A14\n"\
+"\n"\
+"////////////////////////////////////////      Robert-5 Memory-Mapper      ////////////////////////////////////////\n"
 
 //                      //
 // REQUEST FILE PARSING //
@@ -73,6 +74,7 @@
 
 #define ERR_FILE_PREMATURE_END_OF_FILE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde '%s', jedoch Ende der Datei gefunden\n", line, arg
 #define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde '%s', jedoch neue Zeile gefunden\n", line, arg
+#define ERR_FILE_WHITE_SPACE(line) "Fehler: Request-Datei ungültig: Zeile %zu - Leerzeichen sind nicht erlaubt\n", line
 #define ERR_FILE_INVALID_ARG_RW(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'write_enable' muss einer der Werte [r,w,R,W] sein\n", line
 #define ERR_FILE_INVALID_ARG_ADDR(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'address' muss ein Integer im Interval [0; 4294967295] sein\n", line
 #define ERR_FILE_INVALID_ARG_DATA(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'write_data' muss ein Integer im Interval [0; 4294967295] sein\n", line
