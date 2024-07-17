@@ -53,7 +53,7 @@ Es können folgende Simulations-Optionen übergeben werden:
 | -t, --tlb-latency      | 1                             | [0; 4294967295] uint | Gibt die Latenzzeit des TLB in Zyklen an                                                                 |
 | -m, --memory-latency   | 100                           | [0; 4294967295] uint | Gibt die Latenzzeit des Hauptspeichers in Zyklen an                                                      |
 | -f, --tf               | null                          | &lt;Dateiname&gt;    | Name der Ausgabedatei, falls ein Tracefile erstellt werden soll; Dürfen nicht mit '-' beginnen           |
-| &lt;Dateiname&gt;      | **muss immer gesetzt werden** | &lt;Dateiname&gt;    | Name der Eingabedatei, mit den zu verarbeitenden Daten; ; Dürfen nicht mit '-' beginnen                  |
+| &lt;Dateiname&gt;      | **muss immer gesetzt werden** | &lt;Dateiname&gt;    | Name der Eingabedatei, mit den zu verarbeitenden Daten; Dürfen nicht mit '-' beginnen                    |
 
 ### Request-Datei
 
