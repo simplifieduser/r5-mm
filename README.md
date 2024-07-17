@@ -4,18 +4,19 @@
 
 ## Recherche-Ergebnisse
 
-In modernen Prozessoren ist eine kurze Zugriffszeit auf Daten, welche nicht in den Registern
-geladen sind essenziell. Um die Übersetzung von virtuellen auf physikalische Adressen zu
-beschleunigen, wird ein Translation Lookaside Buffer (TLB) verwendet. Dieser speichert als
-Mengenassoziativ Cache 16 - 512 Adresspaare, wobei jede Adresse eine Referenz auf eine 4 KiB
-Seite in Hauptspeicher ist. Durch die Hit-Rate von über 99% und die geringe Zugriffszeit von 1
-Zyklus ist der TLB erheblich schneller als ein Zugriff auf den Hauptspeicher, welcher über 100 Zyklen
+In modernen Prozessoren ist eine kurze Zugriffszeit auf Daten, welche im Hauptspeicher gespeichert
+sind essenziell. Um die Übersetzungszeit zwischen virtuellen und physischen Seiten zu beschleunigen 
+kann ein Translation Lookaside Buffer (TLB) verwendet werden. Dieser speichert als
+Mengenassoziativer Cache 16 - 512 Adresspaare, welche eine Referenz auf eine 4 KiB
+Seite in Hauptspeicher sind. Durch Hit-Raten von über 99% und einer geringen Zugriffszeit von 1
+Zyklus ist der TLB erheblich schneller als ein Hauptspeicherzugriff, welcher über 100 Zyklen
 benötigt.
 
 In unserem Fallbeispiel wurde anhand eines direktabbildenden TLB das Speicherzugriffsverhalten
 einer Summe über eine verkettete Liste bei zunehmender Größe des TLB untersucht.
 Hierbei wurden 102400 Integer über den Hauptspeicher verteilt und sowohl die Ausführungszeit, als
 auch die Hit-Rate beim Zugriff auf diese Daten gemessen.
+
 Bei optimaler Verteilung befinden sich die Daten chronologisch auf 100 Seiten im Hauptspeicher.
 Hierbei wird bereits bei einer TLB-Größe von 1 eine Hit-Rate von 99,9% erreicht und die
 Simulationszeit um fast 50% gesenkt. Mit zunehmender Größe des TLB bleiben diese Werte jedoch
@@ -32,10 +33,11 @@ gegen Ende sowohl bei der Versuchsreihe mit 128 als auch bei der mit 512 Seiten 
 
 Lediglich die Versuchsreihe mit 1024 Seiten konnte selbst bei einer TLB-Größe von 512 nur eine Hit-Rate
 von 93% erreichen.
-Im Allgemeinen kann man klar feststellen, dass bereits bei einer sehr kleinen TLB-Größe die
-Zugriffszeit auf die Daten durch den TLB erheblich verringert wird. Dadurch wird erkenntlich, wie
-wichtig ein solcher Translation Lookaside Buffer ist, um die Performanz von Speicherzugriffen zu
-verbessern.
+
+Sollten die Daten sehr schlecht im Speicher verteilt sein, ein Datum pro Seite, dann hätte der TLB eine negative
+Auswirkung auf die Laufzeit (vgl. Diagramme in den PDF-Slides).
+
+Es zeigt sich, dass bereits ein sehr kleiner TLB bei gutem Speichermanagement die Zugriffszeit auf die Daten erheblich verringert.
 
 ## Beitrag der Gruppenmitglieder
 
