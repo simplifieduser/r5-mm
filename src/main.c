@@ -8,26 +8,27 @@
 #include "file_parser.h"
 
 extern Result
-run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsigned blocksize, unsigned v2bBlockOffset,
-               unsigned memoryLatency, size_t numRequests, Request *requests, const char *tracefile);
+run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsigned blocksize, unsigned v2bBlockOffset, unsigned memoryLatency, size_t numRequests, Request *requests, const char *tracefile);
+
 enum RetCode {
     OK, ERR
 } typedef RetCode;
 
 // Umwandlung der Eingabe String zu Integer Werten mit Fehlerbehandlung
-RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound, uint32_t *value);
+RetCode
+inputConversion(int *booleanValue, char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound, uint32_t *value);
 
 // Umwandlung der tracefile eingabe
-RetCode traceFileInput (char inputString[]);
+RetCode traceFileInput(char inputString[]);
 
 // Umwandlung des positional Arguments, der input Datei
-RetCode positionalArgument (char *argv[], int argc, int pos);
+RetCode positionalArgument(char *argv[], int argc, int pos);
 
 // Überprüfung, ob eine Option bereits gesetzt wurde
 RetCode alreadySetCheck(int *booleanValue, char errorMSG[]);
 
 // Ausgabe der gesetzten und ermittelten Werte
-void printDebug(Request* requests, size_t requestCount, Result result);
+void printDebug(Request *requests, size_t requestCount, Result result);
 
 // Globale variablen für das Parameter Parsing
 unsigned cycles = 1000000;
@@ -42,12 +43,12 @@ int cycles_bool = 0, tlbSize_bool = 0, tlbLatency_bool = 0, blocksize_bool = 0, 
 
 /*
  * die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da diese nur für die Simulation relevant sind und bei einem echten TLB nicht existieren
- * alle anderen Werte stammen von: Patterson, D. A., Hennessy, J. L. (). Computer Organization and Design: The Hardware/Software Interface. (4th ed.). Morgan Kaufman. Seite 503(ff.).
+ * alle anderen Werte stammen von: Patterson, D. A., Hennessy, J. L. (2009). Computer Organization and Design: The Hardware/Software Interface. (4th ed.). Morgan Kaufman. Seite 503(ff.).
 */
 int main(int argc, char *argv[]) {
     // vgl. getopt_long man getopt_long, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
     static struct option long_options[] = {
-            {"help",             no_argument,       0, 'h'},
+            {"help",             no_argument, 0, 'h'},
             {"tf",               required_argument, 0, 'f'},
             {"cycles",           required_argument, 0, 'c'},
             {"blocksize",        required_argument, 0, 'b'},
@@ -55,8 +56,8 @@ int main(int argc, char *argv[]) {
             {"tlb-size",         required_argument, 0, 's'},
             {"tlb-latency",      required_argument, 0, 't'},
             {"memory-latency",   required_argument, 0, 'm'},
-            {"quickStart",       no_argument,       0, 'q'},
-            {0, 0,                                  0, 0}
+            {"quickStart",       no_argument, 0, 'q'},
+            {0, 0, 0, 0}
     };
     opterr = 0; // Stellt die Fehlermeldungen von getopt_long still, um eigene Fehlermeldungen auszugeben
     int opt;
@@ -104,7 +105,7 @@ int main(int argc, char *argv[]) {
 
         // tracefile: -f / --tf
         if (opt == 'f') {
-            if (traceFileInput(optarg)==ERR) return EXIT_FAILURE;
+            if (traceFileInput(optarg) == ERR) return EXIT_FAILURE;
             continue;
         }
 
@@ -112,37 +113,44 @@ int main(int argc, char *argv[]) {
         switch (opt) {
             // cycles: -c / --cycles
             case 'c': {
-                if ( inputConversion(&cycles_bool,cycle_str,optarg,0,INT32_MAX, &cycles) == ERR) return EXIT_FAILURE;
+                if (inputConversion(&cycles_bool, cycle_str, optarg, 0, INT32_MAX, &cycles) == ERR) return EXIT_FAILURE;
                 break;
             }
 
             // blocksize: -b / --blocksize
             case 'b': {
-                if ( inputConversion(&blocksize_bool,blocksize_str,optarg,1,UINT32_MAX,&blocksize) == ERR) return EXIT_FAILURE;
+                if (inputConversion(&blocksize_bool, blocksize_str, optarg, 1, UINT32_MAX, &blocksize) == ERR)
+                    return EXIT_FAILURE;
                 break;
             }
 
             // v2bBlockOffset: -o / --v2bBlockOffset
             case 'o': {
-                if ( inputConversion(&v2bBlockOffset_bool,v2b_block_offset_str,optarg,0,UINT32_MAX, &v2bBlockOffset) == ERR) return EXIT_FAILURE;
+                if (inputConversion(&v2bBlockOffset_bool, v2b_block_offset_str, optarg, 0, UINT32_MAX,
+                                    &v2bBlockOffset) == ERR)
+                    return EXIT_FAILURE;
                 break;
             }
 
             // tlb-size: -s / --tlb-size
             case 's': {
-                if (inputConversion(&tlbSize_bool,tlb_size_str,optarg,0,UINT32_MAX, &tlbSize) == ERR ) return EXIT_FAILURE;
+                if (inputConversion(&tlbSize_bool, tlb_size_str, optarg, 0, UINT32_MAX, &tlbSize) == ERR)
+                    return EXIT_FAILURE;
                 break;
             }
 
             // tlb-latency: -t / --tlb-latency
             case 't': {
-                if ( inputConversion(&tlbLatency_bool,tlb_latency_str,optarg,0,UINT32_MAX, & tlbLatency) == ERR) return EXIT_FAILURE;
+                if (inputConversion(&tlbLatency_bool, tlb_latency_str, optarg, 0, UINT32_MAX, &tlbLatency) == ERR)
+                    return EXIT_FAILURE;
                 break;
             }
 
             //memory-latency -m / --memory-latency
             case 'm': {
-                if ( inputConversion(&memoryLatency_bool,memory_latency_str,optarg,0,UINT32_MAX, &memoryLatency) == ERR) return EXIT_FAILURE;
+                if (inputConversion(&memoryLatency_bool, memory_latency_str, optarg, 0, UINT32_MAX, &memoryLatency) ==
+                    ERR)
+                    return EXIT_FAILURE;
                 break;
             }
 
@@ -155,9 +163,7 @@ int main(int argc, char *argv[]) {
     }
 
     // einlesen der Eingabe als positional Argument
-    if (positionalArgument(argv,argc,optind)== ERR) return EXIT_FAILURE;
-
-
+    if (positionalArgument(argv, argc, optind) == ERR) return EXIT_FAILURE;
 
     // Lese Requests aus Datei
 
@@ -174,7 +180,8 @@ int main(int argc, char *argv[]) {
 #ifndef DEBUG_BUILD
     (void) run_simulation((int) cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
 #else
-    Result result = run_simulation((int) cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency, requestCount, requests, tracefile);
+    Result result = run_simulation((int) cycles, tlbSize, tlbLatency, blocksize, v2bBlockOffset, memoryLatency,
+                                   requestCount, requests, tracefile);
     printDebug(requests, requestCount, result);
 #endif
 
@@ -189,28 +196,27 @@ int main(int argc, char *argv[]) {
 
 // ------------ DEBUG CODE ------------
 
-void createDebugMSG_options () {
-
-    printf("'cycles (-c/--cycles)'                      hat den Wert: %u\n",cycles);
-    printf("'blocksize (-b/--blocksize)'                hat den Wert: %u\n",blocksize);
-    printf("'v2b-block-offset (-o/--v2b-block-offset)'  hat den Wert: %u\n",v2bBlockOffset);
-    printf("'tlb-size (-s/--tlb-size)'                  hat den Wert: %u\n",tlbSize);
-    printf("'tlb-latency (-t/--tlb-latency)'            hat den Wert: %u\n",tlbLatency);
-    printf("'memory-latency (-m/--memory-latency)'      hat den Wert: %u\n",memoryLatency);
-    printf("'tracefile (-f/--tf)'                       hat den Wert: %s\n",tracefile);
-    printf("'Eingabedatei'                              hat den Wert: %s\n",inputfile);
+void createDebugMSG_options() {
+    printf("'cycles (-c/--cycles)'                      hat den Wert: %u\n", cycles);
+    printf("'blocksize (-b/--blocksize)'                hat den Wert: %u\n", blocksize);
+    printf("'v2b-block-offset (-o/--v2b-block-offset)'  hat den Wert: %u\n", v2bBlockOffset);
+    printf("'tlb-size (-s/--tlb-size)'                  hat den Wert: %u\n", tlbSize);
+    printf("'tlb-latency (-t/--tlb-latency)'            hat den Wert: %u\n", tlbLatency);
+    printf("'memory-latency (-m/--memory-latency)'      hat den Wert: %u\n", memoryLatency);
+    printf("'tracefile (-f/--tf)'                       hat den Wert: %s\n", tracefile);
+    printf("'Eingabedatei'                              hat den Wert: %s\n", inputfile);
 }
 
-void createDebugMSG_sim (unsigned  sim_cycles, unsigned sim_misses, unsigned sim_hits, unsigned sim_primitive_gate_count) {
-
-    printf("'cycles'                                    hat den Wert: %u\n",sim_cycles);
-    printf("'misses'                                    hat den Wert: %u\n",sim_misses);
-    printf("'hits'                                      hat den Wert: %u\n",sim_hits);
-    printf("'primitive_gate_count'                      hat den Wert: %u\n",sim_primitive_gate_count);
+void
+createDebugMSG_sim(unsigned sim_cycles, unsigned sim_misses, unsigned sim_hits, unsigned sim_primitive_gate_count) {
+    printf("'cycles'                                    hat den Wert: %u\n", sim_cycles);
+    printf("'misses'                                    hat den Wert: %u\n", sim_misses);
+    printf("'hits'                                      hat den Wert: %u\n", sim_hits);
+    printf("'primitive_gate_count'                      hat den Wert: %u\n", sim_primitive_gate_count);
 }
 
 
-void printDebug(Request* requests, size_t requestCount, Result result) {
+void printDebug(Request *requests, size_t requestCount, Result result) {
 
     printf("\n\n#1 Optionen und ihre jeweiligen Argumente:\n\n");
     createDebugMSG_options();
@@ -221,14 +227,14 @@ void printDebug(Request* requests, size_t requestCount, Result result) {
     }
 
     printf("\n#3 Durch die Simulation ermittelte Werte:\n\n");
-    createDebugMSG_sim(result.cycles,result.misses,result.hits,result.primitive_gate_count);
+    createDebugMSG_sim(result.cycles, result.misses, result.hits, result.primitive_gate_count);
 
 }
 
 // ------------ DEBUG CODE ------------
 
 
-RetCode alreadySetCheck(int *booleanValue, char errorMSG[]){
+RetCode alreadySetCheck(int *booleanValue, char errorMSG[]) {
     // überprüfe, ob dieser Wert bereits gesetzt wurde
     if (*booleanValue == 1) {
         (void) fprintf(stderr, ERR_AlREADY_SET(errorMSG));
@@ -239,10 +245,11 @@ RetCode alreadySetCheck(int *booleanValue, char errorMSG[]){
 }
 
 
-RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound, uint32_t *value) {
+RetCode
+inputConversion(int *booleanValue, char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound, uint32_t *value) {
 
     // Überprüfen, ob Option schon vorher gesetzt wird
-    if ( alreadySetCheck(booleanValue,errorMSG) == ERR) return ERR;
+    if (alreadySetCheck(booleanValue, errorMSG) == ERR) return ERR;
 
     // vgl. man strtol, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
     char *endptr = NULL;
@@ -257,14 +264,15 @@ RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], 
     }
 
     // Fehler bei der Umwandlung
-    if(errno || *endptr != '\0') {
+    if (errno || *endptr != '\0') {
         (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_CONVERSION(errorMSG));
         return ERR;
     }
 
     // Nicht im Wertebereich
-    // edge case: es war möglich eine sehr große negative Zahl zu übergeben, die strtol durch das zweierkomplement zu einer positiven umgewandelt hat, die dann im Wertebereich lag. Die Überprüfung auf negatives Vorzeichen behebt dies
-    if (inputString[0]=='-'||tmp < lowerBound || tmp > upperBound) {
+    // edge case: es war möglich eine sehr große negative Zahl zu übergeben, die strtol durch das zweierkomplement zu einer positiven umgewandelt hat, die dann im Wertebereich lag.
+    // Die Überprüfung auf negatives Vorzeichen behebt dies
+    if (inputString[0] == '-' || tmp < lowerBound || tmp > upperBound) {
         (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT(errorMSG, lowerBound, upperBound));
         return ERR;
     }
@@ -272,13 +280,13 @@ RetCode inputConversion (int *booleanValue,char errorMSG[], char inputString[], 
     return OK;
 }
 
-RetCode traceFileInput (char inputString[]){
-    if (alreadySetCheck(&tracefile_bool,tracefile_str) == ERR) return ERR;
+RetCode traceFileInput(char inputString[]) {
+    if (alreadySetCheck(&tracefile_bool, tracefile_str) == ERR) return ERR;
 
     // Edge case: ./r5mm -f -c 1234 examples/kurze_Eingabedatei_valid.csv, wäre sonst valide, weil
     // als Argument von -f -c genommen wird. Dies würde zwar auch zu einem fehler führen, aber mit unpräziser Fehlernachricht
-    if (inputString[0]=='-') {
-        (void) fprintf(stderr,ERR_ILLEGAL_TRACEFILE_NAME);
+    if (inputString[0] == '-') {
+        (void) fprintf(stderr, ERR_ILLEGAL_TRACEFILE_NAME);
         return ERR;
     }
 
@@ -297,7 +305,7 @@ RetCode traceFileInput (char inputString[]){
         return ERR;
     }
     if (fclose(file) != 0) {
-        (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT_TRACEFILE);
+        (void) fprintf(stderr, ERR_GENERAL_UNKNOWN);
         return ERR;
     }
 
@@ -307,7 +315,7 @@ RetCode traceFileInput (char inputString[]){
 }
 
 // vgl. https://stackoverflow.com/questions/18079340/using-getopt-in-c-with-non-option-arguments
-RetCode positionalArgument (char *argv[], int argc, int pos) {
+RetCode positionalArgument(char *argv[], int argc, int pos) {
     if (quickStart_bool == 0) {
         if (pos == argc) {
             (void) fprintf(stderr, ERR_NO_FILE_INPUT);
