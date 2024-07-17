@@ -55,11 +55,19 @@ public class Main {
 
         int n = 0;
         while (n < numberOfElements) {
+
             int page = rand.nextInt(averageCaseNumberOfMaxPages);
-            int position_of_first_element = 4 * rand.nextInt(0, (blocksize / 4) - 1);
+
+            int position_of_first_element =rand.nextInt(0, (blocksize / 4) - 1);
+
             int numIntegers = rand.nextInt(averageCaseNumberOfMaxElement);
+            int address = 0;
             for (int i = 0; i < numIntegers && n < numberOfElements; i++) {
-                int address = blocksize * page + position_of_first_element + i * 4;
+
+                address = blocksize * page + (position_of_first_element + i) * 4;
+
+                if (address >= blocksize*(page+1)) break;
+
                 if (!visited.contains(address)) {
                     if (i == 0) individualTimesOfPrint.put(page, individualTimesOfPrint.getOrDefault(page, 0) + 1);
                     eintraegeProSeite.put(page, eintraegeProSeite.getOrDefault(page, 0) + 1);
