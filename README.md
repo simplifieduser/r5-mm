@@ -34,7 +34,7 @@ Lediglich die Versuchsreihe mit 1024 Seiten konnte selbst bei einer TLB-Größe 
 von 93% erreichen.
 
 Sollten die Daten sehr schlecht im Speicher verteilt sein, ein Datum pro Seite, dann hätte der TLB eine negative
-Auswirkung auf die Laufzeit (vgl. Diagramme in den [PDF-Slides](Robert-5%20Memory%20Mapper.pdf).
+Auswirkung auf die Laufzeit (vgl. Diagramme in den [PDF-Slides](Robert-5%20Memory%20Mapper.pdf)).
 
 Es zeigt sich, dass bereits ein sehr kleiner TLB bei gutem Speichermanagement die Zugriffszeit auf die Daten erheblich verringert.
 
