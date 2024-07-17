@@ -54,4 +54,4 @@ Es zeigt sich, dass bereits ein sehr kleiner TLB bei gutem Speichermanagement di
 
 * Erstellung des Programms zur Eingabeverarbeitung
 * Ausarbeitung des Theorieteiles mit Entwicklung eines Javatools zur Erstellung der
-Versuchsdateien (examples/Javatool/src)
+Versuchsdateien [Javatool](examples/Javatool/src/Main.java)
