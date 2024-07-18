@@ -23,7 +23,7 @@ Datenverteilung auf 128, 512 und 1024 Seiten untersucht. Bei all diesen Szenarie
 Simulationszeit um 43 % bis 48 % senken, wobei Hit-Raten von 87 % bis 97 % erreicht wurden. Jedoch fiel auf, dass sich
 bei zunehmender Größe des TLB die Simulationszeit und die Hit-Raten nur kaum verbesserten. Erst ab 64 Speicherzellen
 nahmen die Hit-Raten erneut stark zu und erreichten gegen Ende sowohl bei der Versuchsreihe mit 128 als auch bei der mit
-512 Seiten 99,9 %.
+512 Seiten über 99 %.
 
 Lediglich die Versuchsreihe mit 1024 Seiten konnte selbst bei einer TLB-Größe von 512 nur eine Hit-Rate von 93 %
 erreichen.
