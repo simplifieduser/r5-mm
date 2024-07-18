@@ -81,6 +81,11 @@ SC_MODULE(REQUEST_PROCESSOR)
             primitive_gate_count->write(0);
         }
 
+        // sicherstellen, dass diese Werte mit 0 initialisiert sind
+        cycles->write(0);
+        hits->write(0);
+        misses->write(0);
+
         for (size_t i = 0; i < num_requests; i++)
         {
             wait(SC_ZERO_TIME);
