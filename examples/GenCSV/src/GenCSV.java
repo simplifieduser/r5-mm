@@ -2,7 +2,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-public class Main {
+public class GenCSV {
     // Anzahl der Elemente
     static int numberOfElements = 102400;
     // Seitengröße
