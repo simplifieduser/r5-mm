@@ -78,12 +78,18 @@ SC_MODULE(REQUEST_PROCESSOR)
         }
         else
         {
-            primitive_gate_count->write(count);
+            primitive_gate_count->write(0);
         }
+
+        // Sicherstellen, dass diese Werte mit 0 initialisiert sind
+        cycles->write(0);
+        hits->write(0);
+        misses->write(0);
 
         for (size_t i = 0; i < num_requests; i++)
         {
             wait(SC_ZERO_TIME);
+
             // Signale mit Werten des aktuellen Requests setzen
             data.write(requests[i].data);
             we.write(requests[i].we);
@@ -96,10 +102,19 @@ SC_MODULE(REQUEST_PROCESSOR)
             wait(get_address_finished.posedge_event());
             wait(SC_ZERO_TIME);
 
-            // Output mit zurückgegebenen Werten aktualisieren
-            cycles->write(cycles->read() + address_getter.cycles->read());
-            hits->write(hits->read() + address_getter.hit->read());
-            misses->write(misses->read() + !address_getter.hit->read());
+            // Output mit zurückgegebenen Werten aktualisieren, falls tlb vorhanden ist
+            if (tlb_size > 0)
+            {
+                cycles->write(cycles->read() + address_getter.cycles->read());
+                hits->write(hits->read() + address_getter.hit->read());
+                misses->write(misses->read() + !address_getter.hit->read());
+            }
+            else
+            {
+                // Wenn tlb_size = 0, dann existiert der TLB nicht, dessen latency wird also nicht gezählt und es kann keine Hits oder Misses geben
+                // Da jedes Mal die physische Adresse geholt werden muss, wird diese latency immer dazuaddiert
+                cycles->write(cycles->read() + memory_latency);
+            }
 
             // address_getter soll jetzt bis zum nächsten Request warten
             start_request.write(false);
@@ -107,14 +122,14 @@ SC_MODULE(REQUEST_PROCESSOR)
             // Speicheroperation kann jetzt stattfinden
             notify_memory.write(true);
 
-            // Warten, bis Speicheroperation zu ende
+            // Warten, bis Speicheroperation zu ende ist
             wait(manage_data_finished.posedge_event());
             wait(SC_ZERO_TIME);
 
             // data_manager soll jetzt bis zum nächsten Request warten
             notify_memory.write(false);
 
-            // Zyklen nochmal aktualisieren
+            // Zyklen (nochmal) aktualisieren
             cycles->write(cycles->read() + memory_latency);
             wait();
         }

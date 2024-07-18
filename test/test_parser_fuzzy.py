@@ -106,6 +106,7 @@ def convert_to_result(requests):
 @pytest.mark.parametrize("requests", [generate_valid_requests() for _ in range(1000)])
 def test_valid(requests):
 
+    random.seed(0)
     generate_file("./temp_test.csv", requests)
     results = convert_to_result(requests)
 
@@ -124,6 +125,7 @@ def test_valid(requests):
 @pytest.mark.parametrize("requests", [generate_invalid_requests() for _ in range(1000)])
 def test_invalid(requests):
 
+    random.seed(0)
     generate_file("./temp_test.csv", requests)
 
     process = subprocess.run(["./dist/r5mm", "./temp_test.csv"], stdout=subprocess.PIPE, text=True)

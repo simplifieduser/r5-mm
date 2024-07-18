@@ -9,12 +9,12 @@ SC_MODULE(MAIN_MEMORY)
 {
     // Input
     sc_in<bool> clk;
-    sc_in<bool> we;          // Write enable -> 1 wenn Schreibzugriff, 0 wenn Lesezugriff
+    sc_in<bool> we;          // Write enable → 1 wenn Schreibzugriff, 0 wenn Lesezugriff
     sc_in<uint32_t> data;    // Daten die evtl. gespeichert werden sollen
-    sc_in<uint32_t> address; // physikalische Adresse
+    sc_in<uint32_t> address; // Physikalische Adresse
     sc_in<bool> got_address; // True, sobald richtige physikalische Adresse am address-Signal liegt, erst dann können Daten gelesen / geschrieben werden
 
-    unsigned memory_latency; // benötigte Zyklen für die Speicheropertaion
+    unsigned memory_latency; // Benötigte Zyklen für die Speicheropertaion
 
     // Simuliert den Hauptspeicher: speichert Adresse als Key und Daten als Value
     std::map<uint32_t, unsigned char> mem_map;
@@ -101,7 +101,7 @@ SC_MODULE(MAIN_MEMORY)
             {
                 // UNGÜLTIGER LESEZUGRIFF
 
-                // falls noch nie in diese Adresse geschrieben wurde, soll 0 als Default-Wert zurückgegeben werden
+                // Falls noch nie in diese Adresse geschrieben wurde, soll 0 als Default-Wert zurückgegeben werden
                 out_data->write(0);
             }
         }

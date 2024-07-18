@@ -2,7 +2,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-public class Main {
+public class GenCSV {
     // Anzahl der Elemente
     static int numberOfElements = 102400;
     // Seitengröße
@@ -38,38 +38,35 @@ public class Main {
             durchschnittlicher("../../durchschnittlicher_schlechter_Fall.csv", 1024, 16);
 
 
-
         } catch (IOException e) {
             System.out.println("FEHLER!");
         }
     }
 
-    static void durchschnittlicher (String name, int averageCaseNumberOfMaxPages, int averageCaseNumberOfMaxElement) throws IOException {
+    static void average(String name, int averageCaseNumberOfMaxPages, int averageCaseNumberOfMaxElement) throws IOException {
         if (numberOfElements / (blocksize / 4) > averageCaseNumberOfMaxPages) throw new IllegalArgumentException();
 
         FileWriter averagecaseWriter = new FileWriter(name);
-        HashSet<Integer> visited = new HashSet<>();
-        HashMap<Integer, Integer> eintraegeProSeite = new HashMap<>();
-        HashMap<Integer, Integer> individualTimesOfPrint = new HashMap<>();
+
+        HashSet<Integer> visited = new HashSet<>(); // Keine Doppeltspeicherung
+        HashMap<Integer, Integer> eintraegeProSeite = new HashMap<>(); // Für Statistik
+        HashMap<Integer, Integer> individualTimesOfPrint = new HashMap<>(); // Für Statistik
         StringBuilder sbA = new StringBuilder();
 
         int n = 0;
         while (n < numberOfElements) {
 
             int page = rand.nextInt(averageCaseNumberOfMaxPages);
-
-            int position_of_first_element =rand.nextInt(0, (blocksize / 4) - 1);
-
+            int position_of_first_element = 4 * rand.nextInt(0, (blocksize / 4) - 1);
             int numIntegers = rand.nextInt(averageCaseNumberOfMaxElement);
-            int address = 0;
+
             for (int i = 0; i < numIntegers && n < numberOfElements; i++) {
 
-                address = blocksize * page + (position_of_first_element + i) * 4;
-
-                if (address >= blocksize*(page+1)) break;
+                int address = blocksize * page + position_of_first_element + i * 4;
 
                 if (!visited.contains(address)) {
                     if (i == 0) individualTimesOfPrint.put(page, individualTimesOfPrint.getOrDefault(page, 0) + 1);
+
                     eintraegeProSeite.put(page, eintraegeProSeite.getOrDefault(page, 0) + 1);
                     visited.add(address);
                     sbA.append("R,0x").append(Integer.toHexString(address)).append("\n");
@@ -81,11 +78,11 @@ public class Main {
         }
         averagecaseWriter.write(sbA.toString());
         averagecaseWriter.close();
-
-        print(eintraegeProSeite,individualTimesOfPrint);
-
+        print(eintraegeProSeite, individualTimesOfPrint);
     }
-    static void print (HashMap<Integer, Integer> eintraegeProSeite, HashMap<Integer, Integer> individualTimesOfPrint) {
+
+    static void print(HashMap<Integer, Integer> eintraegeProSeite, HashMap<Integer, Integer> individualTimesOfPrint) {
+        // Statistiken
         if (statistikEin) {
             int tmp = 0;
             int min = Integer.MAX_VALUE;

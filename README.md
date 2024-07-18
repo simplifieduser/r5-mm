@@ -5,8 +5,8 @@
 ## Recherche-Ergebnisse
 
 In modernen Prozessoren ist eine kurze Zugriffszeit auf Daten, welche im Hauptspeicher gespeichert sind, essenziell. Um
-die Übersetzungszeit zwischen virtuellen und physischen Seiten zu beschleunigen, kann ein Translation Lookaside Buffer (
-TLB) verwendet werden. Dieser speichert als Mengen assoziativer Cache 16 - 512 Adresspaare, welche eine Referenz auf
+die Übersetzungszeit zwischen virtuellen und physischen Seiten zu beschleunigen, kann ein Translation Lookaside Buffer (TLB)
+verwendet werden. Dieser speichert als Mengen assoziativer Cache 16 - 512 Adresspaare, welche eine Referenz auf
 eine 4 KiB Seite im Hauptspeicher sind. Durch Hit-Raten von über 99 % und einer geringen Zugriffszeit von einem Zyklus
 ist der TLB erheblich schneller als ein Hauptspeicherzugriff, welcher über 100 Zyklen benötigt.
 
@@ -50,4 +50,4 @@ verringert.
 
 * Erstellung des Programms zur Eingabeverarbeitung
 * Ausarbeitung des Theorieteiles mit Entwicklung eines Javatools zur Erstellung der
-  Versuchsdateien [Javatool](examples/Javatool/src/Main.java)
+  Versuchsdateien [GenCSV](examples/GenCSV/src/GenCSV.java)
