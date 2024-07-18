@@ -81,7 +81,7 @@ SC_MODULE(REQUEST_PROCESSOR)
             primitive_gate_count->write(0);
         }
 
-        // sicherstellen, dass diese Werte mit 0 initialisiert sind
+        // Sicherstellen, dass diese Werte mit 0 initialisiert sind
         cycles->write(0);
         hits->write(0);
         misses->write(0);
@@ -111,9 +111,8 @@ SC_MODULE(REQUEST_PROCESSOR)
             }
             else
             {
-                // wenn tlb_size = 0, dann existiert der TLB nicht, dessen latency wird also nicht gezählt und es kann keine Hits oder Misses geben
-
-                // da jedes Mal die physische Adresse geholt werden muss, wird diese latency immer dazuaddiert
+                // Wenn tlb_size = 0, dann existiert der TLB nicht, dessen latency wird also nicht gezählt und es kann keine Hits oder Misses geben
+                // Da jedes Mal die physische Adresse geholt werden muss, wird diese latency immer dazuaddiert
                 cycles->write(cycles->read() + memory_latency);
             }
 

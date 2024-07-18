@@ -23,11 +23,11 @@ SC_MODULE(ADDRESS_GETTER)
     sc_out<bool> finished; // True, sobald die richtige physikalische Adresse am physical_address-Signal liegt
     sc_out<uint32_t> physical_address;
 
-    sc_out<int> cycles; // Zählt, wie viele Zyklen gebraucht wurden, um Addresse zu übersetzen
+    sc_out<int> cycles; // Zählt, wie viele Zyklen gebraucht wurden, um A dresse zu übersetzen
 
-    sc_out<bool> hit; // True, wenn Addresse im TLB abgespeichert war, sonst False
+    sc_out<bool> hit; // True, wenn Adresse im TLB abgespeichert war, sonst False
 
-    int latency; // wird auf tlb_latency oder memory_latency gesetzt, je nachdem ob es ein Hit oder Miss war
+    int latency; // Wird auf tlb_latency oder memory_latency gesetzt, je nachdem ob es ein Hit oder Miss war
 
     SC_CTOR(ADDRESS_GETTER);
 
@@ -70,7 +70,7 @@ SC_MODULE(ADDRESS_GETTER)
 
     void set_values()
     {
-        // Tag der virtuellen Adresse berechnen -> Rechtsshift der virtuellen Adresse um blocksize
+        // Tag der virtuellen Adresse berechnen → Rechts-Shift der virtuellen Adresse um blocksize
         uint32_t tag = virtual_address->read() >> (int)std::log2(blocksize);
 
         // Überprüfen, ob tlb_size = 0
@@ -89,7 +89,6 @@ SC_MODULE(ADDRESS_GETTER)
             if (tag == current_tag_in_tlb && previuosly_visited.count(tag))
             {
                 // HIT
-
                 // Tag als schonmal gecached markieren
                 previuosly_visited.insert(tag);
 
@@ -99,7 +98,6 @@ SC_MODULE(ADDRESS_GETTER)
             else
             {
                 // MISS
-
                 // Tag als schonmal gecached markieren
                 previuosly_visited.insert(tag);
 
@@ -111,7 +109,7 @@ SC_MODULE(ADDRESS_GETTER)
             }
         }
 
-        // Physische Addresse konstruieren (Abstraktion)
+        // Physische Adresse konstruieren (Abstraktion)
         // Oberen Bits aus dem TLB rauslesen (v2b_block_offset darauf addieren) und unteren Bits aus der virtuellen Adresse kopieren
         if (blocksize > 1)
         {

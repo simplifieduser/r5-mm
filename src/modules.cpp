@@ -41,7 +41,7 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     // Überprüfen, ob die Anzahl von Zyklen unter dem übergebenen Limit liegt
     if (cycles_count.read() > cycles)
     {
-        // zu viele Zyklen gebraucht
+        // Zu viele Zyklen gebraucht
         result.cycles = INT_MAX;
     }
     else
@@ -54,7 +54,7 @@ Result run_simulation(int cycles, unsigned tlbSize, unsigned tlbsLatency, unsign
     return result;
 }
 
-// Wir brauchen diese default sc_main Implementation.
+// Benötigt, sodass SystemC kompiliert
 int sc_main(int argc, char *argv[])
 {
     std::cout << "Should not be called directly" << std::endl;
