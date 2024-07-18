@@ -103,12 +103,18 @@ SC_MODULE(REQUEST_PROCESSOR)
             wait(SC_ZERO_TIME);
 
             // Output mit zurückgegebenen Werten aktualisieren, falls tlb vorhanden ist
-            // wenn tlb_size = 0, dann existiert der TLB nicht, dessen latency wird also nicht gezählt und es kann keine Hits oder Misses geben
             if (tlb_size > 0)
             {
                 cycles->write(cycles->read() + address_getter.cycles->read());
                 hits->write(hits->read() + address_getter.hit->read());
                 misses->write(misses->read() + !address_getter.hit->read());
+            }
+            else
+            {
+                // wenn tlb_size = 0, dann existiert der TLB nicht, dessen latency wird also nicht gezählt und es kann keine Hits oder Misses geben
+
+                // da jedes Mal die physische Adresse geholt werden muss, wird diese latency immer dazuaddiert
+                cycles->write(cycles->read() + memory_latency);
             }
 
             // address_getter soll jetzt bis zum nächsten Request warten
