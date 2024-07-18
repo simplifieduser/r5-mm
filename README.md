@@ -50,4 +50,4 @@ verringert.
 
 * Erstellung des Programms zur Eingabeverarbeitung
 * Ausarbeitung des Theorieteiles mit Entwicklung eines Javatools zur Erstellung der
-  Versuchsdateien [Javatool](examples/GenCSV/src/GenCSV.java)
+  Versuchsdateien [GenCSV](examples/GenCSV/src/GenCSV.java)
