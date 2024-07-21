@@ -77,14 +77,15 @@
 #define MSG_HINT_FILE "Hinweis: Beispiele für gültige Request-Dateien können in dem Verzeichnis 'examples' gefunden werden\n"
 
 #define ERR_FILE_PREMATURE_EOF_ARG(arg, line) "Fehler: Request-Datei ungültig: Erwartet wurde '%s', jedoch Ende der Datei gefunden (Zeile %zu)\n%s", arg, line, MSG_HINT_FILE
+#define ERR_FILE_PREMATURE_NEW_ARG(arg, line) "Fehler: Request-Datei ungültig: Erwartet wurde '%s', jedoch neues Argument gefunden (Zeile %zu)\n%s", arg, line, MSG_HINT_FILE
 #define ERR_FILE_PREMATURE_EOF_NL(line) "Fehler: Request-Datei ungültig: Erwartet wurde neue Zeile, jedoch Ende der Datei gefunden (Zeile %zu)\n%s", line, MSG_HINT_FILE
 #define ERR_FILE_PREMATURE_NEW_LINE(arg, line) "Fehler: Request-Datei ungültig: Erwartet wurde '%s', jedoch neue Zeile gefunden (Zeile %zu)\n%s", arg, line, MSG_HINT_FILE
 #define ERR_FILE_WHITE_SPACE(line) "Fehler: Request-Datei ungültig: Leerzeichen sind nicht erlaubt (Zeile %zu)\n%s", line, MSG_HINT_FILE
 
 #define ERR_FILE_INVALID_ARG_RW(line) "Fehler: Request-Datei ungültig: 'write_enable' muss einer der Werte [r,w,R,W] sein (Zeile %zu)\n%s", line, MSG_HINT_FILE
-#define ERR_FILE_INVALID_ARG_ADDR(line) "Fehler: Request-Datei ungültig: 'address' muss ein Integer im Interval [0; 4294967295] sein und darf nicht leer sein (Zeile %zu)\n%s", line, MSG_HINT_FILE
+#define ERR_FILE_INVALID_ARG_ADDR(line) "Fehler: Request-Datei ungültig: 'address' muss ein Integer im Interval [0; 4294967295] sein (Zeile %zu)\n%s", line, MSG_HINT_FILE
 #define ERR_FILE_INVALID_ARG_DATA_READ(line) "Fehler: Request-Datei ungültig: 'write_data' muss leer sein bei einem Lesezugriff (Zeile %zu)\n%s", line, MSG_HINT_FILE
-#define ERR_FILE_INVALID_ARG_DATA_WRITE(line) "Fehler: Request-Datei ungültig: 'write_data' muss ein Integer im Interval [0; 4294967295] und darf nicht leer sein (Zeile %zu)\n%s", line, MSG_HINT_FILE
+#define ERR_FILE_INVALID_ARG_DATA_WRITE(line) "Fehler: Request-Datei ungültig: 'write_data' muss ein Integer im Interval [0; 4294967295] sein (Zeile %zu)\n%s", line, MSG_HINT_FILE
 
 #define ERR_FILE_TOO_MANY_ARGS(line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n%s", line, MSG_HINT_FILE
 

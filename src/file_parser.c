@@ -167,7 +167,13 @@ RetCode getRWArg(FILE *file, size_t line) {
 
     if (modeChar == '\n') {
         // Fehler beim Parsen: Vorzeitiges Ende der Zeile
-        (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_ARG("write_enable", line));
+        (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE("write_enable", line));
+        return ERROR;
+    }
+
+    if (modeChar == ',') {
+        // Fehler beim Parsen: Vorzeitiges neues Argument
+        (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_ARG("write_enable", line));
         return ERROR;
     }
 
@@ -183,13 +189,13 @@ RetCode getRWArg(FILE *file, size_t line) {
 
     if (feof(file)) {
         // Fehler beim Parsen: Vorzeitiges Ende der Datei
-        (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_ARG("address", line));
+        (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_ARG(",", line));
         return ERROR;
     }
 
     if (sepChar == '\n') {
         // Fehler beim Parsen: Vorzeitiges Ende der Zeile
-        (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE("address", line));
+        (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE(",", line));
         return ERROR;
     }
 
@@ -237,7 +243,7 @@ int getAddressArg(FILE *file, uint32_t *res, size_t line) {
         if (feof(file)) {
             // Fehler beim Parsen: Vorzeitiges Ende der Datei
             free(address_string);
-            (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_ARG("write_data", line));
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_ARG(",", line));
             return 1;
         }
 
@@ -258,7 +264,7 @@ int getAddressArg(FILE *file, uint32_t *res, size_t line) {
         if (current == '\n') {
             // Fehler beim Parsen: Vorzeitiges Ende der Zeile
             free(address_string);
-            (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE("write_data", line));
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE(",", line));
             return 1;
         }
 
@@ -275,7 +281,7 @@ int getAddressArg(FILE *file, uint32_t *res, size_t line) {
             if (i == 0) {
                 // Fehler beim Parsen: Ungültiges Argument
                 free(address_string);
-                (void) fprintf(stderr, ERR_FILE_INVALID_ARG_ADDR(line));
+                (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_ARG("address", line));
                 return 1;
             }
 
@@ -417,7 +423,7 @@ int getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
             if (i == 0) {
                 // Fehler beim Parsen: Ungültiges Argument
                 free(data_string);
-                (void) fprintf(stderr, ERR_FILE_INVALID_ARG_DATA_WRITE(line));
+                (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE("write_data", line));
                 return 1;
             }
 
