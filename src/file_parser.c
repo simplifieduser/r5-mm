@@ -257,7 +257,7 @@ int getAddressArg(FILE *file, uint32_t *res, size_t line) {
 
         if (current == ',') {
 
-            // wenn leeres Argument
+            // Wenn leeres Argument
             if (i == 0) {
                 // Fehler beim Parsen: Ungültiges Argument
                 free(address_string);
@@ -392,7 +392,7 @@ int getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
 
         if (current == '\n') {
 
-            // wenn leers Argument
+            // Wenn leers Argument
             if (i == 0) {
                 // Fehler beim Parsen: Ungültiges Argument
                 free(data_string);
