@@ -7,14 +7,8 @@
 
 // Wird zur Bestimmung des Erfolgs der Zusatzfunktionen für Argumente verwendet
 enum RetCode {
-    OK_READ, OK_WRITE, OK_EOF,                                                                    // Codes, die ausschließlich von getREArg verwendet werden
-    OK, ERR_ALLOC, ERR_FOPEN, ERR_EOF, ERR_NEWLINE, ERR_WHITESPACE, ERR_INVARG, ERR_TOOMANY       // Codes, die von allen anderen Argumenten verwendet werden
+    OK_READ, OK_WRITE, OK_EOF, ERROR
 } typedef RetCode;
-
-// Wird für Fehler-Meldungen verwendet
-enum Argument {
-    NONE, WRITE_ENABLE, ADDRESS, WRITE_DATA
-} typedef Argument;
 
 const int MAX_ARG_LENGTH = 11;                    // Eine 32-Bit-Zahl kann nur aus 11 Zeichen bestehen
 const unsigned int MAX_ARG_VALUE = 0xFFFFFFFF;    // Maske zur Bestimmung, ob die übergebene Zahl den Höchstwert überschreitet
@@ -24,9 +18,9 @@ const int DEC_BASE = 10;                 // Basis für die Umwandlung von dezima
 
 RetCode getRWArg(FILE *file, size_t line);
 
-RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode, size_t line);
+int getAddressArg(FILE *file, uint32_t *res, size_t line);
 
-RetCode getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line);
+int getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line);
 
 int CORRECTED_CARR_RET = 0;  // Wird verwendet, um Korrektur von '\r' zu '\n' zu speichern
 
@@ -106,20 +100,22 @@ int parseFile(const char *path, size_t *requestCount, Request **requests) {
             return 0;
         }
 
-        if (mode != OK_READ && mode != OK_WRITE) {
+        if (mode == ERROR) {
             // PARSE-FEHLER
             break;
         }
 
         // Address-Argument
-        int addressStatus = getAddressArg(file, address, mode, i + 1);
-        if (addressStatus != OK) {
+        int addressStatus = getAddressArg(file, address, i + 1);
+        if (addressStatus) {
+            // PARSE-FEHLER
             break;
         }
 
         // Daten-Argument
         int dataStatus = getDataArg(file, data, mode, i + 1);
-        if (dataStatus != OK) {
+        if (dataStatus) {
+            // PARSE-FEHLER
             break;
         }
 
@@ -171,8 +167,14 @@ RetCode getRWArg(FILE *file, size_t line) {
 
     if (modeChar == '\n') {
         // PARSE-FEHLER: VORZEITIGE ZEILENENDE
-        (void) fprintf(stderr, ERR_FILE_PREMATURE_END_OF_FILE("write_enable", line));
-        return ERR_NEWLINE;
+        (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_ARG("write_enable", line));
+        return ERROR;
+    }
+
+    if (modeChar != 'r' && modeChar != 'R' && modeChar != 'w' && modeChar != 'W') {
+        // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
+        (void) fprintf(stderr, ERR_FILE_INVALID_ARG_RW(line));
+        return ERROR;
     }
 
     // Lese Trenncharakter
@@ -181,20 +183,20 @@ RetCode getRWArg(FILE *file, size_t line) {
 
     if (feof(file)) {
         // PARSE-FEHLER: VORZEITIGES DATEIENDE
-        (void) fprintf(stderr, ERR_FILE_PREMATURE_END_OF_FILE("write_enable", line));
-        return ERR_EOF;
+        (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_ARG("address", line));
+        return ERROR;
     }
 
     if (sepChar == '\n') {
         // PARSE-FEHLER: VORZEITIGES ZEILENENDE
-        (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE("write_enable", line));
-        return ERR_NEWLINE;
+        (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE("address", line));
+        return ERROR;
     }
 
     if (sepChar != ',') {
         // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         (void) fprintf(stderr, ERR_FILE_INVALID_ARG_RW(line));
-        return ERR_INVARG;
+        return ERROR;
     }
 
     // mode zurückgeben
@@ -203,17 +205,11 @@ RetCode getRWArg(FILE *file, size_t line) {
         return OK_READ;
     }
 
-    if (modeChar == 'w' || modeChar == 'W') {
-        return OK_WRITE;
-    }
-
-    // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
-    (void) fprintf(stderr, ERR_FILE_INVALID_ARG_RW(line));
-    return ERR_INVARG;
+    return OK_WRITE;
 
 }
 
-RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
+int getAddressArg(FILE *file, uint32_t *res, size_t line) {
 
     // Initialisiere array fürs lesen
 
@@ -222,7 +218,7 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
     if (address_string == NULL) {
         // SPEICHER-FEHLER
         (void) fprintf(stderr, ERR_GENERAL_MEMORY_ALLOCATION_ERROR);
-        return ERR_ALLOC;
+        return 1;
     }
 
     // Einlesen bis ',' '\n' oder 11 Zeichen
@@ -234,29 +230,29 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
         if (feof(file)) {
             // PARSE-FEHLER: VORZEITIGES DATEIENDE
             free(address_string);
-            (void) fprintf(stderr, ERR_FILE_PREMATURE_END_OF_FILE("address", line));
-            return ERR_EOF;
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_ARG("address", line));
+            return 1;
         }
 
         if (current == ' ') {
             // PARSE-FEHLER: LEERZEICHEN NICHT ERLAUBT
             free(address_string);
             (void) fprintf(stderr, ERR_FILE_WHITE_SPACE(line));
-            return ERR_WHITESPACE;
+            return 1;
         }
 
         if (current == '\n') {
             // PARSE-FEHLER: VORZEITIGER NEUE ZEILE
             free(address_string);
             (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE("address", line));
-            return ERR_NEWLINE;
+            return 1;
         }
 
         if (i >= MAX_ARG_LENGTH - 1 && current != ',') {
             // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
             free(address_string);
             (void) fprintf(stderr, ERR_FILE_INVALID_ARG_ADDR(line));
-            return ERR_INVARG;
+            return 1;
         }
 
         if (current == ',') {
@@ -266,7 +262,7 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
                 // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
                 free(address_string);
                 (void) fprintf(stderr, ERR_FILE_INVALID_ARG_ADDR(line));
-                return ERR_INVARG;
+                return 1;
             }
 
             // Null-Byte anhängen
@@ -296,24 +292,25 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
         // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(address_string);
         (void) fprintf(stderr, ERR_FILE_INVALID_ARG_ADDR(line));
-        return ERR_INVARG;
+        return 1;
     }
 
     if (address_int > MAX_ARG_VALUE) {
         // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(address_string);
         (void) fprintf(stderr, ERR_FILE_INVALID_ARG_ADDR(line));
-        return ERR_INVARG;
+        return 1;
     }
 
     // Adresse zurückgeben
     *res = (uint32_t) address_int;
     free(address_string);
-    return OK;
+    return 0;
 
 }
 
-RetCode getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
+int getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
+
 
     // Wenn im Lesemodus, muss leeres Argument
     if (mode == OK_READ) {
@@ -322,29 +319,29 @@ RetCode getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
 
         if (feof(file)) {
             // PARSE-FEHLER: VORZEITIGES DATEIENDE
-            (void) fprintf(stderr, ERR_FILE_PREMATURE_END_OF_FILE("write_data", line));
-            return ERR_EOF;
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_NL(line));
+            return 1;
         }
 
         if (current == ' ') {
             // PARSE-FEHLER: LEERZEICHEN NICHT ERLAUBT
             (void) fprintf(stderr, ERR_FILE_WHITE_SPACE(line));
-            return ERR_WHITESPACE;
+            return 1;
         }
 
         if (current == ',') {
             // PARSE-FEHLER: ZU VIELE ARGUMENTE
             (void) fprintf(stderr, ERR_FILE_TOO_MANY_ARGS(line));
-            return ERR_TOOMANY;
+            return 1;
         }
 
         if (current != '\n') {
             // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
             (void) fprintf(stderr, ERR_FILE_INVALID_ARG_DATA_READ(line));
-            return ERR_TOOMANY;
+            return 1;
         }
 
-        return OK;
+        return 0;
 
     }
 
@@ -356,7 +353,7 @@ RetCode getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
         // SPEICHER-FEHLER
         free(data_string);
         (void) fprintf(stderr, ERR_GENERAL_MEMORY_ALLOCATION_ERROR);
-        return ERR_ALLOC;
+        return 1;
     }
 
     // Einlesen bis ',' '\n' oder 11 Zeichen
@@ -368,29 +365,29 @@ RetCode getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
         if (feof(file)) {
             // PARSE-FEHLER: VORZEITIGES DATEIENDE
             free(data_string);
-            (void) fprintf(stderr, ERR_FILE_PREMATURE_END_OF_FILE("write_data", line));
-            return ERR_EOF;
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_NL(line));
+            return 1;
         }
 
         if (current == ' ') {
             // PARSE-FEHLER: LEERZEICHEN NICHT ERLAUBT
             free(data_string);
             (void) fprintf(stderr, ERR_FILE_WHITE_SPACE(line));
-            return ERR_WHITESPACE;
+            return 1;
         }
 
         if (current == ',') {
             // PARSE-FEHLER: ZU VIELE ARGUMENTE
             free(data_string);
             (void) fprintf(stderr, ERR_FILE_TOO_MANY_ARGS(line));
-            return ERR_TOOMANY;
+            return 1;
         }
 
         if (i == MAX_ARG_LENGTH - 1 && current != '\n') {
             // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
             free(data_string);
             (void) fprintf(stderr, ERR_FILE_INVALID_ARG_DATA_WRITE(line));
-            return ERR_INVARG;
+            return 1;
         }
 
         if (current == '\n') {
@@ -400,7 +397,7 @@ RetCode getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
                 // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
                 free(data_string);
                 (void) fprintf(stderr, ERR_FILE_INVALID_ARG_DATA_WRITE(line));
-                return ERR_INVARG;
+                return 1;
             }
 
             // Null-Byte anhängen
@@ -430,19 +427,19 @@ RetCode getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
         // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(data_string);
         (void) fprintf(stderr, ERR_FILE_INVALID_ARG_DATA_WRITE(line));
-        return ERR_INVARG;
+        return 1;
     }
 
     if (data_int > MAX_ARG_VALUE) {
         // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
         free(data_string);
         (void) fprintf(stderr, ERR_FILE_INVALID_ARG_DATA_WRITE(line));
-        return ERR_INVARG;
+        return 1;
     }
 
     // Adresse zurückgeben
     *res = (uint32_t) data_int;
     free(data_string);
-    return OK;
+    return 0;
 
 }
