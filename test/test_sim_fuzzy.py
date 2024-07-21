@@ -22,7 +22,7 @@ def generate_valid_requests():
         mode = random.choice(command_options)
         if mode == 'r' or mode == 'R':
             addr = random_value()
-            requests.append([mode, addr])
+            requests.append([mode, addr, ""])
         else:
             addr = random_value()
             data = random_value()
