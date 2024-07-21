@@ -227,10 +227,17 @@ int getAddressArg(FILE *file, uint32_t *res, size_t line) {
 
         int current = getNextChar(file);
 
-        if (feof(file)) {
+        if (feof(file) && i == 0) {
             // Fehler beim Parsen: Vorzeitiges Ende der Datei
             free(address_string);
             (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_ARG("address", line));
+            return 1;
+        }
+
+        if (feof(file)) {
+            // Fehler beim Parsen: Vorzeitiges Ende der Datei
+            free(address_string);
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_ARG("write_data", line));
             return 1;
         }
 
@@ -241,10 +248,17 @@ int getAddressArg(FILE *file, uint32_t *res, size_t line) {
             return 1;
         }
 
-        if (current == '\n') {
+        if (current == '\n' && i == 0) {
             // Fehler beim Parsen: Vorzeitiges Ende der Zeile
             free(address_string);
             (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE("address", line));
+            return 1;
+        }
+
+        if (current == '\n') {
+            // Fehler beim Parsen: Vorzeitiges Ende der Zeile
+            free(address_string);
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_LINE("write_data", line));
             return 1;
         }
 
@@ -361,6 +375,13 @@ int getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
     for (int i = 0; i < MAX_ARG_LENGTH; i++) {
 
         int current = getNextChar(file);
+
+        if (feof(file) && i == 0) {
+            // Fehler beim Parsen: Vorzeitiges Ende der Datei
+            free(data_string);
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_EOF_ARG("write_data", line));
+            return 1;
+        }
 
         if (feof(file)) {
             // Fehler beim Parsen: Vorzeitiges Ende der Datei
