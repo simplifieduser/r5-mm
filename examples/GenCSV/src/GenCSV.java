@@ -18,7 +18,7 @@ public class GenCSV {
             FileWriter bestcaseWriter = new FileWriter("../../optimaler_Fall.csv");
             StringBuilder string_best_case = new StringBuilder();
             for (int i = 0; i < numberOfElements; i++) {
-                string_best_case.append("R,0x").append(Integer.toHexString(4 * i)).append("\n");
+                string_best_case.append("R,0x").append(Integer.toHexString(4 * i)).append(",\n");
             }
             bestcaseWriter.write(string_best_case.toString());
             bestcaseWriter.close();
@@ -27,15 +27,15 @@ public class GenCSV {
             FileWriter worstcaseWriter = new FileWriter("../../schlechtester_Fall.csv");
             StringBuilder sbW = new StringBuilder();
             for (int i = 0; i < numberOfElements; i++) { // 1 Integer Pro 4KB page-> 102400 Seiten
-                sbW.append("R,0x").append(Integer.toHexString(blocksize * i)).append("\n");
+                sbW.append("R,0x").append(Integer.toHexString(blocksize * i)).append(",\n");
             }
             worstcaseWriter.write(sbW.toString());
             worstcaseWriter.close();
 
             // Durchschnittliche Fälle
-            durchschnittlicher("../../durchschnittlicher_guter_Fall.csv", 128, 128);
-            durchschnittlicher("../../durchschnittlicher_mittlerer_Fall.csv", 512, 32);
-            durchschnittlicher("../../durchschnittlicher_schlechter_Fall.csv", 1024, 16);
+            average("../../durchschnittlicher_guter_Fall.csv", 128, 128);
+            average("../../durchschnittlicher_mittlerer_Fall.csv", 512, 32);
+            average("../../durchschnittlicher_schlechter_Fall.csv", 1024, 16);
 
 
         } catch (IOException e) {
@@ -69,7 +69,7 @@ public class GenCSV {
 
                     eintraegeProSeite.put(page, eintraegeProSeite.getOrDefault(page, 0) + 1);
                     visited.add(address);
-                    sbA.append("R,0x").append(Integer.toHexString(address)).append("\n");
+                    sbA.append("R,0x").append(Integer.toHexString(address)).append(",\n");
                     n++;
                 } else {
                     break;
