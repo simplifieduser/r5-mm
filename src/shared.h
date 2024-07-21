@@ -77,7 +77,8 @@
 #define ERR_FILE_WHITE_SPACE(line) "Fehler: Request-Datei ungültig: Zeile %zu - Leerzeichen sind nicht erlaubt\n", line
 #define ERR_FILE_INVALID_ARG_RW(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'write_enable' muss einer der Werte [r,w,R,W] sein\n", line
 #define ERR_FILE_INVALID_ARG_ADDR(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'address' muss ein Integer im Interval [0; 4294967295] sein\n", line
-#define ERR_FILE_INVALID_ARG_DATA(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'write_data' muss ein Integer im Interval [0; 4294967295] sein\n", line
+#define ERR_FILE_INVALID_ARG_DATA_READ(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'write_data' muss leer sein bei einem Lesezugriff\n", line
+#define ERR_FILE_INVALID_ARG_DATA_WRITE(line) "Fehler: Request-Datei ungültig: Zeile %zu - 'write_data' muss ein Integer im Interval [0; 4294967295] sein\n", line
 
 #define ERR_FILE_TOO_MANY_ARGS(line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n", line
 
