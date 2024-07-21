@@ -18,7 +18,7 @@ enum RetCode {
 RetCode
 inputConversion(int *booleanValue, char errorMSG[], char inputString[], uint32_t lowerBound, uint32_t upperBound, uint32_t *value);
 
-// Umwandlung der tracefile eingabe
+// Umwandlung der tracefile Eingabe
 RetCode traceFileInput(char inputString[]);
 
 // Umwandlung des positional Arguments, der input Datei
@@ -42,11 +42,11 @@ const char *inputfile = NULL;
 int cycles_bool = 0, tlbSize_bool = 0, tlbLatency_bool = 0, blocksize_bool = 0, v2bBlockOffset_bool = 0, memoryLatency_bool = 0, tracefile_bool = 0, quickStart_bool = 0;
 
 /*
- * die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da diese nur für die Simulation relevant sind und bei einem echten TLB nicht existieren
+ * Die Werte von v2bBlockOffset und cycles wurden beliebig gewählt, da diese nur für die Simulation relevant sind und bei einem echten TLB nicht existieren
  * alle anderen Werte stammen von: Patterson, D. A., Hennessy, J. L. (2009). Computer Organization and Design: The Hardware/Software Interface. (4th ed.). Morgan Kaufman. Seite 503(ff.).
 */
 int main(int argc, char *argv[]) {
-    // vgl. getopt_long man getopt_long, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
+    // Vgl. getopt_long man getopt_long, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
     static struct option long_options[] = {
             {"help",             no_argument, 0, 'h'},
             {"tf",               required_argument, 0, 'f'},
@@ -65,10 +65,10 @@ int main(int argc, char *argv[]) {
     // Einlesen der Optionen/Argumente
     while (1) {
 
-        // nächste Option, erstes ':' ermöglicht präzisere Fehlermeldung
+        // Nächste Option, erstes ':' ermöglicht präzisere Fehlermeldung
         opt = getopt_long(argc, argv, ":hqf:c:b:o:s:t:m:", long_options, NULL);
 
-        // keine weiteren Optionen
+        // Keine weiteren Optionen
         if (opt == -1) break;
 
         // -h / --help
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        //Fehler: unbekannte Option übergeben
+        // Fehler: unbekannte Option übergeben
         if (opt == '?') {
             (void) fprintf(stderr, ERR_UNKNOWN_OPTION);
             return EXIT_FAILURE;
@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
                 break;
             }
 
-            //memory-latency -m / --memory-latency
+            // memory-latency -m / --memory-latency
             case 'm': {
                 if (inputConversion(&memoryLatency_bool, memory_latency_str, optarg, 0, UINT32_MAX, &memoryLatency) ==
                     ERR)
@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // einlesen der Eingabe als positional Argument
+    // Einlesen der Eingabe als positional Argument
     if (positionalArgument(argv, argc, optind) == ERR) return EXIT_FAILURE;
 
     // Lese Requests aus Datei
@@ -172,6 +172,7 @@ int main(int argc, char *argv[]) {
     int status = parseFile(inputfile, &requestCount, &requests);
 
     if (status < 0) {
+        free(requests);
         return EXIT_FAILURE;
     }
 
@@ -251,7 +252,7 @@ inputConversion(int *booleanValue, char errorMSG[], char inputString[], uint32_t
     // Überprüfen, ob Option schon vorher gesetzt wird
     if (alreadySetCheck(booleanValue, errorMSG) == ERR) return ERR;
 
-    // vgl. man strtol, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
+    // Vgl. man strtol, Grundlagenpraktikum Rechnerarchitektur SS24, Aufgabe: Nutzereingaben
     char *endptr = NULL;
     errno = 0;
     uint32_t tmp;
@@ -270,7 +271,7 @@ inputConversion(int *booleanValue, char errorMSG[], char inputString[], uint32_t
     }
 
     // Nicht im Wertebereich
-    // edge case: es war möglich eine sehr große negative Zahl zu übergeben, die strtol durch das zweierkomplement zu einer positiven umgewandelt hat, die dann im Wertebereich lag.
+    // Edge case: es war möglich eine sehr große negative Zahl zu übergeben, die strtol durch das zweierkomplement zu einer positiven umgewandelt hat, die dann im Wertebereich lag.
     // Die Überprüfung auf negatives Vorzeichen behebt dies
     if (inputString[0] == '-' || tmp < lowerBound || tmp > upperBound) {
         (void) fprintf(stderr, ERR_ILLEGAL_ARGUMENT(errorMSG, lowerBound, upperBound));
@@ -291,7 +292,7 @@ RetCode traceFileInput(char inputString[]) {
     }
 
     // Erstellen der Datei, zur Überprüfung möglicher unzulässiger Dateinamen mit angehängtem '.vcd'
-    // vgl.: https://stackoverflow.com/questions/11836064/c-creating-new-file-extensions-based-on-a-filename
+    // Vgl.: https://stackoverflow.com/questions/11836064/c-creating-new-file-extensions-based-on-a-filename
     FILE *file = NULL;
     tracefile = optarg;
     char tracefile_tmp[strlen(optarg) + 5];
@@ -314,7 +315,7 @@ RetCode traceFileInput(char inputString[]) {
     return OK;
 }
 
-// vgl. https://stackoverflow.com/questions/18079340/using-getopt-in-c-with-non-option-arguments
+// Vgl. https://stackoverflow.com/questions/18079340/using-getopt-in-c-with-non-option-arguments
 RetCode positionalArgument(char *argv[], int argc, int pos) {
     if (quickStart_bool == 0) {
         if (pos == argc) {

@@ -30,7 +30,7 @@ def generate_valid_requests():
         mode = random.choice(command_options)
         if mode == 'r' or mode == 'R':
             addr = random_value()
-            requests.append([mode, addr])
+            requests.append([mode, addr, ""])
         else:
             addr = random_value()
             data = random_value()
@@ -51,7 +51,7 @@ def generate_invalid_requests():
         mode = random.choice(command_options)
         if mode == 'r' or mode == 'R':
             addr = random_value()
-            requests.append([mode, addr])
+            requests.append([mode, addr, ""])
         else:
             addr = random_value()
             data = random_value()
@@ -62,7 +62,7 @@ def generate_invalid_requests():
     mode = random.choice(command_options)
     if mode in ['r', 'R']:
         addr = random_value(False)
-        requests.append([mode, addr])
+        requests.append([mode, addr, ""])
     elif mode in ['w', 'W']:
         choice = random.choice([True, False])
         addr = random_value(choice)

@@ -52,7 +52,7 @@ SC_MODULE(REQUEST_PROCESSOR)
         data_manager.out_data.bind(out_data);
         data_manager.finished.bind(manage_data_finished);
 
-        // Erstmal soll kein Modul etwas machen; beide startsignale auf false setzen
+        // Erstmal soll kein Modul etwas machen; beide Startsignale auf false setzen
         start_request.write(false);
         notify_memory.write(false);
 
