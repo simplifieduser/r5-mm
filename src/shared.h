@@ -62,7 +62,8 @@
 "   -h, --help                 ---------------------------  ---------------------   Gibt diese Nachricht aus\n" \
 "   -q, --quickStart           ---------------------------  ---------------------   Setzt und überschreibt alle Parameter wie aus der folgenden beispiel Eingabe\n" \
 "\n" \
-"Eine mögliche valide Eingabe wäre: ./r5mm -c 2000 --blocksize 16 --tlb-size=16 -t 2 --tf tracefile examples/kurze_Eingabedatei_valid.csv\n" \
+"Eine mögliche valide Eingabe wäre: ./r5mm -c 2000 --blocksize 16 --tlb-size=16 -t 2 --tf tracefile examples/kurze_Eingabedatei_valid.csv\n"                                           \
+"Weitere Beispiele für gültige Request-Dateien können in dem Verzeichnis 'examples' gefunden werden\n" \
 "\n" \
 "Dieses Programm ist die Projektabgabe für das Fach 'Grundlagenpraktikum: Rechnerarchitektur', Projektaufgabe A14\n" \
 "Gruppe 151, Elena Reinbold Fraire, Jonah Zabel, Lukas Wolf\n" \
