@@ -206,11 +206,12 @@ int parseFile(const char *path, size_t *requestCount, Request **requests) {
     // Etwas ist fehlgeschlagen
     free(address);
     free(data);
+
     if (fclose(file) != 0) {
         // IO-FEHLER
         (void) fprintf(stderr, ERR_GENERAL_UNKNOWN);
-        return -1;
     }
+
     return -1;
 
 }
