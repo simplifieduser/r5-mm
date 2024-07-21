@@ -26,7 +26,7 @@ RetCode getRWArg(FILE *file);
 
 RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode);
 
-RetCode getDataArg(FILE *file, uint32_t *res);
+RetCode getDataArg(FILE *file, uint32_t *res, RetCode mode);
 
 int CORRECTED_CARR_RET = 0;  // Wird verwendet, um Korrektur von '\r' zu '\n' zu speichern
 
@@ -153,7 +153,7 @@ int parseFile(const char *path, size_t *requestCount, Request **requests) {
 
         if (mode != OK_READ && mode != OK_WRITE) {
             // PARSE-FEHLER
-            printError(mode, WRITE_ENABLE, "", i + 1);
+            printError(mode, WRITE_ENABLE, "address", i + 1);
             break;
         }
 
@@ -161,18 +161,16 @@ int parseFile(const char *path, size_t *requestCount, Request **requests) {
         int addressStatus = getAddressArg(file, address, mode);
         if (addressStatus != OK) {
             // PARSE-FEHLER
-            printError(addressStatus, ADDRESS, "", i + 1);
+            printError(addressStatus, ADDRESS, "write_data", i + 1);
             break;
         }
 
-        // Daten-Argument - wenn Schreibzugriff aktiviert
-        if (mode == OK_WRITE) {
-            int dataStatus = getDataArg(file, data);
-            if (dataStatus != OK) {
-                // PARSE-FEHLER
-                printError(dataStatus, WRITE_DATA, "", i + 1);
-                break;
-            }
+        // Daten-Argument
+        int dataStatus = getDataArg(file, data, mode);
+        if (dataStatus != OK) {
+            // PARSE-FEHLER
+            printError(dataStatus, WRITE_DATA, "", i + 1);
+            break;
         }
 
         // Speicher für neue Request zuweisen und zum Array hinzufügen
@@ -291,28 +289,12 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode) {
         }
 
         if (current == ' ') {
+            // PARSE-FEHLER: LEERZEICHEN NICHT ERLAUBT
             free(address_string);
             return ERR_WHITESPACE;
         }
 
-        // Wenn neue Zeile im Lesemodus → gültig
-        if (current == '\n' && mode == OK_READ) {
-
-            // wenn leeres Argument
-            if (i == 0) {
-                // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
-                free(address_string);
-                return ERR_INVARG;
-            }
-
-            // Null-Byte anhängen
-            address_string[i] = 0;
-            break;
-
-        }
-
-        // Wenn neue Zeile im Schreibmodus → ungültig
-        if (current == '\n' && mode == OK_WRITE) {
+        if (current == '\n') {
             // PARSE-FEHLER: VORZEITIGER NEUE ZEILE
             free(address_string);
             return ERR_NEWLINE;
@@ -320,7 +302,6 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode) {
 
         if (i >= MAX_ARG_LENGTH - 1 && current != ',') {
             // PARSE-FEHLER: UNGÜLTIGES ARGUMENT
-            printf("TEST 2");
             free(address_string);
             return ERR_INVARG;
         }
@@ -376,7 +357,29 @@ RetCode getAddressArg(FILE *file, uint32_t *res, RetCode mode) {
 
 }
 
-RetCode getDataArg(FILE *file, uint32_t *res) {
+RetCode getDataArg(FILE *file, uint32_t *res, RetCode mode) {
+
+    // Wenn im Lesemodus, muss leeres Argument
+    if (mode == OK_READ) {
+
+        int current = getNextChar(file);
+
+        if (feof(file)) {
+            // PARSE-FEHLER: VORZEITIGES DATEIENDE
+            return ERR_EOF;
+        }
+
+        if (current == ' ') {
+            return ERR_WHITESPACE;
+        }
+
+        if (current != '\n') {
+            return ERR_TOOMANY;
+        }
+
+        return OK;
+
+    }
 
     // Initialisiere array fürs lesen
 
@@ -401,6 +404,7 @@ RetCode getDataArg(FILE *file, uint32_t *res) {
         }
 
         if (current == ' ') {
+            // PARSE-FEHLER: LEERZEICHEN NICHT ERLAUBT
             free(data_string);
             return ERR_WHITESPACE;
         }
