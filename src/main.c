@@ -172,6 +172,7 @@ int main(int argc, char *argv[]) {
     int status = parseFile(inputfile, &requestCount, &requests);
 
     if (status < 0) {
+        free(requests);
         return EXIT_FAILURE;
     }
 
