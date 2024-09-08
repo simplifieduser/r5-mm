@@ -87,7 +87,7 @@
 #define ERR_FILE_INVALID_ARG_DATA_READ(line) "Fehler: Request-Datei ungültig: 'write_data' muss leer sein bei einem Lesezugriff (Zeile %zu)\n%s", line, MSG_HINT_FILE
 #define ERR_FILE_INVALID_ARG_DATA_WRITE(line) "Fehler: Request-Datei ungültig: 'write_data' muss ein Integer im Interval [0; 4294967295] sein (Zeile %zu)\n%s", line, MSG_HINT_FILE
 
-#define ERR_FILE_TOO_MANY_ARGS(line) "Fehler: Request-Datei ungültig: Zeile %zu - Erwartet wurde neue Request, jedoch weiteres Argument gefunden\n%s", line, MSG_HINT_FILE
+#define ERR_FILE_TOO_MANY_ARGS(line) "Fehler: Request-Datei ungültig: Erwartet wurde neue Zeile, jedoch weiteres Argument gefunden (Zeile %zu)\n%s", line, MSG_HINT_FILE
 
 
 //                //

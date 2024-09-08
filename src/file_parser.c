@@ -403,6 +403,13 @@ int getDataArg(FILE *file, uint32_t *res, RetCode mode, size_t line) {
             return 1;
         }
 
+        if (current == ',' && i == 0) {
+            // Fehler beim Parsen: Zu viele Argumente
+            free(data_string);
+            (void) fprintf(stderr, ERR_FILE_PREMATURE_NEW_ARG("write_data", line));
+            return 1;
+        }
+
         if (current == ',') {
             // Fehler beim Parsen: Zu viele Argumente
             free(data_string);
